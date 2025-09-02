@@ -66,63 +66,65 @@ subgraph "Response Flow" {
 
 FastAPI includes several useful middleware classes that you can add to your application using `app.add_middleware()`. These are direct re-exports from Starlette.
 
-<x-cards data-columns="2">
-  <x-card data-title="HTTPSRedirectMiddleware" data-icon="lucide:lock">
-    Enforces that all incoming requests must use `https` or `wss`. It redirects any `http` or `ws` requests to their secure counterparts.
-    ```python
-    from fastapi import FastAPI
-    from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+### HTTPSRedirectMiddleware
 
-    app = FastAPI()
+This middleware enforces that all incoming requests must use `https` or `wss`. It redirects any `http` or `ws` requests to their secure counterparts.
 
-    app.add_middleware(HTTPSRedirectMiddleware)
+```python
+from fastapi import FastAPI
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
+app = FastAPI()
 
-    @app.get("/")
-    async def main():
-        return {"message": "Hello World"}
-    ```
-  </x-card>
-  <x-card data-title="TrustedHostMiddleware" data-icon="lucide:shield-check">
-    Protects against HTTP Host header attacks by ensuring the `Host` header of incoming requests is within a list of allowed hosts.
-    ```python
-    from fastapi import FastAPI
-    from fastapi.middleware.trustedhost import TrustedHostMiddleware
-
-    app = FastAPI()
-
-    app.add_middleware(
-        TrustedHostMiddleware, allowed_hosts=["example.com", "*.example.com"]
-    )
+app.add_middleware(HTTPSRedirectMiddleware)
 
 
-    @app.get("/")
-    async def main():
-        return {"message": "Hello World"}
-    ```
-  </x-card>
-  <x-card data-title="GZipMiddleware" data-icon="lucide:file-archive">
-    Compresses responses for any request that includes `"gzip"` in the `Accept-Encoding` header. This can reduce bandwidth usage.
-    ```python
-    from fastapi import FastAPI
-    from fastapi.middleware.gzip import GZipMiddleware
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
 
-    app = FastAPI()
+### TrustedHostMiddleware
 
-    app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+This middleware protects against HTTP Host header attacks by ensuring the `Host` header of incoming requests is within a list of allowed hosts. It validates the `Host` header against a list of allowed hosts to prevent these attacks.
+
+```python
+from fastapi import FastAPI
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=["example.com", "*.example.com"]
+)
 
 
-    @app.get("/")
-    async def main():
-        return "somebigcontent"
-    ```
-    - `minimum_size`: Only compresses responses larger than this value in bytes.
-    - `compresslevel`: Sets the gzip compression level (1-9).
-  </x-card>
-  <x-card data-title="CORSMiddleware" data-icon="lucide:globe">
-    Handles Cross-Origin Resource Sharing (CORS). It allows you to define which origins, methods, and headers are permissible for cross-domain requests, which is essential for building web applications that interact with your API from a different domain. You can import it from `fastapi.middleware.cors`.
-  </x-card>
-</x-cards>
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+### GZipMiddleware
+
+This middleware compresses responses for any request that includes "gzip" in the `Accept-Encoding` header, which can reduce bandwidth usage. You can configure it with a `minimum_size` in bytes to avoid compressing very small responses and a `compresslevel` from 1 to 9.
+
+```python
+from fastapi import FastAPI
+from fastapi.middleware.gzip import GZipMiddleware
+
+app = FastAPI()
+
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
+
+
+@app.get("/")
+async def main():
+    return "somebigcontent"
+```
+
+### CORSMiddleware
+
+This middleware handles Cross-Origin Resource Sharing (CORS), which is essential for building web applications that interact with your API from a different domain. You can import it from `fastapi.middleware.cors` and configure it to specify allowed origins, methods, and headers.
 
 By leveraging middleware, you can keep your path operation logic clean and focused on business functionality while handling common tasks in a reusable and efficient manner.
 

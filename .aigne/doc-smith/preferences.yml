@@ -1,4 +1,12 @@
 rules:
+  - id: pref_de1aa612a4ab143f
+    active: true
+    scope: document
+    rule: 在描述内置中间件时，应避免使用自定义组件。
+    feedback: 文档关于内置中间件的描述，不要使用自定义组件
+    createdAt: 2025-09-02T08:16:11.242Z
+    paths:
+      - /advanced/middleware
   - id: pref_47d97ca3e3a64436
     active: true
     scope: document
