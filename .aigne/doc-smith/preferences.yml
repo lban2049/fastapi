@@ -1,0 +1,7 @@
+rules:
+  - id: pref_47d97ca3e3a64436
+    active: true
+    scope: document
+    rule: 自定义组件 <x-card> 内部只能使用普通字符，不可以使用 markdown 或代码块。
+    feedback: 自定义组件 <x-card> 中不可以使用 markdown、代码块，只能使用普通字符
+    createdAt: 2025-09-02T07:49:32.522Z
