@@ -1,40 +1,46 @@
-# 安全性
+# 安全
 
-实现身份认证和授权是大多数 Web API 的关键组成部分。FastAPI 提供了多种工具，可以轻松地通过 OAuth2、HTTP Basic/Bearer/Digest Auth 和 API 密钥等标准协议来处理安全性。
+实现安全是任何 API 的一个关键方面。FastAPI 提供了一套与标准安全协议集成的工具和依赖项，可以轻松地为您的应用程序添加强大的身份验证和授权功能。这是通过 FastAPI 强大的依赖注入系统来处理的。
 
-本指南将通过实际的分步示例，引导你完成这些安全方案的实现。
+本指南涵盖了多种常见的安全方案，包括使用 JWT 令牌的 OAuth2、HTTP 基本身份验证和 API 密钥。
 
-## 认证流程概述
+## 安全流程概述
 
-大多数基于令牌的安全流程都遵循类似的模式：客户端使用凭据（如用户名和密码）进行一次性认证以获取令牌，然后在所有后续请求中使用该令牌。
-
-下面是一个说明常见 OAuth2 登录和请求流程的图表：
+一个典型的身份验证流程，例如使用不记名令牌的 OAuth2，涉及客户端首先使用凭据进行身份验证以获取令牌，然后使用该令牌访问受保护的资源。
 
 ```d2
-shape: sequence_diagram
+direction: down
 
-Client: 客户端应用程序
-API: FastAPI 服务器
+"User": { shape: person }
+"API Server": {
+  shape: package
+  grid-columns: 1
+  "/token": {label: "令牌端点"}
+  "/users/me": {label: "受保护的端点"}
+}
 
-Client->API: 1. 使用用户名和密码请求 /token
-API->API: 2. 验证凭据并生成 JWT 令牌
-API->Client: 3. 返回访问令牌
+"User" -> "API Server"."/token": "1. 使用凭据进行身份验证" {
+  label: "POST /token\n(username, password)"
+}
+"API Server"."/token" -> "User": "2. 接收访问令牌 (JWT)"
 
-Client->API: 4. 使用 'Authorization: Bearer <token>' 请求 /users/me
-API->API: 5. 解码并验证 JWT 令牌，识别用户
-API->Client: 6. 返回用户数据
+"User" -> "API Server"."/users/me": "3. 使用令牌请求受保护的数据" {
+  label: "GET /users/me\n(Authorization: Bearer <token>)"
+}
+"API Server"."/users/me" -> "User": "4. 接收受保护的数据"
 ```
 
 ## 使用密码和不记名令牌的 OAuth2
 
-OAuth2 是一种用于授权的标准协议。“密码流”是一种常见的模式，用户通过它直接向你的应用程序提供凭据，然后应用程序用这些凭据换取不记名令牌。
+OAuth2 是一种广泛使用的授权协议。“密码”流是用户直接提供凭据以换取访问令牌的常用方式。然后，该令牌作为“不记名”令牌在 `Authorization` 标头中发送，用于后续请求。
 
-### 第一步
+### 第一步：创建安全方案
 
-首先，你需要一个 `OAuth2PasswordBearer` 的实例。这个类是一个依赖项，它提供一个 `tokenUrl`。客户端将向此 URL 发送用户名和密码以获取令牌。
+首先，您需要一个 `OAuth2PasswordBearer` 的实例。该对象是一个依赖项，它将在 `Authorization` 标头中要求一个不记名令牌。
+
+`tokenUrl` 参数指向客户端将用于获取令牌的 URL（我们稍后将创建它）。
 
 ```python
-# 来源：docs_src/security/tutorial001.py
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordBearer
 
@@ -48,21 +54,15 @@ async def read_items(token: str = Depends(oauth2_scheme)):
     return {"token": token}
 ```
 
-在此示例中，`Depends(oauth2_scheme)` 声明 `/items/` 端点依赖于 OAuth2 方案。FastAPI 会知道它需要查找带有不记名令牌的 `Authorization` 请求头，并将该令牌作为 `token` 参数提供给你的函数。
-
-如果你打开位于 `/docs` 的交互式文档，你会看到一个“Authorize”按钮。点击它后，会弹出一个窗口让你输入用户名和密码。但是，我们还没有创建 `/token` 端点，所以这还无法正常工作。这里的关键在于，该依赖项已经与你的 API 文档集成在一起了。
+这样，`/items/` 端点将需要一个 `Authorization` 标头，其值类似于 `Bearer your-token-here`。该依赖项将以 `str` 形式返回令牌。
 
 ### 获取当前用户
 
-仅仅获取令牌字符串并没有太大用处。你需要使用该令牌来识别发出请求的用户。我们可以创建一个依赖项 `get_current_user` 来处理此事。
+仅仅拥有令牌字符串是不够的；您需要验证它并获取相应的用户数据。您可以创建第二个依赖项 `get_current_user`，它依赖于 `oauth2_scheme`。
 
-该依赖项将：
-1.  从 `oauth2_scheme` 依赖项中获取令牌。
-2.  解码令牌以获取用户信息。
-3.  返回用户对象。
+这个新的依赖项将接收令牌，对其进行解码，并返回用户的数据。
 
 ```python
-# 来源：docs_src/security/tutorial002.py
 from typing import Union
 
 from fastapi import Depends, FastAPI
@@ -97,69 +97,23 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 ```
 
-现在，`read_users_me` 路径操作依赖于 `get_current_user`。当请求到达时，FastAPI 会调用 `get_current_user`，而后者又会从 `oauth2_scheme` 获取令牌。然后，用户信息就可以通过 `current_user` 参数获取。
+现在，`read_users_me` 路径操作依赖于 `get_current_user`。FastAPI 将按顺序调用依赖项：首先是 `oauth2_scheme`，然后是使用其结果调用 `get_current_user`。最终结果是一个 `User` 对象。
 
-### 密码流和令牌端点
+### 令牌端点
 
-现在我们来实现 `/token` 端点。该端点将以表单数据的形式接收用户名和密码，进行验证，然后返回一个访问令牌。
+接下来，您需要创建 `/token` 路径操作，以便客户端可以发送用户名和密码来获取令牌。
 
-FastAPI 提供了 `OAuth2PasswordRequestForm` 依赖项来处理接收表单数据。
-
-我们还添加了一个依赖项 `get_current_active_user`，它建立在 `get_current_user` 的基础上，用于检查用户是否处于活动状态。
+FastAPI 提供了 `OAuth2PasswordRequestForm` 来处理传入的表单数据。
 
 ```python
-# 来源：docs_src/security/tutorial003.py
-from typing import Union
-
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordRequestForm
 
-# --- 这是一个简化示例。为简洁起见，模型和伪数据库未完全显示 --- 
-# 有关 fake_users_db、User、UserInDB 等的详细信息，请参阅完整的源文件。
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-}
-
-class User(BaseModel):
-    username: str
-    email: Union[str, None] = None
-    full_name: Union[str, None] = None
-    disabled: Union[bool, None] = None
-
-class UserInDB(User):
-    hashed_password: str
-
-def fake_hash_password(password: str):
-    return "fakehashed" + password
+# ... (来自先前示例的用户模型和 fake_users_db)
 
 app = FastAPI()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# ... (get_user 和 fake_decode_token 函数) ...
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    # 在实际应用中，这里会解码令牌并获取用户
-    user_dict = fake_users_db.get(token)
-    if not user_dict:
-         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return UserInDB(**user_dict)
-
-async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+# ... (get_current_user 等)
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -167,31 +121,31 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user_dict:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     user = UserInDB(**user_dict)
-    hashed_password = fake_hash_password(form_data.password)
-    if not hashed_password == user.hashed_password:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-
+    # 目前，我们不检查密码，只检查用户名
+    # 令牌也只是用户名
     return {"access_token": user.username, "token_type": "bearer"}
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
+async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
 ```
 
-`/token` 端点会验证用户名和密码。如果正确，它会返回一个包含 `access_token` 和 `token_type` 的 JSON 对象。在此示例中，我们仅使用用户名作为令牌，这并不安全。下一步将解决此问题。
+此端点从一个伪数据库中验证用户，并返回一个包含 `access_token` 和 `token_type` 的对象。
 
 ### 使用 JWT 作为令牌
 
-我们不应该直接返回用户名作为令牌，而是应该使用像 JSON Web Tokens (JWT) 这样的标准。JWT 包含经过签名的数据，其完整性可以被验证。
+在实际应用程序中，您应该使用像 JSON Web Tokens (JWT) 这样的加密签名令牌，而不是简单的字符串。这可以确保令牌数据未被篡改。
 
-这包括：
-1.  **密码哈希**：使用像 `passlib` 这样的库来安全地哈希和验证密码。
-2.  **JWT 创建**：创建一个包含用户标识符（`sub` 声明）和过期时间（`exp`）的 JWT。
-3.  **JWT 解码**：在 `get_current_user` 依赖项中，从 `Authorization` 请求头解码 JWT 以获取用户身份。
+您需要安装 `passlib` 用于密码哈希，以及 `python-jwt` 用于创建和验证 JWT。
+
+```bash
+pip install "passlib[bcrypt]" python-jwt
+```
+
+以下是一个包含密码哈希和 JWT 创建的更完整的示例：
 
 ```python
-# 来源：docs_src/security/tutorial004.py
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
@@ -202,12 +156,12 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-# --- 常量 ---
-SECRET_KEY = "一个非常机密的密钥，应放在环境变量中"
+# --- 配置 ---
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# --- Pydantic 模型 ---
+# --- 模型 ---
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -215,13 +169,13 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Union[str, None] = None
 
-# ... (User 和 UserInDB 模型) ...
+# ... (User, UserInDB 模型)
 
-# --- 安全工具 ---
+# --- 哈希与数据库 ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-app = FastAPI()
+# ... (包含哈希密码的 fake_users_db, verify_password, get_user)
 
+# --- JWT 创建 ---
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode = data.copy()
     if expires_delta:
@@ -232,6 +186,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+# --- 获取当前用户的依赖项 ---
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -246,16 +201,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    # 在实际应用中，你会从数据库中获取用户
     user = get_user(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user
 
-# --- 路径操作 ---
-@app.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    # 在实际应用中，authenticate_user 会将密码与数据库中哈希过的密码进行比对
+# --- 令牌端点 ---
+@app.post("/token", response_model=Token)
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+):
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -267,71 +222,82 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    return {"access_token": access_token, "token_type": "bearer"}
 
-# ... (其他端点：/users/me/、/users/me/items/) ...
+# --- 受保护的端点 ---
+@app.get("/users/me/", response_model=User)
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
+    return current_user
 ```
 
-现在，`/token` 端点会返回一个真正的 JWT，而我们的 `get_current_user` 依赖项可以安全地验证它并提取用户信息。
+此实现正确地验证了用户，生成了一个安全的 JWT，并在受保护的端点上对其进行验证。
 
 ### 用于授权的 OAuth2 范围
 
-身份认证用于识别用户，而授权则决定用户可以做什么。OAuth2 使用“范围（scopes）”来实现这一目的。
+范围（Scopes）用于向客户端授予特定权限。您可以在 `OAuth2PasswordBearer` 中定义可用的范围，然后使用 `Security` 依赖项为某些端点要求特定的范围。
 
-你可以使用 `Security` 依赖项为路径操作要求特定的范围。
+1.  **定义范围：**
+
+    ```python
+    oauth2_scheme = OAuth2PasswordBearer(
+        tokenUrl="token",
+        scopes={"me": "Read information about the current user.", "items": "Read items."},
+    )
+    ```
+
+2.  **在令牌端点中请求范围：** 客户端可以在 `/token` 请求中请求特定的范围。您应该将这些范围包含在 JWT 中。
+
+    ```python
+    # 在您的 /token 端点中
+    access_token = create_access_token(
+        data={"sub": user.username, "scope": " ".join(form_data.scopes)},
+        expires_delta=access_token_expires,
+    )
+    ```
+
+3.  **在依赖项中检查范围：** `get_current_user` 依赖项必须更新，以检查令牌是否包含正在访问的端点所需的范围。
+
+    ```python
+    from fastapi.security import SecurityScopes
+
+    async def get_current_user(
+        security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
+    ):
+        # ... (JWT 解码)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        scope_str: str = payload.get("scope", "")
+        token_scopes = scope_str.split(" ")
+        # ... (用户获取)
+        for scope in security_scopes.scopes:
+            if scope not in token_scopes:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Not enough permissions",
+                    # ...
+                )
+        return user
+    ```
+
+4.  **在路径操作中要求范围：** 使用 `Security` 而不是 `Depends` 来指定所需的范围。
+
+    ```python
+    from fastapi import Security
+
+    @app.get("/users/me/items/")
+    async def read_own_items(
+        current_user: User = Security(get_current_active_user, scopes=["items"]),
+    ):
+        return [{"item_id": "Foo", "owner": current_user.username}]
+    ```
+
+## HTTP 基本身份验证
+
+HTTP 基本身份验证是一种更简单的方案，其中用户名和密码包含在 `Authorization` 标头中，并经过 Base64 编码。虽然简单，但它只应在 HTTPS 上使用，因为凭据未加密。
+
+FastAPI 为此提供了 `HTTPBasic` 和 `HTTPBasicCredentials`。
 
 ```python
-# 来源：docs_src/security/tutorial005.py
-from fastapi import Security
-from fastapi.security import SecurityScopes
-
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="token",
-    scopes={"me": "Read information about the current user.", "items": "Read items."},
-)
-
-async def get_current_user(
-    security_scopes: SecurityScopes, token: str = Depends(oauth2_scheme)
-):
-    # ... (JWT 解码同前) ...
-    # 现在，检查令牌负载中的范围
-    token_data = # ... 解码令牌并获取范围
-    for scope in security_scopes.scopes:
-        if scope not in token_data.scopes:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Not enough permissions",
-                headers={"WWW-Authenticate": f'Bearer scope="{security_scopes.scope_str}"'},
-            )
-    return user
-
-async def get_current_active_user(
-    current_user: User = Security(get_current_user, scopes=["me"]),
-):
-    if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
-
-@app.get("/users/me/items/")
-async def read_own_items(
-    current_user: User = Security(get_current_active_user, scopes=["items"]),
-):
-    return [{"item_id": "Foo", "owner": current_user.username}]
-```
-
-在此示例中：
--   `OAuth2PasswordBearer` 通过一个包含可用范围的字典进行初始化。
--   `get_current_user` 依赖项现在接受一个 `SecurityScopes` 参数，并检查令牌是否包含所需的范围。
--   路径操作 `/users/me/items/` 通过使用 `Security(get_current_active_user, scopes=["items"])` 来要求 `items` 范围。
-
-## HTTP 基本认证
-
-HTTP 基本认证是一种更简单的方案，其中用户名和密码经过 Base64 编码后直接包含在 `Authorization` 请求头中。虽然它比 OAuth2 简单，但通常安全性较低，因为凭据会随着每个请求发送。
-
-FastAPI 提供了 `HTTPBasic` 安全方案。
-
-```python
-# 来源：docs_src/security/tutorial007.py
 import secrets
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -367,53 +333,89 @@ def read_current_user(username: str = Depends(get_current_username)):
     return {"username": username}
 ```
 
-在这里，`get_current_username` 依赖项使用 `HTTPBasic` 来提取凭据。为了防止时序攻击，使用 `secrets.compare_digest` 来比较凭据非常重要。
+此示例创建了一个依赖项 `get_current_username`，它接收凭据，使用 `secrets.compare_digest` 将它们与已知值进行比较以防止时序攻击，如果凭据不匹配则引发异常。
 
-## API 密钥
+## API 密钥身份验证
 
-API 密钥是验证服务器间请求或识别项目的一种常用方式。FastAPI 支持从请求头、查询参数或 cookie 中接收 API 密钥。
+API 密钥是向特定客户端或服务授予访问权限的常用方法。密钥是客户端在每个请求中发送的单个令牌。FastAPI 提供了从不同位置提取 API 密钥的帮助程序。
 
 <x-cards data-columns="3">
-  <x-card data-title="请求头中的 API 密钥" data-icon="lucide:arrow-right-from-line">
-    使用 APIKeyHeader 类从自定义请求头中提取密钥。这是一种常用且推荐的方法。
+  <x-card data-title="查询中的 API 密钥" data-icon="lucide:file-question">
+    API 密钥作为 URL 中的查询参数传递。
   </x-card>
-  <x-card data-title="查询参数中的 API 密钥" data-icon="lucide:at-sign">
-    使用 APIKeyQuery 类从 URL 查询参数中提取密钥。这对于简单的脚本或浏览器测试很有用。
+  <x-card data-title="标头中的 API 密钥" data-icon="lucide:file-terminal">
+    API 密钥在自定义 HTTP 标头中传递。
   </x-card>
   <x-card data-title="Cookie 中的 API 密钥" data-icon="lucide:cookie">
-    使用 APIKeyCookie 类从浏览器 cookie 中提取密钥。这通常用于管理 Web 会话。
+    API 密钥在请求 Cookie 中传递。
   </x-card>
 </x-cards>
 
-这些类都可作为依赖项来保护你的端点。你需要创建一个依赖函数，用它来根据数据库或机密列表验证收到的密钥，如此示例中使用 `APIKeyHeader` 一样：
+### 查询中的 API 密钥
+
+使用 `APIKeyQuery` 来期望在查询参数中获取 API 密钥。
 
 ```python
-from fastapi import Depends, FastAPI, HTTPException, Security
-from fastapi.security import APIKeyHeader
-
-API_KEY = "my-super-secret-api-key"
-API_KEY_NAME = "X-API-KEY"
-
-api_key_header_scheme = APIKeyHeader(name=API_KEY_NAME)
+from fastapi import Depends, FastAPI
+from fastapi.security import APIKeyQuery
 
 app = FastAPI()
 
-async def get_api_key(api_key_header: str = Security(api_key_header_scheme)):
-    if api_key_header == API_KEY:
-        return api_key_header
-    else:
-        raise HTTPException(
-            status_code=403,
-            detail="Could not validate credentials"
-        )
+api_key_query = APIKeyQuery(name="api-key", auto_error=False)
+
 
 @app.get("/items/")
-async def read_items(api_key: str = Depends(get_api_key)):
-    return [{"item": "Foo"}, {"item": "Bar"}]
+async def read_items(api_key: str = Depends(api_key_query)):
+    if api_key:
+        return {"api_key": api_key}
+    else:
+        return {"message": "No API Key provided."}
 ```
+
+### 标头中的 API 密钥
+
+使用 `APIKeyHeader` 来期望在自定义标头（例如，`X-API-Key`）中获取 API 密钥。
+
+```python
+from fastapi import Depends, FastAPI
+from fastapi.security import APIKeyHeader
+
+app = FastAPI()
+
+api_key_header = APIKeyHeader(name="X-API-Key")
+
+
+@app.get("/items/")
+async def read_items(api_key: str = Depends(api_key_header)):
+    return {"api_key": api_key}
+```
+
+### Cookie 中的 API 密钥
+
+使用 `APIKeyCookie` 来期望在 Cookie 中获取 API 密钥。
+
+```python
+from fastapi import Depends, FastAPI
+from fastapi.security import APIKeyCookie
+
+app = FastAPI()
+
+cookie_scheme = APIKeyCookie(name="session")
+
+
+@app.get("/items/")
+async def read_items(session: str = Depends(cookie_scheme)):
+    return {"session": session}
+```
+
+## 安全策略
+
+我们非常重视安全。我们鼓励您及时更新 FastAPI 版本，以受益于最新的功能、错误修复和安全修复。
+
+### 报告漏洞
+
+如果您认为自己发现了安全漏洞，请通过发送电子邮件至 **security@tiangolo.com** 私下报告。请提供尽可能详细的信息，包括重现问题的步骤。在找到解决方案之前，请不要公开讨论潜在的漏洞。
 
 ---
 
-本指南涵盖了 FastAPI 中可用的主要安全工具。现在你可以为你的应用程序实现强大的身份认证和授权。有关特定类及其参数的更多详细信息，请参阅 [安全工具 API 参考](./api-reference-security.md)。
-
-接下来，你可能想学习有关 [中间件](./advanced-middleware.md) 的知识，以便对每个传入的请求执行操作。
+借助这些工具，您可以在 FastAPI 应用程序中实现强大且标准的安全实践。有关安全实用程序的更多详细信息，您可以查阅 [API 参考](./api-reference-security.md)。要了解在请求到达您的路径操作之前如何处理请求，请参阅下一章关于 [中间件](./advanced-middleware.md) 的内容。

@@ -1,30 +1,14 @@
-# 更大的应用 - 多文件
+# 更大型的应用
 
-当应用规模变大时，将其拆分为多个文件有助于提高可维护性和组织性。FastAPI 的设计旨在使用 `APIRouter` 来支持这种做法。
+随着应用的增长，将其拆分成多个文件会很有益处。这有助于组织代码、提高可维护性，并允许不同团队成员同时处理 API 的不同部分。**FastAPI** 提供了一个名为 `APIRouter` 的强大工具，可以有效地组织应用结构。
 
-## 示例文件结构
+## `APIRouter`
 
-构建大型应用的一种常见方法是将路径操作分离到不同的模块中。您可以将相关的端点分组到一个 `routers` 目录中。
+`APIRouter` 就像一个迷你的 `FastAPI` 应用。你可以在其上声明*路径操作*，然后将其包含在主 `FastAPI` 应用中。这使你可以将相关的端点分组到不同的 Python 模块中。
 
-```text
-. / app /
-│
-├── __init__.py
-├── main.py
-├── dependencies.py
-└── routers /
-    ├── __init__.py
-    ├── items.py
-    └── users.py
-```
+### 一个简单的路由示例
 
-这种结构有助于分离关注点，例如，将所有与用户相关的端点放在 `users.py` 中，将与项目相关的端点放在 `items.py` 中。
-
-## 创建路由器
-
-您可以在每个模块中创建独立的 `APIRouter` 实例。`APIRouter` 的工作方式与 `FastAPI` 应用非常相似，允许您声明路径操作。
-
-以下是 `app/routers/users.py` 的示例：
+让我们从为用户相关的端点创建一个简单的路由开始。你可以将此代码放在类似 `app/routers/users.py` 的文件中。
 
 ```python
 from fastapi import APIRouter
@@ -47,7 +31,68 @@ async def read_user(username: str):
     return {"username": username}
 ```
 
-同样，`app/routers/items.py` 也定义了自己的路由器。您可以为路由器配置参数，这些参数将应用于其所有路径操作，例如 `prefix`、`tags`、`dependencies` 和默认 `responses`。
+在这里，我们创建了一个 `APIRouter` 实例，并使用与 `FastAPI` 实例相同的装饰器（`@router.get`、`@router.post` 等）向其添加*路径操作*。
+
+### 包含路由
+
+现在，你可以将此路由包含在主应用文件中，例如 `app/main.py`。
+
+```python
+from fastapi import FastAPI
+from .routers import items, users
+
+app = FastAPI()
+
+app.include_router(users.router)
+app.include_router(items.router)
+
+@app.get("/")
+async def root():
+    return {"message": "Hello Bigger Applications!"}
+```
+
+通过使用 `app.include_router(users.router)`，来自 `users.router` 的所有路由现在都成为主应用的一部分。最终的 API 将拥有像 `/users/` 和 `/users/me` 这样的路径。
+
+下图直观地展示了主应用如何包含不同的路由：
+
+```d2
+direction: down
+
+"app/main.py" {
+  shape: document
+  "FastAPI App" {
+    shape: rectangle
+  }
+  "app.include_router(users.router)" {}
+  "app.include_router(items.router)" {}
+  "app.include_router(admin.router)" {}
+}
+
+"app/routers/users.py" {
+  shape: document
+  "users_router = APIRouter()"
+}
+
+"app/routers/items.py" {
+  shape: document
+  "items_router = APIRouter()"
+}
+
+"app/internal/admin.py" {
+  shape: document
+  "admin_router = APIRouter()"
+}
+
+"app/main.py" -> "app/routers/users.py": "includes"
+"app/main.py" -> "app/routers/items.py": "includes"
+"app/main.py" -> "app/internal/admin.py": "includes"
+```
+
+## 路由参数：`prefix`、`tags`、`dependencies` 和 `responses`
+
+你可以为 `APIRouter` 配置参数，这些参数将应用于其所有的*路径操作*。这对于避免代码重复很有用。
+
+不妨看看 `app/routers/items.py` 中的另一个路由：
 
 ```python
 from fastapi import APIRouter, Depends, HTTPException
@@ -88,14 +133,22 @@ async def update_item(item_id: str):
             status_code=403, detail="You can only update the item: plumbus"
         )
     return {"item_id": item_id, "name": "The great Plumbus"}
-
 ```
 
-在这种情况下，`items.py` 中的所有路径操作的路径都将以 `/items` 开头，被标记为 `items`，并需要 `get_token_header` 依赖。
+让我们来分解 `APIRouter` 中使用的参数：
 
-## 主应用
+- **`prefix`**：此路由中所有路径的路径前缀。在这里，`"/items"` 意味着 `read_items` 的路径将是 `/items/`，而 `read_item` 的路径将是 `/items/{item_id}`。
+- **`tags`**：应用于所有路径操作的标签列表，用于在 API 文档中进行分组。
+- **`dependencies`**：将为此路由中所有路径操作执行的依赖项列表。
+- **`responses`**：应用于所有路径操作的附加响应字典。
 
-主应用文件 `app/main.py` 是您将所有内容整合在一起的地方。您可以从路由器模块中导入路由器对象，并将它们包含在主 `FastAPI` 应用中。
+请注意，你仍然可以基于单个操作覆盖这些设置。例如，`update_item` 操作添加了一个 `"custom"` 标签和一个特定的 `403` 响应。
+
+## 使用自定义参数包含路由
+
+你也可以在调用 `app.include_router()` 时提供这些参数。这对于为一组路由添加前缀，或为 API 中需要身份验证的部分应用依赖项非常有用。
+
+在 `app/main.py` 中，你可以使用特定设置包含另一个路由：
 
 ```python
 from fastapi import Depends, FastAPI
@@ -121,70 +174,10 @@ app.include_router(
 @app.get("/")
 async def root():
     return {"message": "Hello Bigger Applications!"}
-
 ```
 
-### 包含路由器
+在此示例中，来自 `admin.router` 的所有路由都将以 `/admin` 为前缀，标记为 `"admin"`，需要 `get_token_header` 依赖项，并在文档中定义一个额外的 `418` 响应。
 
-您可以使用 `app.include_router()` 来挂载路由器。此方法允许您添加路由器，并可以选择性地覆盖或增加其配置。
+通过使用 `APIRouter`，你可以有效地构建大型应用的结构，使代码保持井然有序、可重用且易于管理。
 
-对于 `admin.router`，我们添加了 `/admin` 前缀、一个 `admin` 标签、一个额外的依赖项和一个默认响应。这些参数会应用于 `admin.router` 中定义的所有路径操作，并叠加在路由器本身已配置的任何参数之上。
-
-这种结构使您的代码保持组织性和可扩展性。
-
-### 应用结构图
-
-下图说明了主应用如何包含不同的路由器，以及如何组合前缀以形成最终的 API 路径。
-
-```d2
-direction: down
-
-"FastAPI App (main.py)": {
-  shape: cloud
-
-  "app.include_router(users.router)": {}
-  "app.include_router(items.router)": {}
-  "app.include_router(admin.router, prefix='/admin')": {}
-}
-
-"users.router (APIRouter)": {
-  shape: package
-  "/users/": {}
-  "/users/me": {}
-}
-
-"items.router (APIRouter(prefix='/items'))": {
-  shape: package
-  "/": "-> /items/"
-  "/{item_id}": "-> /items/{item_id}"
-}
-
-"admin.router (APIRouter)": {
-  shape: package
-  "/": "-> /admin/"
-  "/dashboard": "-> /admin/dashboard"
-}
-
-"FastAPI App (main.py)"."app.include_router(users.router)" -> "users.router (APIRouter)": {
-  label: "Includes"
-  style: {
-    animated: true
-  }
-}
-"FastAPI App (main.py)"."app.include_router(items.router)" -> "items.router (APIRouter(prefix='/items'))": {
-  label: "Includes"
-  style: {
-    animated: true
-  }
-}
-"FastAPI App (main.py)"."app.include_router(admin.router, prefix='/admin')" -> "admin.router (APIRouter)": {
-  label: "Includes with prefix"
-  style: {
-    animated: true
-  }
-}
-```
-
-通过使用 `APIRouter`，您可以有效地将应用组织成逻辑模块，从而使您的代码库在不断增长的过程中更清晰、更易于维护和导航。这种方法促进了代码重用和关注点分离。
-
-要了解有关路由的更多具体信息，请参阅[路由 API 参考](./api-reference-routing.md)。要了解如何测试您的结构化应用，请访问[测试](./advanced-testing.md)指南。
+现在你的应用结构良好，下一步是确保其可靠性。在 [测试](./advanced-testing.md) 部分学习如何为你的路径操作和依赖项编写测试。

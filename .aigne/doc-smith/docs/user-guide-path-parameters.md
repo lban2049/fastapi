@@ -1,6 +1,10 @@
 # Path Parameters
 
-You can declare path "parameters" or "variables" with the same syntax used by Python f-strings:
+You can declare path "parameters" or "variables" with the same syntax used by Python format strings. This allows you to capture parts of the URL path and use them in your *path operation function*.
+
+## Declare Path Parameters
+
+A path parameter is defined in the path using curly braces `{}`.
 
 ```python
 from fastapi import FastAPI
@@ -13,9 +17,7 @@ async def read_item(item_id):
     return {"item_id": item_id}
 ```
 
-The value of the path parameter `item_id` will be passed to your function as the argument `item_id`.
-
-So, if you run this example and go to `http://127.0.0.1:8000/items/foo`, you will see a response of:
+The value of the path parameter `item_id` will be passed to your function as the argument `item_id`. So, if you run this example and go to `http://127.0.0.1:8000/items/foo`, you will see the response:
 
 ```json
 {
@@ -23,9 +25,9 @@ So, if you run this example and go to `http://127.0.0.1:8000/items/foo`, you wil
 }
 ```
 
-## Path parameters with types
+## Path Parameters with Types
 
-You can declare the type of a path parameter in the function, using standard Python type annotations.
+You can declare the type of a path parameter in the function, using standard Python type hints.
 
 ```python
 from fastapi import FastAPI
@@ -38,11 +40,21 @@ async def read_item(item_id: int):
     return {"item_id": item_id}
 ```
 
-In this case, `item_id` is declared to be an `int`.
+In this case, `item_id` is declared to be an `int`. This provides editor support, checking for errors, and more.
 
-This will give you editor support inside of your function, with error checks, completion, etc.
+With this type declaration, FastAPI gives you automatic request "parsing". If you go to `http://127.0.0.1:8000/items/3` in your browser, the response will be:
 
-With this type declaration, FastAPI provides automatic data parsing and validation. If you go to `http://127.0.0.1:8000/items/3`, the `item_id` will be converted to the integer `3`. However, if you go to `http://127.0.0.1:8000/items/foo`, you will see a helpful HTTP error:
+```json
+{
+  "item_id": 3
+}
+```
+
+Because the value `"3"` from the path is parsed and converted into the integer `3`.
+
+### Data Validation
+
+If you go to the URL `/items/foo` with the `int` type hint, you will see a clear HTTP error message, indicating that the path parameter has an invalid type.
 
 ```json
 {
@@ -59,11 +71,13 @@ With this type declaration, FastAPI provides automatic data parsing and validati
 }
 ```
 
-This is because the path parameter `item_id` failed to parse as an `int`.
+This automatic validation is provided by Pydantic, which FastAPI uses under the hood.
 
-## Order matters
+## Order Matters
 
-When creating *path operations*, you may find a situation where you have a fixed path, like `/users/me`, and a path with a parameter, like `/users/{user_id}`. Because path operations are evaluated in order, you need to ensure that the path for `/users/me` is declared before the one for `/users/{user_id}`.
+When creating *path operations*, you might have a situation where you have a fixed path (like `/users/me`) and a path that captures a parameter (like `/users/{user_id}`).
+
+Because path operations are evaluated in order, you need to make sure that the path for the fixed endpoint is declared *before* the one with the parameter.
 
 ```python
 from fastapi import FastAPI
@@ -81,24 +95,28 @@ async def read_user(user_id: str):
     return {"user_id": user_id}
 ```
 
-Otherwise, the path for `/users/{user_id}` would also match `/users/me`, thinking that it's receiving a parameter `user_id` with a value of `"me"`.
+If `/users/{user_id}` were declared first, it would match `/users/me`, thinking that the `user_id` parameter is the string `"me"`.
 
-## Predefined values
+## Predefined Values with Enums
 
-If you have a *path operation* that should only receive a predefined set of values, you can use a standard Python `Enum`.
+If you have a path parameter that can only accept a few predefined values, you can use a standard Python `Enum`.
 
-Create an `Enum` that inherits from `str` and `Enum`.
+Create an `Enum` class that inherits from `str` and `Enum`.
 
 ```python
 from enum import Enum
+
 from fastapi import FastAPI
+
 
 class ModelName(str, Enum):
     alexnet = "alexnet"
     resnet = "resnet"
     lenet = "lenet"
 
+
 app = FastAPI()
+
 
 @app.get("/models/{model_name}")
 async def get_model(model_name: ModelName):
@@ -111,24 +129,13 @@ async def get_model(model_name: ModelName):
     return {"model_name": model_name, "message": "Have some residuals"}
 ```
 
-By inheriting from `str`, the API docs will be able to know that the values must be strings and will be able to render correctly.
+FastAPI will use the enum to validate the path parameter and will also include the available values in the interactive API documentation.
 
-Then you can use it in a type annotation. The path parameter will be validated against the set of values in the enum.
+## Path Parameters Containing Paths
 
-If you visit `http://127.0.0.1:8000/models/resnet`, you'll get a response like:
+There might be cases where you need a path parameter to contain a file path, which includes slashes (`/`). You can use a path converter from Starlette (the underlying ASGI framework) to achieve this.
 
-```json
-{
-  "model_name": "resnet",
-  "message": "Have some residuals"
-}
-```
-
-The interactive docs will automatically show the available values in a dropdown menu.
-
-## Path parameters containing paths
-
-You can declare a path parameter that contains a path itself, using a URL converter.
+To capture a path, use the syntax `{file_path:path}`.
 
 ```python
 from fastapi import FastAPI
@@ -141,33 +148,31 @@ async def read_file(file_path: str):
     return {"file_path": file_path}
 ```
 
-In this example, the parameter `file_path` can contain slashes (`/`), such as `home/johndoe/myfile.txt`.
+If you make a request to `/files/home/johndoe/myfile.txt`, the `file_path` parameter will contain the full path `home/johndoe/myfile.txt`.
 
-If you go to `http://127.0.0.1:8000/files/home/johndoe/myfile.txt`, the response will be:
+## Numeric Validations
 
-```json
-{
-  "file_path": "home/johndoe/myfile.txt"
-}
-```
+For more advanced validation, especially for numbers, you can use the `Path()` function.
 
-## Path parameters and numeric validations
-
-FastAPI allows you to declare additional validations and metadata for your parameters. For path parameters, you can use `Path`.
-
-To use it, you first need to import `Path` from `fastapi`:
+First, import `Path` from `fastapi`:
 
 ```python
 from fastapi import FastAPI, Path
 ```
 
-Since path parameters are always required, you must declare them with `...` as the default value to mark them as required.
+You can use `Path()` as the default value for your parameter, while still declaring its type. This allows you to add extra metadata and validation checks.
+
+### Add Metadata
+
+You can add a `title` and other metadata to your path parameter. This information will be used in the generated OpenAPI schema and the interactive API docs.
 
 ```python
 from typing import Union
+
 from fastapi import FastAPI, Path, Query
 
 app = FastAPI()
+
 
 @app.get("/items/{item_id}")
 async def read_items(
@@ -182,9 +187,7 @@ async def read_items(
 
 ### Order the parameters as you need
 
-When you need to declare a query parameter `q` and a path parameter `item_id`, Python's syntax rules state that parameters with a default value must come after those without one. 
-
-However, you can reorder them by using `*` in the function signature. This tells Python that all subsequent arguments are keyword-only arguments and their order doesn't matter.
+When you use `Path()`, you might want to reorder the parameters. For example, having a required query parameter `q` first. Python requires that parameters with default values come after those without. You can use a `*` in the function arguments to indicate that all subsequent arguments are keyword-only.
 
 ```python
 from fastapi import FastAPI, Path
@@ -200,11 +203,9 @@ async def read_items(*, item_id: int = Path(title="The ID of the item to get"), 
     return results
 ```
 
-### Number validations: greater or equal
+### Number validations: greater than or equal
 
-With `Path` you can also declare numeric validations.
-
-The `ge=1` parameter will enforce that `item_id` must be an integer "greater than or equal to" 1.
+With `Path()`, you can declare numeric constraints. For instance, to ensure `item_id` is an integer greater than or equal to 1, you can use `ge=1`.
 
 ```python
 from fastapi import FastAPI, Path
@@ -246,9 +247,7 @@ async def read_items(
 
 ### Number validations with floats
 
-Number validations also work for `float` values. This is useful not only for `Path` but also for `Query` parameters.
-
-Here we add a `size` query parameter that must be greater than 0 and less than 10.5.
+Number validations also work for `float` values. This example shows how you can combine path and query parameter validations.
 
 ```python
 from fastapi import FastAPI, Path, Query
@@ -273,11 +272,14 @@ async def read_items(
 
 ## Recap
 
-You have seen how to:
-- Use Python type hints for path parameters.
-- Control the order of path operations.
-- Use `Enum` for predefined, allowed path parameter values.
-- Define path parameters that can contain paths themselves.
-- Use `Path` to declare metadata and numeric validations.
+You can declare path parameters using f-string-like syntax. FastAPI provides powerful features for path parameters:
 
-Now you can proceed to learn about [Query Parameters](./user-guide-query-parameters.md).
+*   **Type Hinting**: Automatic parsing and data validation.
+*   **Order Importance**: Fixed paths should be declared before paths with variables.
+*   **Enums**: For predefined, allowed values.
+*   **Path Converter**: To capture paths that include slashes.
+*   **`Path()`**: For adding rich metadata and numeric validations (`gt`, `ge`, `lt`, `le`).
+
+Now that you know how to handle path parameters, let's look at another common type of parameter.
+
+Next, we will explore how to declare [Query Parameters](./user-guide-query-parameters.md).

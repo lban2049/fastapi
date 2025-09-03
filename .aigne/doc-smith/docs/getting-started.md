@@ -1,12 +1,16 @@
 # Getting Started
 
-This tutorial guides you through creating and running your first FastAPI application. You will learn how to install FastAPI, write a simple API, run it locally, and explore its automatic documentation features.
+This tutorial guides you through installing FastAPI and creating your first application, step by step. You will build a simple but complete API from the ground up.
 
-## 1. Install FastAPI
+## Installation
 
-First, you need to install FastAPI and a server to run it. We recommend using a virtual environment to manage your project's dependencies.
+First, you need to install FastAPI. This process also installs the necessary dependencies, including a web server.
 
-Install FastAPI along with its standard dependencies, which includes the Uvicorn server, using `pip`:
+<x-card data-title="Prerequisite" data-icon="lucide:python" data-horizontal="true">
+  FastAPI requires Python 3.8 or higher. You can verify your installation by running `python --version` in your terminal.
+</x-card>
+
+To install FastAPI and its standard dependencies, including the Uvicorn server, run the following command in your terminal:
 
 ```console
 $ pip install "fastapi[standard]"
@@ -14,15 +18,16 @@ $ pip install "fastapi[standard]"
 ---> 100%
 ```
 
-**Note:** The quotes around `"fastapi[standard]"` are important to ensure the command works correctly in all terminals.
+This single command installs FastAPI, Pydantic for data validation, and Uvicorn to serve your application.
 
-## 2. Create the Code
+## Create It
 
-Create a file named `main.py` and add the following code:
+Now, let's create your first API.
+
+1.  Create a file named `main.py`.
+2.  Add the following code to it:
 
 ```python
-from typing import Union
-
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -34,18 +39,17 @@ def read_root():
 
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
+def read_item(item_id: int, q: str | None = None):
     return {"item_id": item_id, "q": q}
 ```
 
 This code defines a simple API with two endpoints:
+*   `@app.get("/")`: Handles `GET` requests to the root URL `/`.
+*   `@app.get("/items/{item_id}")`: Handles `GET` requests to paths like `/items/5`. It captures a path parameter `item_id` and an optional query parameter `q`.
 
-*   `@app.get("/")`: A `GET` operation at the root path `/` that returns a simple JSON message.
-*   `@app.get("/items/{item_id}")`: A `GET` operation that takes a path parameter `item_id` (which must be an integer) and an optional query parameter `q` (which can be a string).
+## Run It
 
-## 3. Run the Application
-
-Run the server from your terminal using the `fastapi` command:
+Run the development server from your terminal:
 
 ```console
 $ fastapi dev main.py
@@ -62,103 +66,46 @@ $ fastapi dev main.py
  │                                                     │
  ╰─────────────────────────────────────────────────────╯
 
-INFO:     Will watch for changes in these directories: ['/home/user/code/awesomeapp']
+INFO:     Will watch for changes in these directories: ['.']
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [2248755] using WatchFiles
-INFO:     Started server process [2248757]
+INFO:     Started reloader process [12345] using StatReload
+INFO:     Started server process [12347]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-The `fastapi dev` command starts a local development server that automatically reloads when you make changes to your code.
+The `fastapi dev` command starts a local server that automatically reloads when you make changes to your code, which is ideal for development.
 
-## 4. Check It Out
+## Check It
 
-Open your web browser and navigate to [http://127.0.0.1:8000/items/5?q=somequery](http://127.0.0.1:8000/items/5?q=somequery).
+Open your browser and navigate to [http://127.0.0.1:8000/items/5?q=somequery](http://127.0.0.1:8000/items/5?q=somequery).
 
 You will see the following JSON response:
 
 ```json
-{"item_id": 5, "q": "somequery"}
+{"item_id":5,"q":"somequery"}
 ```
 
-You have successfully created an API that receives path and query parameters, validates their types, and returns a JSON response.
+You have just created and run your first API that validates path and query parameters.
 
-## 5. Explore the Interactive Docs
+## Interactive API Docs
 
-FastAPI automatically generates interactive documentation for your API. 
+One of FastAPI's key features is its automatically generated documentation. 
 
-Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) to see the Swagger UI documentation:
+Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in your browser. You will see the interactive API documentation provided by Swagger UI:
 
 ![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
 
-There is also an alternative documentation interface provided by ReDoc. You can access it at [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc):
+FastAPI also provides an alternative documentation interface. Go to [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) to see the documentation generated by ReDoc:
 
 ![ReDoc](https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png)
 
-## 6. Add a Request Body
+These documentation pages are automatically generated from your code and can be used to test your API endpoints directly from the browser.
 
-Now, let's modify the `main.py` file to handle data sent from a client in a request body. You can define the structure of the body using Pydantic models.
+## Next Steps
 
-Update `main.py` with the following code:
+You've successfully created and run a basic FastAPI application. To learn how to handle more complex scenarios, such as receiving data in request bodies, proceed to the next section in our User Guide.
 
-```python
-from typing import Union
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Union[bool, None] = None
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
-```
-
-Here's what changed:
-- We imported `BaseModel` from `pydantic`.
-- We created an `Item` class that inherits from `BaseModel` to define the request body's schema.
-- We added a new path operation `@app.put("/items/{item_id}")` that accepts `PUT` requests and expects a request body matching the `Item` model.
-
-## 7. See the Automatic Update
-
-Because the server reloads automatically, your changes are already live. Refresh the documentation page at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The interactive docs will update to include the new `PUT` endpoint:
-
-![Swagger UI Updated](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)
-
-You can use the "Try it out" button to fill in the parameters and interact with your new endpoint directly from the browser.
-
-## Recap and Next Steps
-
-Congratulations! You have successfully created a FastAPI application that handles path parameters, query parameters, and request bodies, complete with automatic, interactive documentation.
-
-Now that you understand the basics, you are ready to dive deeper into the core concepts of FastAPI.
-
-<x-cards data-columns="3">
-  <x-card data-title="Path Parameters" data-icon="lucide:milestone" data-href="/user-guide/path-parameters">
-    Learn more about declaring and validating path parameters.
-  </x-card>
-  <x-card data-title="Query Parameters" data-icon="lucide:list-filter" data-href="/user-guide/query-parameters">
-    Understand how to define and add more validations for query parameters.
-  </x-card>
-  <x-card data-title="Request Body" data-icon="lucide:file-code-2" data-href="/user-guide/request-body">
-    Explore how to receive and validate complex data structures using Pydantic models.
-  </x-card>
-</x-cards>
+<x-card data-title="Next: User Guide" data-icon="lucide:book-open" data-href="/user-guide/path-parameters" data-cta="Start the User Guide">
+  Explore core concepts with practical examples, starting with Path Parameters.
+</x-card>

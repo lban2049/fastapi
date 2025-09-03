@@ -1,19 +1,20 @@
 # 处理响应
 
-在 FastAPI 中，你可以精细地控制返回给客户端的响应。这包括定义数据结构、设置 HTTP 状态码以及添加自定义标头或 Cookie。本节将介绍管理 API 输出的主要方法。
+构建 API 时，你可以精细控制返回给客户端的内容。FastAPI 允许你定义响应的形态、更改默认的 HTTP 状态码以及设置自定义的标头或 Cookie。这能确保你的 API 是可预测、文档完善且行为符合客户端预期的。
 
-## 定义响应模型
+本节将介绍管理 API 输出的主要方法。
 
-你可以在任何*路径操作装饰器*中使用 `response_model` 参数来声明用于响应的模型。FastAPI 会使用此 `response_model` 来：
+## 使用 `response_model` 参数
 
-- 将输出数据转换为模型所定义的类型。
-- 验证数据。
-- 在 OpenAPI 路径操作中为响应添加 JSON Schema。
-- 过滤输出数据，仅将模型中定义的字段包含在响应中。
+控制响应最常见的方法是在*路径操作装饰器*中声明 `response_model`。该模型（通常是 Pydantic 模型）有以下几个用途：
 
-### 示例：过滤响应数据
+- **数据筛选**：确保返回的数据符合模型结构。返回对象中任何未在 `response_model` 中定义的数据都将被排除。
+- **数据校验**：校验输出数据。如果返回对象的数据类型不正确（例如，期望 `int` 类型，实际却是 `float` 类型），FastAPI 将会引发错误。
+- **生成文档**：将响应模型添加到 API 的 OpenAPI 文档中，让用户清楚地知道应该期待什么样的数据。
 
-在这里，`response_model` 被设置为 `Item` 模型。即使函数返回的数据多于 `Item` 中定义的字段，FastAPI 也会对其进行过滤以匹配该模型。
+### 单个项的响应模型
+
+以下是如何为一个创建项的端点声明 `response_model`。尽管函数接收并返回同一个 `item` 对象，但 `response_model` 能保证输出与 `Item` 模型的结构相匹配。
 
 ```python
 from typing import Any, List, Union
@@ -21,7 +22,7 @@ from typing import Any, List, Union
 from fastapi import FastAPI
 from pydantic import BaseModel
 
-ap = FastAPI()
+app = FastAPI()
 
 
 class Item(BaseModel):
@@ -35,8 +36,15 @@ class Item(BaseModel):
 @app.post("/items/", response_model=Item)
 async def create_item(item: Item) -> Any:
     return item
+```
 
+FastAPI 将使用此 `response_model` 来筛选、校验和记录输出。
 
+### 项列表的响应模型
+
+你也可以在 `response_model` 中使用 Python `typing` 模块的类型提示，例如 `List`。
+
+```python
 @app.get("/items/", response_model=List[Item])
 async def read_items() -> Any:
     return [
@@ -45,11 +53,11 @@ async def read_items() -> Any:
     ]
 ```
 
-在此示例中，`create_item` 将返回该项目，但只会发送 `Item` Pydantic 模型中定义的字段。对于 `read_items`，响应将是一个对象列表，其中每个对象都符合 `Item` 模型。
+在这种情况下，FastAPI 会确保响应是一个 JSON 数组，且数组中的每个对象都符合 `Item` 模型。
 
 ## 更改状态码
 
-默认情况下，路径操作返回 `200 OK` 状态码。你可以使用装饰器中的 `status_code` 参数来覆盖成功响应的默认状态码。
+默认情况下，成功响应使用 `200 OK` 状态码。你可以在*路径操作装饰器*中添加 `status_code` 参数来轻松覆盖此默认设置。这对于创建操作的端点尤其有用，因为 `201 Created` 状态码更为合适。
 
 ```python
 from fastapi import FastAPI
@@ -60,17 +68,18 @@ app = FastAPI()
 @app.post("/items/", status_code=201)
 async def create_item(name: str):
     return {"name": name}
+
 ```
 
-在这里，创建项目现在将返回 `201 Created` 状态码，这是成功创建新资源的标准 HTTP 状态。
+现在，向 `/items/` 发送一个成功的 POST 请求将返回 `201 Created` 状态码。
 
-## 使用直接的响应对象
+## 设置自定义标头和 Cookie
 
-对于设置自定义标头或 Cookie 等高级场景，你可以直接返回一个 `Response` 对象。FastAPI 提供了 `JSONResponse` 等多个辅助工具，以简化此过程。
+如需更高级的控制，例如设置自定义标头或 Cookie，你可以直接返回一个 `Response` 对象。FastAPI 提供了多个 `Response` 的子类，其中 `JSONResponse` 是 API 最常用的子类。
 
 ### 自定义标头
 
-要添加自定义标头，你可以创建一个 `JSONResponse` 并向其传递一个包含标头的字典。
+要为响应添加自定义标头，可以创建一个 `JSONResponse` 实例，并将标头以字典形式传入。
 
 ```python
 from fastapi import FastAPI
@@ -86,11 +95,11 @@ def get_headers():
     return JSONResponse(content=content, headers=headers)
 ```
 
-此端点的响应将包含自定义的 `X-Cat-Dog` 和 `Content-Language` 标头。
+客户端现在将收到自定义的 `X-Cat-Dog` 和 `Content-Language` 标头。
 
 ### 设置 Cookie
 
-要设置 Cookie，可以创建一个 `JSONResponse` 实例，然后使用其 `set_cookie()` 方法。
+同样，你可以通过创建 `JSONResponse` 对象并使用其 `set_cookie` 方法来设置 Cookie。
 
 ```python
 from fastapi import FastAPI
@@ -107,11 +116,9 @@ def create_cookie():
     return response
 ```
 
-这样你就可以完全控制 `key`、`value`、`domain`、`path` 等 Cookie 属性。
+## 直接返回 Response 对象
 
-## 使用 `jsonable_encoder` 处理复杂数据类型
-
-有时需要返回包含非 JSON 兼容类型的数据，例如 `datetime` 对象或 Pydantic 模型。FastAPI 提供了 `jsonable_encoder` 实用工具，可将此类数据转换为与 JSON 兼容的结构。
+返回 `Response` 对象可以让你获得完全的控制权。当你需要序列化非 JSON 原生数据类型（如 `datetime` 对象）时，这种方法也很有用。FastAPI 为此提供了一个 `jsonable_encoder` 实用工具。
 
 ```python
 from datetime import datetime
@@ -138,24 +145,25 @@ def update_item(id: str, item: Item):
     return JSONResponse(content=json_compatible_item_data)
 ```
 
-在这里，`jsonable_encoder` 将 `item` 对象（包括其 `timestamp` 字段）转换为一个字典，其中的 `datetime` 会被表示为字符串。然后，这个字典可以安全地作为内容传递给 `JSONResponse`。
+在这里，`jsonable_encoder` 会先将 `Item` 模型中的 `datetime` 对象转换为适合 JSON 的字符串格式，然后再将其传递给 `JSONResponse`。
 
-## 其他响应类型
+## 更多响应类型
 
-FastAPI 提供了多种直接继承自 Starlette 的响应类，以满足不同需求。你可以直接在路径操作中返回其中任何一个类的实例。
+FastAPI 基于 Starlette 构建，为不同的使用场景提供了一系列响应类。你可以直接从 `fastapi.responses` 导入它们。
 
-| Class               | Description                                                 |
-|---------------------|-------------------------------------------------------------|
-| `Response`          | 基类，可用于自定义响应。           |
-| `JSONResponse`      | 默认响应类，用于 JSON 编码的数据。                         |
-| `HTMLResponse`      | 用于返回 HTML 内容。                                 |
-| `PlainTextResponse` | 用于返回纯文本。                                   |
-| `RedirectResponse`  | 用于发送 HTTP 重定向 (307)。                         |
-| `StreamingResponse` | 用于流式传输响应体。                              |
-| `FileResponse`      | 用于以流式传输文件作为响应。                       |
+<x-cards data-columns="3">
+  <x-card data-title="JSONResponse" data-icon="lucide:code-json">JSON 数据的默认响应类型。支持高性能编码器。</x-card>
+  <x-card data-title="HTMLResponse" data-icon="lucide:code">用于直接向浏览器返回 HTML 内容。</x-card>
+  <x-card data-title="PlainTextResponse" data-icon="lucide:file-text">用于发送纯文本响应。</x-card>
+  <x-card data-title="RedirectResponse" data-icon="lucide:corner-up-right">发出 HTTP 重定向到不同的 URL。</x-card>
+  <x-card data-title="StreamingResponse" data-icon="lucide:workflow">流式传输响应正文，适用于大文件或实时数据。</x-card>
+  <x-card data-title="FileResponse" data-icon="lucide:file">将磁盘上的文件作为响应进行流式传输。</x-card>
+</x-cards>
 
-对于高性能应用程序，你也可以在安装相应的库（`ujson` 或 `orjson`）后使用 `UJSONResponse` 或 `ORJSONResponse`。
+更多详细信息，请参阅[响应的 API 参考](./api-reference-responses.md)。
 
-## 后续步骤
+借助这些工具，你可以精确控制 API 响应的方方面面。接下来，你将学习一个用于管理依赖和共享逻辑的强大系统。
 
-你现在已经掌握了控制 API 响应各个方面的工具。要学习如何管理共享逻辑和依赖项，请继续阅读下一节关于[依赖注入](./user-guide-dependency-injection.md)的内容。
+---
+
+接下来，让我们通过[依赖注入](./user-guide-dependency-injection.md)来学习如何组织代码结构和处理依赖关系。

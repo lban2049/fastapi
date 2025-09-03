@@ -1,18 +1,66 @@
 # 安全工具
 
-FastAPI 提供了一系列可作为依赖项调用的类，用于在您的 API 中实现各种安全方案。这些工具负责从请求中提取凭证（如令牌、API 密钥或基本认证标头），并与 OpenAPI 文档集成。
+FastAPI 提供了一套简单而强大的工具来处理安全和身份验证。这些工具构建于依赖注入系统之上，让你可以轻松实现各种安全方案，如 OAuth2、HTTP Basic/Bearer/Digest 和 API 密钥。它们直接与自动生成的 OpenAPI 文档集成，使你的 API 的安全要求清晰且可交互。
 
-本参考文档介绍了 `fastapi.security` 中可用的主要安全工具。
+本参考指南为 `fastapi.security` 中可用的每个安全类和实用工具模型提供了详细文档。
 
----
+```d2
+direction: down
 
-## API 密钥
+"安全工具": {
+  shape: package
+  grid-columns: 2
 
-API 密钥认证是一种常见的模式，即在请求中传递一个密钥。FastAPI 提供了从查询参数、标头或 Cookie 中提取密钥的工具。
+  "API 密钥认证": {
+    shape: rectangle
+    "APIKeyQuery": {label: "来自查询参数"}
+    "APIKeyHeader": {label: "来自标头"}
+    "APIKeyCookie": {label: "来自 Cookie"}
+  }
 
-### `APIKeyQuery`
+  "HTTP 认证": {
+    shape: rectangle
+    "HTTPBasic": {}
+    "HTTPBearer": {}
+    "HTTPDigest": {}
+    "HTTPBasicCredentials": {shape: document}
+    "HTTPAuthorizationCredentials": {shape: document}
+  }
 
-从查询参数中提取 API 密钥。
+  "OAuth2": {
+    shape: rectangle
+    "OAuth2PasswordBearer": {}
+    "OAuth2AuthorizationCodeBearer": {}
+    "OAuth2PasswordRequestForm": {shape: document}
+    "OAuth2PasswordRequestFormStrict": {shape: document}
+    "SecurityScopes": {shape: document}
+  }
+
+  "OpenID Connect": {
+    shape: rectangle
+    "OpenIdConnect": {}
+  }
+}
+```
+
+## API 密钥认证
+
+API 密钥认证可以来源于查询参数、标头或 Cookie。
+
+### APIKeyQuery
+
+从查询参数中提取 API 密钥。你可以创建一个实例并将其用作依赖项。
+
+**参数**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `str` | 用于 API 密钥的查询参数的名称。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
+| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
+
+**示例**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -28,18 +76,20 @@ async def read_items(api_key: str = Depends(query_scheme)):
     return {"api_key": api_key}
 ```
 
+### APIKeyHeader
+
+从 HTTP 标头中提取 API 密钥。
+
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `name` | `str` | **必需。** 包含 API 密钥的查询参数的名称。 |
-| `scheme_name` | `Optional[str]` | 安全方案的名称，显示在 OpenAPI 文档中。默认为类名。 |
-| `description` | `Optional[str]` | 安全方案的描述，显示在 OpenAPI 文档中。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在找不到密钥时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
+| `name` | `str` | 用于 API 密钥的 HTTP 标头的名称。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
+| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
 
-### `APIKeyHeader`
-
-从请求标头中提取 API 密钥。
+**示例**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -55,18 +105,20 @@ async def read_items(key: str = Depends(header_scheme)):
     return {"key": key}
 ```
 
-**参数**
-
-| 名称 | 类型 | 描述 |
-|---|---|---|
-| `name` | `str` | **必需。** 包含 API 密钥的标头的名称。 |
-| `scheme_name` | `Optional[str]` | 安全方案的名称，显示在 OpenAPI 文档中。默认为类名。 |
-| `description` | `Optional[str]` | 安全方案的描述，显示在 OpenAPI 文档中。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在缺少标头时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
-
-### `APIKeyCookie`
+### APIKeyCookie
 
 从请求 Cookie 中提取 API 密钥。
+
+**参数**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `str` | 用于 API 密钥的 Cookie 的名称。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
+| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
+
+**示例**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -82,24 +134,24 @@ async def read_items(session: str = Depends(cookie_scheme)):
     return {"session": session}
 ```
 
+## HTTP 认证
+
+实现标准的 HTTP 认证方案。
+
+### HTTPBasic
+
+处理 HTTP Basic 认证。依赖项的结果是一个 `HTTPBasicCredentials` 对象。
+
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `name` | `str` | **必需。** 包含 API 密钥的 Cookie 的名称。 |
-| `scheme_name` | `Optional[str]` | 安全方案的名称，显示在 OpenAPI 文档中。默认为类名。 |
-| `description` | `Optional[str]` | 安全方案的描述，显示在 OpenAPI 文档中。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在找不到 Cookie 时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
+| `realm` | `Optional[str]` | HTTP Basic 认证域。 |
+| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在未提供认证时会引发错误。如果为 `False`，则返回 `None`。 |
 
----
-
-## HTTP 身份认证
-
-这些工具实现了 RFC 文档中定义的标准 HTTP 身份认证方案，例如 Basic、Bearer 和 Digest。
-
-### `HTTPBasic`
-
-实现 HTTP 基本认证。它会提取 `Authorization` 标头，解码 Base64 凭证，并返回一个 `HTTPBasicCredentials` 对象。
+**示例**
 
 ```python
 from typing import Annotated
@@ -117,18 +169,20 @@ def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(secur
     return {"username": credentials.username, "password": credentials.password}
 ```
 
+### HTTPBearer
+
+处理 HTTP Bearer 令牌认证。依赖项的结果是一个 `HTTPAuthorizationCredentials` 对象。
+
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。默认为类名。 |
-| `realm` | `Optional[str]` | HTTP 基本认证领域，包含在 `WWW-Authenticate` 标头中。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在标头无效或缺失时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
+| `bearerFormat` | `Optional[str]` | Bearer 令牌的格式（例如，'JWT'），在 OpenAPI 文档中可见。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称。 |
+| `description` | `Optional[str]` | 对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
 
-### `HTTPBearer`
-
-实现 HTTP 持有者令牌认证。它会验证 `Authorization` 标头是否以“Bearer ”开头，并返回一个 `HTTPAuthorizationCredentials` 对象。
+**示例**
 
 ```python
 from typing import Annotated
@@ -148,18 +202,19 @@ def read_current_user(
     return {"scheme": credentials.scheme, "credentials": credentials.credentials}
 ```
 
+### HTTPDigest
+
+处理 HTTP Digest 认证。依赖项的结果是一个 `HTTPAuthorizationCredentials` 对象。
+
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `bearerFormat` | `Optional[str]` | 持有者令牌的预期格式（例如“JWT”），用于 OpenAPI 文档。 |
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。默认为类名。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在标头无效或缺失时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
+| `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
+| `description` | `Optional[str]` | 对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在摘要缺失时会引发错误。如果为 `False`，则返回 `None`。 |
 
-### `HTTPDigest`
-
-实现 HTTP 摘要认证。它会验证 `Authorization` 标头是否以“Digest ”开头，并返回一个 `HTTPAuthorizationCredentials` 对象。
+**示例**
 
 ```python
 from typing import Annotated
@@ -179,128 +234,104 @@ def read_current_user(
     return {"scheme": credentials.scheme, "credentials": credentials.credentials}
 ```
 
-**参数**
+### HTTPBasicCredentials
 
-| 名称 | 类型 | 描述 |
+一个包含来自 HTTP Basic 认证的用户名和密码的数据模型。
+
+**属性**
+
+| Attribute | Type | Description |
 |---|---|---|
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。默认为类名。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在标头无效或缺失时会引发错误。如果为 `False`，则依赖项返回 `None`。 |
+| `username` | `str` | HTTP Basic 用户名。 |
+| `password` | `str` | HTTP Basic 密码。 |
 
-### 凭证模型
+### HTTPAuthorizationCredentials
 
-- **`HTTPBasicCredentials`**：使用 `HTTPBasic` 的结果。它有两个属性：
-  - `username` (str)：提供的用户名。
-  - `password` (str)：提供的密码。
+一个包含来自 `Authorization` 标头的方案和凭据的数据模型。
 
-- **`HTTPAuthorizationCredentials`**：`HTTPBearer` 或 `HTTPDigest` 的结果。它有两个属性：
-  - `scheme` (str)：身份认证方案（例如，“Bearer”）。
-  - `credentials` (str)：凭证字符串（例如，令牌）。
+**属性**
 
----
+| Attribute | Type | Description |
+|---|---|---|
+| `scheme` | `str` | 授权方案（例如，'Bearer'、'Digest'）。 |
+| `credentials` | `str` | 标头值中的凭据部分。 |
 
 ## OAuth2
 
-FastAPI 提供了实现 OAuth2 流程的全面工具。
+用于实现 OAuth2 流程的工具。
 
-### `OAuth2PasswordBearer`
+### OAuth2PasswordBearer
 
-用于 OAuth2 密码持有者流程的依赖项类。它会检查是否存在有效的 `Authorization: Bearer <token>` 标头，并以字符串形式返回令牌。
-
-**参数**
-
-| 名称 | 类型 | 描述 |
-|---|---|---|
-| `tokenUrl` | `str` | **必需。** 颁发令牌的端点的 URL（例如 `/token`）。 |
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
-| `scopes` | `Optional[Dict[str, str]]` | 一个包含可用作用域及其描述的字典，用于 OpenAPI。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌无效或缺失时会引发错误。如果为 `False`，则返回 `None`。 |
-| `refreshUrl` | `Optional[str]` | 用于刷新过期令牌的 URL。 |
-
-### `OAuth2AuthorizationCodeBearer`
-
-用于 OAuth2 授权码流程的依赖项类。它也需要一个 `Authorization: Bearer <token>` 标头。
+定义一个 OAuth2 密码持有者流程。它从 `Authorization` 标头中提取令牌。
 
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `authorizationUrl` | `str` | **必需。** 授权端点的 URL。 |
-| `tokenUrl` | `str` | **必需。** 令牌交换端点的 URL。 |
-| `refreshUrl` | `Optional[str]` | 用于刷新过期令牌的 URL。 |
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
-| `scopes` | `Optional[Dict[str, str]]` | 一个包含可用作用域及其描述的字典，用于 OpenAPI。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌无效或缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `tokenUrl` | `str` | 提供令牌的路径操作的 URL（例如，`/token`）。 |
+| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
+| `scopes` | `Optional[Dict[str, str]]` | 可用范围及其描述的字典。 |
+| `description` | `Optional[str]` | 对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `refreshUrl` | `Optional[str]` | 刷新令牌的 URL。 |
 
-### `OAuth2PasswordRequestForm` 和 `OAuth2PasswordRequestFormStrict`
+### OAuth2AuthorizationCodeBearer
 
-这些是在令牌颁发端点中使用的依赖项类，用于接收表单数据（`application/x-www-form-urlencoded`）形式的凭证。
+定义一个 OAuth2 授权码持有者流程。它从 `Authorization` 标头中提取令牌。
 
-- `OAuth2PasswordRequestForm`：`grant_type` 是可选的。
-- `OAuth2PasswordRequestFormStrict`：根据 OAuth2 规范，`grant_type` 必须为 `"password"`。
+**参数**
 
-```python
-from typing import Annotated
+| Parameter | Type | Description |
+|---|---|---|
+| `authorizationUrl` | `str` | 授权步骤的 URL。 |
+| `tokenUrl` | `str` | 获取令牌的 URL。 |
+| `refreshUrl` | `Optional[str]` | 刷新令牌的 URL。 |
+| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
+| `scopes` | `Optional[Dict[str, str]]` | 可用范围及其描述的字典。 |
+| `description` | `Optional[str]` | 对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
 
-from fastapi import Depends, FastAPI
-from fastapi.security import OAuth2PasswordRequestForm
+### OAuth2PasswordRequestForm
 
-app = FastAPI()
+一个从请求中捕获 OAuth2 密码流表单数据的依赖类。
 
+**属性**
 
-@app.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
-    # 在实际应用中，您需要验证 form_data.username 和 form_data.password
-    # 然后创建并返回一个令牌。
-    return {"access_token": form_data.username, "token_type": "bearer"}
-```
+| Attribute | Type | Description |
+|---|---|---|
+| `grant_type` | `Optional[str]` | 必须是 'password'。此为宽容模式，允许 `None`。 |
+| `username` | `str` | 表单数据中的用户名。 |
+| `password` | `str` | 表单数据中的密码。 |
+| `scopes` | `List[str]` | 请求的范围列表，从一个以空格分隔的字符串中解析得出。 |
+| `client_id` | `Optional[str]` | 客户端 ID，如果在表单中提供。 |
+| `client_secret` | `Optional[str]` | 客户端密钥，如果在表单中提供。 |
 
-依赖项实例将具有从表单数据中提取的以下属性：
-- `grant_type`：授权类型（例如，“password”）。
-- `username`：用户名。
-- `password`：用户密码。
-- `scopes`：一个包含所请求作用域的 `list[str]`。
-- `client_id`：客户端 ID（如果提供）。
-- `client_secret`：客户端密钥（如果提供）。
+### OAuth2PasswordRequestFormStrict
 
-### `SecurityScopes`
+`OAuth2PasswordRequestForm` 的更严格版本，根据 OAuth2 规范的要求，该版本要求 `grant_type` 表单字段必须存在且值为 `'password'`。
 
-一个特殊的依赖项，用于访问同一路径操作中其他安全依赖项所需的作用域列表。
+### SecurityScopes
 
-```python
-from fastapi import Depends, FastAPI, Security
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+一个特殊的依赖类，用于获取同一*路径操作*中其他依赖项所需的安全范围。
 
-app = FastAPI()
+**属性**
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scopes={"me": "Read information about the current user."}) 
-
-@app.get("/users/me")
-async def read_users_me(
-    security_scopes: SecurityScopes, token: str = Security(oauth2_scheme, scopes=["me"])
-):
-    return {"scopes": security_scopes.scopes, "token": token}
-```
-
-它提供两个属性：
-- `scopes` (`List[str]`)：所需作用域的列表。
-- `scope_str` (`str`)：一个包含所有作用域的字符串，各作用域之间用空格分隔。
-
----
+| Attribute | Type | Description |
+|---|---|---|
+| `scopes` | `List[str]` | 依赖项所需的所有范围的列表。 |
+| `scope_str` | `str` | 一个包含所有范围的单一字符串，以空格分隔。 |
 
 ## OpenID Connect
 
-### `OpenIdConnect`
+### OpenIdConnect
 
-根据 OpenID Connect URL 实现身份认证。它会提取 `Authorization` 标头的值。
+定义 OpenID Connect 认证。它从 `Authorization` 标头中提取令牌。
 
 **参数**
 
-| 名称 | 类型 | 描述 |
+| Parameter | Type | Description |
 |---|---|---|
-| `openIdConnectUrl` | `str` | **必需。** OpenID Connect 提供商的发现 URL。 |
-| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
-| `description` | `Optional[str]` | OpenAPI 中安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在缺少 `Authorization` 标头时会引发错误。如果为 `False`，则返回 `None`。 |
+| `openIdConnectUrl` | `str` | OpenID Connect 发现 URL。 |
+| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
+| `description` | `Optional[str]` | 对安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |

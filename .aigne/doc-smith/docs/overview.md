@@ -1,62 +1,82 @@
 # Overview
 
-FastAPI is a modern, high-performance web framework for building APIs with Python, leveraging standard Python type hints. It is designed to be easy to use, fast to code, and ready for production environments.
+FastAPI is a modern, high-performance web framework for building APIs with Python, based on standard Python type hints. It is designed to be easy to use, fast to code, and ready for production environments.
 
+## Key Features
 
-### Key Features
+FastAPI provides a development experience that is both efficient and enjoyable, focusing on speed, simplicity, and standards.
 
-FastAPI is built to optimize the development experience and the performance of the final application.
-
-<x-cards data-columns="2">
+<x-cards data-columns="3">
   <x-card data-title="Fast Performance" data-icon="lucide:rocket">
-    Achieve high performance, comparable to **NodeJS** and **Go**, thanks to its foundation on Starlette (for web parts) and Pydantic (for data parts). It is one of the fastest Python frameworks available.
+    Achieve performance on par with NodeJS and Go, thanks to its Starlette and Pydantic foundation. It's one of the fastest Python frameworks available.
   </x-card>
   <x-card data-title="Fast to Code" data-icon="lucide:zap">
-    Increase development speed by 200% to 300%. The framework is designed to help you build features quickly with minimal, intuitive code.
+    Increase feature development speed by 200% to 300%. Minimize code duplication and get more done with less code.
   </x-card>
-  <x-card data-title="Fewer Bugs" data-icon="lucide:bug-off">
-    Reduce human-induced errors by about 40%. With type hints, you get excellent editor support and data validation, catching many errors during development.
+  <x-card data-title="Fewer Bugs" data-icon="lucide:shield-check">
+    Reduce developer-induced errors by about 40%. Type hints and structured data validation catch bugs before they reach production.
   </x-card>
-  <x-card data-title="Robust and Ready" data-icon="lucide:shield-check">
-    Get production-ready code with automatic interactive documentation, data validation, and serialization based on open standards.
+  <x-card data-title="Intuitive" data-icon="lucide:lightbulb">
+    Benefit from excellent editor support with autocompletion everywhere. Spend less time debugging and more time building.
+  </x-card>
+  <x-card data-title="Easy to Learn" data-icon="lucide:book-open">
+    Designed to be straightforward to learn and use. The documentation is clear, letting you focus on your application's logic.
+  </x-card>
+  <x-card data-title="Standards-Based" data-icon="lucide:file-json-2">
+    Fully compatible with open standards for APIs, including OpenAPI (formerly Swagger) and JSON Schema.
   </x-card>
 </x-cards>
 
-### Core Architecture
+## Core Architecture
 
-FastAPI stands on the shoulders of two giants: Starlette for all the web parts and Pydantic for all the data parts. This layered approach allows it to provide high performance and robust data handling simultaneously.
+FastAPI's performance and features are possible because it stands on the shoulders of giants:
+
+-   **[Starlette](https://www.starlette.io/)**: Used for all the web parts, providing a lightweight and high-performance ASGI framework.
+-   **[Pydantic](https://docs.pydantic.dev/)**: Handles all the data parts, offering robust data validation, serialization, and documentation based on Python type hints.
+
+This separation of concerns allows FastAPI to excel at both web handling and data management.
 
 ```d2
-direction: right
+direction: down
 
-"User Request" -> "FastAPI Engine"
-
-"FastAPI Engine": {
-  shape: cloud
-  "Your API Code (with Type Hints)": {
-    shape: document
-  }
-  "Starlette (Web Toolkit)": {
-    shape: hexagon
-  }
-  "Pydantic (Data Validation)": {
-    shape: hexagon
-  }
+"Your API Code": {
+  shape: rectangle
+  style.fill: "#DDF0FF"
 }
 
-"FastAPI Engine" -> "API Response (JSON)"
+"FastAPI": {
+  shape: package
+  "Your API Code"
+}
 
-"Your API Code (with Type Hints)" -> "Starlette (Web Toolkit)": Uses for routing
-"Your API Code (with Type Hints)" -> "Pydantic (Data Validation)": Uses for validation & serialization
+"Starlette": {
+  shape: hexagon
+  label: "Starlette (Web layer)"
+  style.fill: "#D5E8D4"
+}
+
+"Pydantic": {
+  shape: hexagon
+  label: "Pydantic (Data layer)"
+  style.fill: "#FAD7AC"
+}
+
+"FastAPI" -> "Starlette": "Uses for all web parts"
+"FastAPI" -> "Pydantic": "Uses for all data parts"
+
 ```
 
-### A Quick Example
+## A Glimpse of the Code
 
-Creating a FastAPI application is straightforward. Here’s a complete example:
+See how simple it is to create a fully functional API with automatic documentation.
 
-**1. Create a file `main.py`:**
+### 1. Create a File
+
+Create a file `main.py` with the following content:
 
 ```python
+from typing import Union
+
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -68,11 +88,13 @@ def read_root():
 
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
+def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 ```
 
-**2. Run the server:**
+### 2. Run the Server
+
+Execute this command in your terminal:
 
 ```console
 $ fastapi dev main.py
@@ -80,41 +102,32 @@ $ fastapi dev main.py
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 ```
 
-**3. Check the result:**
+### 3. Check the Interactive Docs
 
-Open your browser at [http://127.0.0.1:8000/items/5?q=somequery](http://127.0.0.1:8000/items/5?q=somequery). You will see the JSON response:
+FastAPI automatically generates interactive API documentation from your code. Just open your browser to [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs) to see it in action.
 
-```json
-{"item_id":5,"q":"somequery"}
-```
+![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
 
-### Automatic Interactive Documentation
+## Trusted by Industry Leaders
 
-One of FastAPI's most valued features is the automatic generation of interactive API documentation. Without any extra effort, you get two documentation UIs:
-
-- **Swagger UI**, available at `/docs`:
-
-  ![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
-
-- **ReDoc**, available at `/redoc`:
-
-  ![ReDoc](https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png)
-
-### Trusted by Industry Leaders
-
-FastAPI is used in production by leading tech companies for critical services.
+FastAPI is used in production by leading companies worldwide.
 
 > "[...] I'm using **FastAPI** a ton these days. [...] I'm actually planning to use it for all of my team's **ML services at Microsoft**. Some of them are getting integrated into the core **Windows** product and some **Office** products."
-> <div style="text-align: right; margin-right: 10%;">Kabir Khan - <strong>Microsoft</strong></div>
+> 
+> **Kabir Khan - Microsoft**
 
 > "We adopted the **FastAPI** library to spawn a **REST** server that can be queried to obtain **predictions**. [for Ludwig]"
-> <div style="text-align: right; margin-right: 10%;">Piero Molino, Yaroslav Dudin, and Sai Sumanth Miryala - <strong>Uber</strong></div>
+> 
+> **Piero Molino, Yaroslav Dudin, and Sai Sumanth Miryala - Uber**
 
 > "**Netflix** is pleased to announce the open-source release of our **crisis management** orchestration framework: **Dispatch**! [built with **FastAPI**]"
-> <div style="text-align: right; margin-right: 10%;">Kevin Glisson, Marc Vilanova, Forest Monsen - <strong>Netflix</strong></div>
+> 
+> **Kevin Glisson, Marc Vilanova, Forest Monsen - Netflix**
 
-### Next Steps
+## Next Steps
 
-This overview provides a glimpse into what makes FastAPI a compelling choice for API development. You've seen its key features, a simple code example, and the power of its automatic documentation.
+This overview covers the high-level benefits of FastAPI. To start building your first API, head over to our step-by-step tutorial.
 
-Ready to build your first application? Head over to our [Getting Started](./getting-started.md) guide for a step-by-step tutorial.
+<x-card data-title="Getting Started" data-icon="lucide:play-circle" data-href="/getting-started" data-cta="Start the Tutorial">
+  A step-by-step guide to install FastAPI and create your first application.
+</x-card>

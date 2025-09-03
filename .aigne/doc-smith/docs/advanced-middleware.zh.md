@@ -1,14 +1,62 @@
 # 中间件
 
-中间件是一个函数，它在每个请求到达特定路径操作前处理该请求，并在每个响应返回客户端前处理该响应。这使得你可以用一种集中的方式来实现诸如日志记录、性能监控、身份验证和响应头操作等横切关注点。
+中间件是一个函数，它在每个请求被特定*路径操作*处理之前，以及在每个响应返回之前，都会对其进行处理。它提供了一种挂钩到请求和响应处理管道的机制，以执行横切操作。
 
-FastAPI 的中间件构建于 Starlette 的中间件系统之上。你可以通过两种主要方法向应用程序添加中间件：使用 `@app.middleware("http")` 装饰器创建自定义中间件函数，或使用 `app.add_middleware()` 添加中间件类。
+中间件的常见用例包括：
+
+*   向请求或响应添加自定义标头。
+*   记录每个请求。
+*   处理身份验证或授权。
+*   实现 GZip 压缩。
+*   管理 CORS（跨域资源共享）标头。
+
+中间件按照添加的顺序处理请求，并以相反的顺序处理响应。这可以被形象地看作洋葱的层次，请求必须穿过这些层次才能到达应用程序代码，然后在返回时再次穿过。
+
+```d2
+direction: down
+
+"Client": {
+  shape: person
+}
+
+"Middleware Stack": {
+  shape: package
+  grid-columns: 1
+
+  "Middleware 1 (e.g., GZip)": {
+    shape: rectangle
+  }
+  "Middleware 2 (e.g., CORS)": {
+    shape: rectangle
+  }
+  "Custom Middleware": {
+    shape: rectangle
+  }
+}
+
+"FastAPI Application": {
+  shape: rectangle
+  "Path Operation Code"
+}
+
+"Client" -> "Middleware Stack"."Middleware 1 (e.g., GZip)": "1. Request"
+
+"Middleware Stack"."Middleware 1 (e.g., GZip)" -> "Middleware Stack"."Middleware 2 (e.g., CORS)": "2. Request"
+"Middleware Stack"."Middleware 2 (e.g., CORS)" -> "Middleware Stack"."Custom Middleware": "3. Request"
+"Middleware Stack"."Custom Middleware" -> "FastAPI Application": "4. Request passed to endpoint"
+
+"FastAPI Application" -> "Middleware Stack"."Custom Middleware": "5. Response from endpoint"
+"Middleware Stack"."Custom Middleware" -> "Middleware Stack"."Middleware 2 (e.g., CORS)": "6. Response"
+"Middleware Stack"."Middleware 2 (e.g., CORS)" -> "Middleware Stack"."Middleware 1 (e.g., GZip)": "7. Response"
+
+"Middleware Stack"."Middleware 1 (e.g., GZip)" -> "Client": "8. Final Response (e.g., GZipped)"
+```
 
 ## 创建自定义中间件
 
-你可以使用 `@app.middleware("http")` 装饰器创建自己的中间件。这对于为每个请求实现需要运行的自定义逻辑非常有用。
+你可以使用 `@app.middleware("http")` 装饰器创建自己的中间件。该函数接收 `request` 对象和一个 `call_next` 函数，`call_next` 函数将接收 `request` 作为参数。`call_next` 会将请求传递给下一个中间件或路径操作。
 
-例如，我们来创建一个中间件，用它计算每个请求的处理时间，并将其添加到一个自定义响应头 `X-Process-Time` 中。
+下面是一个示例，它计算请求的处理时间，并将其作为自定义标头 `X-Process-Time` 添加到响应中。
 
 ```python
 import time
@@ -28,47 +76,19 @@ async def add_process_time_header(request: Request, call_next):
 ```
 
 在此示例中：
-- 函数 `add_process_time_header` 由 `@app.middleware("http")` 装饰，从而将其注册为中间件。
-- 它接收 `request` 对象和 `call_next` 函数。
-- `call_next` 是一个接收 `request` 作为参数的函数，负责将请求传递给下一个中间件或实际的路径操作。
-- 我们在调用 `call_next` 前记录时间。
-- `await call_next(request)` 返回应用程序生成的 `response`。
-- 生成响应后，我们计算总处理时间，并将其作为自定义响应头添加。
-
-### 中间件流程
-
-请求和响应以“洋葱式”结构通过中间件。请求会依次穿过每个中间件层，直到到达路径操作，然后响应再沿相同的路径返回。
-
-```d2
-direction: down
-
-Client: "客户端"
-Middleware1: "中间件 1 (例如 GZip)"
-Middleware2: "中间件 2 (例如 Process Time)"
-PathOperation: "路径操作"
-
-subgraph "请求流程" {
-  direction: down
-  Client -> Middleware1: "请求"
-  Middleware1 -> Middleware2: "call_next(request)"
-  Middleware2 -> PathOperation: "call_next(request)"
-}
-
-subgraph "响应流程" {
-  direction: up
-  PathOperation -> Middleware2: "响应"
-  Middleware2 -> Middleware1: "return response"
-  Middleware1 -> Client: "return response"
-}
-```
+1.  在处理请求之前记录开始时间。
+2.  `await call_next(request)` 将控制权传递给应用程序的下一层（另一个中间件或实际的路径操作）。
+3.  一旦生成并返回响应，代码就会计算总处理时间。
+4.  计算出的时间被添加到响应标头中。
+5.  返回最终修改后的响应。
 
 ## 内置中间件
 
-FastAPI 包含几个有用的中间件类，你可以使用 `app.add_middleware()` 将它们添加到你的应用程序中。这些类直接从 Starlette 重新导出。
+FastAPI 包含了几个来自 Starlette 的有用中间件实现，你可以使用 `app.add_middleware()` 将它们添加到你的应用程序中。
 
 ### HTTPSRedirectMiddleware
 
-此中间件强制所有传入请求必须使用 `https` 或 `wss`。它会将任何 `http` 或 `ws` 请求重定向到其安全对应的协议。
+该中间件强制所有传入的请求必须是 `https` 或 `wss`。如果请求以 `http` 或 `ws` 协议到达，它将被重定向到安全协议。
 
 ```python
 from fastapi import FastAPI
@@ -82,11 +102,12 @@ app.add_middleware(HTTPSRedirectMiddleware)
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
+
 ```
 
 ### TrustedHostMiddleware
 
-此中间件通过确保传入请求的 `Host` 头在允许的主机列表中，来防范 HTTP Host 头攻击。它会根据允许的主机列表验证 `Host` 头，以防止此类攻击。
+该中间件强制所有传入的请求都必须正确设置 `Host` 标头，以防止 HTTP Host 标头攻击。你必须指定一个允许的主机名列表。
 
 ```python
 from fastapi import FastAPI
@@ -102,11 +123,14 @@ app.add_middleware(
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
+
 ```
+
+如果请求的 `Host` 标头与 `allowed_hosts` 中的任何模式都不匹配，它将收到一个 400 错误请求响应。
 
 ### GZipMiddleware
 
-对于 `Accept-Encoding` 头中包含 "gzip" 的任何请求，此中间件都会压缩响应，从而减少带宽使用。你可以为其配置以字节为单位的 `minimum_size`（避免压缩过小的响应）和一个从 1 到 9 的 `compresslevel`。
+该中间件处理响应的 GZip 压缩。如果客户端支持 GZip（`Accept-Encoding` 标头），响应将被压缩，这可以减少带宽使用。
 
 ```python
 from fastapi import FastAPI
@@ -119,13 +143,47 @@ app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 @app.get("/")
 async def main():
-    return "somebigcontent"
+    # 如果响应大小 > 1000 字节
+    # 并且客户端支持 gzip，则该响应将被压缩。
+    return "somebigcontent" * 200
+
 ```
+
+关键参数：
+*   `minimum_size`：仅压缩大于此字节数的响应。默认为 500。
+*   `compresslevel`：一个从 0 到 9 的整数，指定压缩级别。9 是最慢但压缩率最高，1 是最快但压缩率最低。默认为 6。
 
 ### CORSMiddleware
 
-此中间件用于处理跨源资源共享 (CORS)，这对于构建从不同域与你的 API 交互的 Web 应用程序至关重要。你可以从 `fastapi.middleware.cors` 导入它，并对其进行配置，以指定允许的来源、方法和请求头。
+该中间件处理跨域资源共享（CORS），当运行在不同域上的前端应用程序需要与你的 API 通信时，这是必需的。它允许你指定允许哪些源、方法和标头。
 
-通过利用中间件，你可以保持路径操作逻辑的整洁，专注于业务功能，同时以可重用且高效的方式处理通用任务。
+```python
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-既然你已经了解了如何使用中间件，你可能想进一步学习如何组织不断壮大的应用程序。请继续阅读，了解 [构建更大型应用程序](./advanced-bigger-applications.md) 的策略。
+app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+    "https://your-frontend-domain.com",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, # 允许特定的源
+    allow_credentials=True,
+    allow_methods=["*"],      # 允许所有方法
+    allow_headers=["*"],      # 允许所有标头
+)
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}
+```
+
+此配置使来自指定 `origins` 的客户端能够向你的 API 发出请求。
+
+---
+
+通过利用中间件，你可以为你的 FastAPI 应用程序添加强大的、可重用的功能。设置好中间件后，你可能想探索如何在你的应用中启用实时通信。请参阅 [WebSocket](./advanced-websockets.md) 部分以了解更多信息。

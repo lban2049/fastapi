@@ -1,60 +1,75 @@
 # User Guide
 
-Welcome to the FastAPI User Guide. This guide provides a hands-on, step-by-step exploration of the fundamental concepts you'll use to build robust and efficient APIs. Each section is designed to be a practical tutorial, complete with working code examples that you can build upon.
+Welcome to the FastAPI User Guide. This section is designed to walk you through the core features of FastAPI with practical, easy-to-follow examples. We'll cover everything from handling incoming request data to managing dependencies.
 
-If you haven't set up your first application yet, we recommend starting with the [Getting Started](./getting-started.md) tutorial first.
+If you haven't already, we recommend starting with the [Getting Started](./getting-started.md) tutorial to set up your first application.
 
-## Core Concepts
-
-The following tutorials cover the essential building blocks of any FastAPI application. They show you how to handle incoming data, process it, and control the response sent back to the client.
+This guide explores the typical request-response lifecycle and how FastAPI's features map to each stage.
 
 ```d2
-direction: right
+direction: down
 
-Client: Browser or App
-
-FastAPI: { 
-  style: {
-    stroke-width: 4
-  }
-  "Path & Query Params": "Extract from URL"
-  "Request Body": "Parse incoming data"
-  "Dependencies": "Handle shared logic (e.g., auth, DB)"
-  "Your Logic": "Process request"
-  "Response Handling": "Format output"
+"Client Request" {
+  shape: circle
 }
 
-Client -> FastAPI."Path & Query Params": "1. Request (e.g., GET /items/5?q=foo)"
-FastAPI."Path & Query Params" -> FastAPI."Request Body"
-FastAPI."Request Body" -> FastAPI."Dependencies"
-FastAPI."Dependencies" -> FastAPI."Your Logic"
-FastAPI."Your Logic" -> FastAPI."Response Handling"
-FastAPI."Response Handling" -> Client: "2. Response (e.g., JSON)"
+"FastAPI Application" {
+  shape: rectangle
+  grid-columns: 1
 
+  "Parameter Handling" {
+    shape: package
+    grid-columns: 2
+
+    "Path Parameters": {
+      label: "Path Parameters\n/items/{item_id}"
+    }
+    "Query Parameters": {
+      label: "Query Parameters\n/items/?skip=0"
+    }
+  }
+
+  "Data Validation" {
+    shape: package
+    "Request Body": "Pydantic Models"
+  }
+
+  "Shared Logic" {
+    shape: package
+    "Dependency Injection": "Reusable Components"
+  }
+}
+
+"API Response" {
+  shape: circle
+}
+
+"Client Request" -> "FastAPI Application"."Parameter Handling": "Receives Request"
+"FastAPI Application"."Parameter Handling" -> "FastAPI Application"."Data Validation": "Extracts Data"
+"FastAPI Application"."Data Validation" -> "FastAPI Application"."Shared Logic": "Runs Dependencies"
+"FastAPI Application"."Shared Logic" -> "API Response": "Sends Response"
 ```
 
-Explore each topic to understand how these pieces fit together.
+Explore the core concepts in detail:
 
 <x-cards data-columns="2">
-  <x-card data-title="Path Parameters" data-href="/user-guide/path-parameters" data-icon="lucide:route">
-    Learn how to declare and validate parameters embedded in the URL path, including type hints and numeric validations.
+  <x-card data-title="Path Parameters" data-icon="lucide:braces" data-href="/user-guide/path-parameters">
+    Learn how to declare and validate path parameters in your API endpoints, including type hints and numeric validations.
   </x-card>
-  <x-card data-title="Query Parameters" data-href="/user-guide/query-parameters" data-icon="lucide:list-filter">
-    Understand how to define, validate, and document parameters in the query string, including default values and aliases.
+  <x-card data-title="Query Parameters" data-icon="lucide:help-circle" data-href="/user-guide/query-parameters">
+    Understand how to define, validate, and document query parameters, including string validations, default values, and aliases.
   </x-card>
-  <x-card data-title="Request Body" data-href="/user-guide/request-body" data-icon="lucide:box-select">
-    Learn how to receive and validate complex data structures from the request body using Pydantic models.
+  <x-card data-title="Request Body" data-icon="lucide:file-text" data-href="/user-guide/request-body">
+    Learn how to receive and validate data from the request body using Pydantic models, including nested data structures and multiple body parameters.
   </x-card>
-  <x-card data-title="Handling Responses" data-href="/user-guide/handling-responses" data-icon="lucide:arrow-left-from-line">
+  <x-card data-title="Handling Responses" data-icon="lucide:arrow-left-from-line" data-href="/user-guide/handling-responses">
     Control the API response by defining response models, changing status codes, and setting custom headers and cookies.
   </x-card>
-  <x-card data-title="Dependency Injection" data-href="/user-guide/dependency-injection" data-icon="lucide:syringe">
-    Master FastAPI's powerful dependency injection system to manage dependencies, share logic, and handle authentication or database connections.
+  <x-card data-title="Dependency Injection" data-icon="lucide:share-2" data-href="/user-guide/dependency-injection">
+    Master FastAPI's powerful dependency injection system to manage dependencies, share logic, and handle authentication and database connections.
   </x-card>
 </x-cards>
 
-## Next Steps
+After mastering these core concepts, you'll be well-equipped to build robust and efficient APIs.
 
-After mastering these core concepts, you will be well-equipped to build production-ready APIs with FastAPI.
-
-When you're ready to explore more complex features, proceed to our [Advanced Topics](./advanced.md) section.
+Ready for more? Dive into our [Advanced Topics](./advanced.md) section to learn about security, middleware, WebSockets, and structuring larger applications.

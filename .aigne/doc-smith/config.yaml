@@ -64,5 +64,5 @@ docsDir: .aigne/doc-smith/docs # Directory to save generated documentation
 sourcesPath: # Source code paths to analyze
   - ./
 lastGitHead: 3e2dbf91699ef2e3a713372f099ef278b3bcc59e
-appUrl: https://staging.docsmith.aigne.io
+appUrl: https://docsmith.aigne.io
 boardId: fastapi

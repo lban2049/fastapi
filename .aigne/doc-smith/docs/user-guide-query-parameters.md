@@ -2,15 +2,19 @@
 
 When you declare function parameters that are not part of the path parameters, they are automatically interpreted as "query" parameters.
 
-The query is the set of key-value pairs that appear after the `?` in a URL. For example, in the URL `http://127.0.0.1:8000/items/?skip=0&limit=10`, the query parameters are `skip` and `limit`.
+The query is the set of key-value pairs that go after the `?` in a URL, separated by `&` characters. For example, in the URL `http://127.0.0.1:8000/items/?skip=0&limit=10`, the query parameters are `skip` and `limit`.
 
-They are a standard part of the URL and FastAPI knows how to extract them.
+Since they are part of the URL, they are "naturally" strings. But when you declare them with Python types (e.g. `int`, `float`, `bool`), they are converted to that type and validated against it.
 
-To learn about declaring parameters that are part of the URL path, see the [Path Parameters](./user-guide-path-parameters.md) documentation.
+This is all handled by FastAPI, which saves you from writing manual parsing and validation code.
 
-## Default Values
+This page covers how to define and validate query parameters. For details on path parameters, refer to the [Path Parameters](./user-guide-path-parameters.md) guide.
 
-Query parameters can be defined with default values, just like any Python function parameter. If the client does not provide a value for a parameter with a default, that default value will be used.
+## Defaults
+
+Query parameters can be defined with default values, just like any other function parameter in Python. If the client does not provide a value for a parameter with a default, FastAPI will use that default value.
+
+Here's an example where `skip` and `limit` have default values:
 
 ```python
 from fastapi import FastAPI
@@ -25,18 +29,21 @@ async def read_item(skip: int = 0, limit: int = 10):
     return fake_items_db[skip : skip + limit]
 ```
 
-In this example, `skip` and `limit` are query parameters. Since they have default values, you can access the endpoint like this:
+In this case, if you go to the URL:
 
-*   `http://127.0.0.1:8000/items/`
+`http://127.0.0.1:8000/items/`
 
-This will use the defaults `skip=0` and `limit=10`. You can also provide specific values:
+The values of `skip` and `limit` will be `0` and `10` respectively.
 
-*   `http://127.0.0.1:8000/items/?skip=20` (uses `limit=10` by default)
-*   `http://127.0.0.1:8000/items/?skip=0&limit=5`
+If you go to:
+
+`http://127.0.0.1:8000/items/?skip=20`
+
+Then `skip` will be `20` and `limit` will remain `10`.
 
 ## Optional Parameters
 
-You can declare optional query parameters by setting their default value to `None` and using `Union` or `Optional` from Python's `typing` library.
+You can also declare optional query parameters by using `Union` (or `|` in Python 3.10+) and setting the default value to `None`.
 
 ```python
 from typing import Union
@@ -51,14 +58,13 @@ async def read_item(item_id: str, q: Union[str, None] = None):
     if q:
         return {"item_id": item_id, "q": q}
     return {"item_id": item_id}
-
 ```
 
-Here, the query parameter `q` is optional. If you call `/items/foo`, `q` will be `None`. If you call `/items/foo?q=somequery`, `q` will be `"somequery"`.
+In this example, the parameter `q` is optional. If the client provides it, it will be used. If not, its value will be `None`.
 
 ## Query Parameter Type Conversion
 
-FastAPI automatically converts the types of query parameters based on your type hints. For example, a boolean parameter will correctly interpret values like `true`, `on`, `1`, or `yes`.
+FastAPI automatically converts the string values from the URL into the specified Python type. For example, a `bool` parameter will recognize values like `true`, `1`, `on`, `yes` as `True`, and `false`, `0`, `off`, `no` as `False`.
 
 ```python
 from typing import Union
@@ -80,11 +86,11 @@ async def read_item(item_id: str, q: Union[str, None] = None, short: bool = Fals
     return item
 ```
 
-If you access the URL `/items/foo?short=true`, the `short` parameter will be converted to the boolean `True`.
+If you visit `http://127.0.0.1:8000/items/foo?short=1` or `http://127.0.0.1:8000/items/foo?short=true`, the `short` parameter will be `True`, and the long description will be omitted from the response.
 
 ## Multiple Path and Query Parameters
 
-You can declare multiple path and query parameters in any order. FastAPI is smart enough to distinguish them based on their names and where they are declared.
+You can declare multiple path and query parameters in any order. FastAPI is smart enough to figure out which is which based on the path string and the function signature.
 
 ```python
 from typing import Union
@@ -108,11 +114,11 @@ async def read_user_item(
     return item
 ```
 
-In this example, `user_id` and `item_id` are path parameters, while `q` and `short` are query parameters.
+FastAPI knows that `user_id` and `item_id` are part of the path, and `q` and `short` are query parameters.
 
 ## Required Query Parameters
 
-If you declare a query parameter without a default value, it becomes required. The client must provide a value for it in the URL.
+To make a query parameter required, simply declare it without a default value.
 
 ```python
 from fastapi import FastAPI
@@ -126,9 +132,13 @@ async def read_user_item(item_id: str, needy: str):
     return item
 ```
 
-If you try to access `/items/foo-item` without the `needy` query parameter, FastAPI will return a clear HTTP error indicating that the parameter is missing.
+In this case, the function expects a required query parameter `needy` of type `str`. If you try to call the URL `http://127.0.0.1:8000/items/foo-item` without adding the `needy` parameter, FastAPI will respond with a clear HTTP error.
 
-You can also mix required, optional, and default parameters:
+A valid request would be: `http://127.0.0.1:8000/items/foo-item?needy=sooooneedy`.
+
+## Mixing Required, Optional, and Default Parameters
+
+You can mix required parameters, parameters with default values, and optional parameters freely.
 
 ```python
 from typing import Union
@@ -146,24 +156,24 @@ async def read_user_item(
     return item
 ```
 
-Here:
-- `needy` is a required `str`.
-- `skip` is an `int` with a default value of `0`.
-- `limit` is an optional `int`.
+- `item_id`: A required path parameter.
+- `needy`: A required query parameter.
+- `skip`: A query parameter with a default value of `0`.
+- `limit`: An optional query parameter.
 
-## Advanced Validation and Metadata with `Query`
+## Additional Validation with `Query`
 
-For more advanced validations and to add metadata to your query parameters, you can use the `Query` function. It allows you to set constraints like minimum and maximum length, regular expressions, and more.
+For more advanced validations on query parameters, you can use the `Query` function. This allows you to set constraints like minimum/maximum length, regular expressions, and more.
 
 First, import `Query` from `fastapi`:
 
 ```python
-from fastapi import Query
+from fastapi import FastAPI, Query
 ```
 
 ### String Validations
 
-You can apply various validations to string parameters. For example, you can enforce a minimum and maximum length.
+You can set constraints like `min_length` and `max_length` for string parameters.
 
 ```python
 from typing import Union
@@ -183,9 +193,11 @@ async def read_items(
     return results
 ```
 
-Now, if you provide a `q` parameter that is shorter than 3 characters or longer than 50, you'll receive an error.
+Here, the `q` parameter is optional, but if it is provided, it must have a length between 3 and 50 characters.
 
-You can also enforce a regular expression pattern:
+### Regular Expression Validation
+
+You can also enforce a regular expression pattern.
 
 ```python
 from typing import Union
@@ -206,64 +218,11 @@ async def read_items(
         results.update({"q": q})
     return results
 ```
-In this case, the `q` parameter must be exactly `fixedquery`.
 
-### Alias Parameters
+In this example, the value of `q` must be exactly `fixedquery`.
 
-Sometimes you need a query parameter name that isn't a valid Python identifier (e.g., `item-query`). You can use the `alias` argument in `Query` to define an alternative name for the parameter.
+### Summary
 
-```python
-from fastapi import FastAPI, Query
+FastAPI provides a powerful and intuitive way to handle query parameters. You can define them with types and default values directly in your function signature. For more complex scenarios, `Query` offers a rich set of validation options.
 
-app = FastAPI()
-
-@app.get("/items/")
-async def read_items(q: str = Query(alias="item-query")):
-    return {"q": q}
-```
-
-Now, you can call the endpoint with `http://127.0.0.1:8000/items/?item-query=somevalue`.
-
-### Deprecating Parameters
-
-You can mark a parameter as deprecated by setting `deprecated=True`. This will be reflected in the interactive API documentation.
-
-```python
-from typing import Union
-
-from fastapi import FastAPI, Query
-
-app = FastAPI()
-
-@app.get("/items/")
-async def read_items(
-    q: Union[str, None] = Query(
-        default=None,
-        alias="item-query",
-        title="Query string",
-        description="Query string for the items to search in the database",
-        min_length=3,
-        deprecated=True,
-    )
-):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-    if q:
-        results.update({"q": q})
-    return results
-```
-
----
-
-## Recap
-
-You have learned how to:
-- Define query parameters with default, optional, and required values.
-- Let FastAPI handle automatic type conversion.
-- Use `Query` to add advanced validations like `min_length`, `max_length`, and `pattern`.
-- Create aliases for parameters and mark them as deprecated.
-
-Next, you will learn how to handle data sent in the request body.
-
-<x-card data-title="Next: Request Body" data-icon="lucide:file-json-2" data-href="/user-guide/request-body">
-  Learn how to receive and validate data from the request body using Pydantic models.
-</x-card>
+After handling path and query parameters, the next step is often to handle data sent in the request body. Learn more about it in the next chapter on [Request Body](./user-guide-request-body.md).

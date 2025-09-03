@@ -1,62 +1,82 @@
 # 概述
 
-FastAPI 是一个用于通过 Python 构建 API 的现代化、高性能 Web 框架，它利用了标准的 Python 类型提示。其设计宗旨是易于使用、编码快速且可用于生产环境。
+FastAPI 是一个用于通过 Python 构建 API 的现代化、高性能 Web 框架，它基于标准的 Python 类型提示。其设计旨在易于使用、编码快速，并适用于生产环境。
 
+## 主要特性
 
-### 主要特性
+FastAPI 专注于速度、简洁性和标准化，提供了高效且愉悦的开发体验。
 
-FastAPI 旨在优化开发体验和最终应用程序的性能。
-
-<x-cards data-columns="2">
+<x-cards data-columns="3">
   <x-card data-title="性能卓越" data-icon="lucide:rocket">
-    得益于其基于 Starlette（用于 Web 部分）和 Pydantic（用于数据部分）的基础，实现了可与 **NodeJS** 和 **Go** 相媲美的高性能。它是目前可用的最快的 Python 框架之一。
+    得益于其 Starlette 和 Pydantic 基础，其性能可与 NodeJS 和 Go 相媲美。它是现有最快的 Python 框架之一。
   </x-card>
   <x-card data-title="编码快速" data-icon="lucide:zap">
-    将开发速度提升 200% 到 300%。该框架旨在帮助您以最少、最直观的代码快速构建功能。
+    将功能开发速度提升 200% 到 300%。最大限度地减少代码重复，用更少的代码完成更多的工作。
   </x-card>
-  <x-card data-title="更少 Bug" data-icon="lucide:bug-off">
-    将人为导致的错误减少约 40%。通过类型提示，您可以获得出色的编辑器支持和数据验证，从而在开发过程中捕获许多错误。
+  <x-card data-title="更少错误" data-icon="lucide:shield-check">
+    将开发人员导致的错误减少约 40%。类型提示和结构化数据验证可在错误进入生产环境前将其捕获。
   </x-card>
-  <x-card data-title="稳健且生产就绪" data-icon="lucide:shield-check">
-    通过基于开放标准的自动交互式文档、数据验证和序列化，获得生产就绪的代码。
+  <x-card data-title="直观易用" data-icon="lucide:lightbulb">
+    得益于出色的编辑器支持和无处不在的自动补全功能。花更少的时间调试，更多的时间用于构建。
+  </x-card>
+  <x-card data-title="易于学习" data-icon="lucide:book-open">
+    其设计旨在易于学习和使用。文档清晰明了，让您可以专注于应用程序的逻辑。
+  </x-card>
+  <x-card data-title="基于标准" data-icon="lucide:file-json-2">
+    完全兼容 API 的开放标准，包括 OpenAPI（前身为 Swagger）和 JSON Schema。
   </x-card>
 </x-cards>
 
-### 核心架构
+## 核心架构
 
-FastAPI 站在两大巨人的肩膀上：Starlette 负责所有 Web 部分，Pydantic 负责所有数据部分。这种分层方法使其能够同时提供高性能和稳健的数据处理能力。
+FastAPI 的卓越性能和丰富功能，得益于以下这些强大的基础：
+
+-   **[Starlette](https://www.starlette.io/)**: 用于处理所有 Web 相关部分，提供了一个轻量级、高性能的 ASGI 框架。
+-   **[Pydantic](https://docs.pydantic.dev/)**: 用于处理所有数据相关部分，基于 Python 类型提示提供强大的数据验证、序列化和文档功能。
+
+这种关注点分离的设计使得 FastAPI 在 Web 处理和数据管理两方面都表现出色。
 
 ```d2
-direction: right
+direction: down
 
-"用户请求" -> "FastAPI 引擎"
-
-"FastAPI 引擎": {
-  shape: cloud
-  "你的 API 代码 (带类型提示)": {
-    shape: document
-  }
-  "Starlette (Web 工具包)": {
-    shape: hexagon
-  }
-  "Pydantic (数据验证)": {
-    shape: hexagon
-  }
+"您的 API 代码": {
+  shape: rectangle
+  style.fill: "#DDF0FF"
 }
 
-"FastAPI 引擎" -> "API 响应 (JSON)"
+"FastAPI": {
+  shape: package
+  "您的 API 代码"
+}
 
-"你的 API 代码 (带类型提示)" -> "Starlette (Web 工具包)": 用于路由
-"你的 API 代码 (带类型提示)" -> "Pydantic (数据验证)": 用于验证和序列化
+"Starlette": {
+  shape: hexagon
+  label: "Starlette (Web 层)"
+  style.fill: "#D5E8D4"
+}
+
+"Pydantic": {
+  shape: hexagon
+  label: "Pydantic (数据层)"
+  style.fill: "#FAD7AC"
+}
+
+"FastAPI" -> "Starlette": "用于所有 Web 部分"
+"FastAPI" -> "Pydantic": "用于所有数据部分"
+
 ```
 
-### 一个快速示例
+## 代码一览
 
-创建一个 FastAPI 应用程序非常简单。下面是一个完整的示例：
+了解创建一个功能齐全且带有自动文档的 API 是多么简单。
 
-**1. 创建一个 `main.py` 文件：**
+### 1. 创建文件
+
+创建一个名为 `main.py` 的文件，内容如下：
 
 ```python
+from typing import Union
+
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -68,11 +88,13 @@ def read_root():
 
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
+def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 ```
 
-**2. 运行服务器：**
+### 2. 运行服务器
+
+在终端中执行以下命令：
 
 ```console
 $ fastapi dev main.py
@@ -80,41 +102,32 @@ $ fastapi dev main.py
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
 ```
 
-**3. 检查结果：**
+### 3. 查看交互式文档
 
-在浏览器中打开 [http://127.0.0.1:8000/items/5?q=somequery](http://127.0.0.1:8000/items/5?q=somequery)。你将看到以下 JSON 响应：
+FastAPI 会根据您的代码自动生成交互式 API 文档。只需在浏览器中打开 [`http://127.0.0.1:8000/docs`](http://127.0.0.1:8000/docs) 即可查看实际效果。
 
-```json
-{"item_id":5,"q":"somequery"}
-```
+![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
 
-### 自动交互式文档
+## 深受行业领导者信赖
 
-FastAPI 最受重视的功能之一是自动生成交互式 API 文档。无需任何额外工作，您就可以获得两个文档用户界面：
+全球众多领先公司已在生产环境中使用 FastAPI。
 
-- **Swagger UI**，可在 `/docs` 访问：
+> “ [...] 我最近在大量使用 **FastAPI**。[...] 我实际上正计划将其用于我团队在 **微软** 的所有 **机器学习服务**。其中一些服务正在被集成到核心的 **Windows** 产品和一些 **Office** 产品中。”
+> 
+> **Kabir Khan - 微软**
 
-  ![Swagger UI](https://fastapi.tiangolo.com/img/index/index-01-swagger-ui-simple.png)
+> “我们采用了 **FastAPI** 库来生成一个 **REST** 服务器，该服务器可被查询以获取 **预测结果**。[针对 Ludwig]”
+> 
+> **Piero Molino, Yaroslav Dudin, and Sai Sumanth Miryala - Uber**
 
-- **ReDoc**，可在 `/redoc` 访问：
+> “**Netflix** 很高兴地宣布，我们开源了我们的 **危机管理** 编排框架：**Dispatch**！[使用 **FastAPI** 构建]”
+> 
+> **Kevin Glisson, Marc Vilanova, Forest Monsen - Netflix**
 
-  ![ReDoc](https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png)
+## 后续步骤
 
-### 深受行业领导者信赖
+本概述介绍了 FastAPI 的主要优点。要开始构建您的第一个 API，请参阅我们的分步教程。
 
-FastAPI 已被领先的科技公司用于生产环境中的关键服务。
-
-> “如今，我正在大量使用 **FastAPI**。[...] 我实际上正计划将其用于我团队在 **Microsoft** 的所有 **ML 服务**。其中一些服务正在被集成到核心的 **Windows** 产品和一些 **Office** 产品中。”
-> <div style="text-align: right; margin-right: 10%;">Kabir Khan - <strong>Microsoft</strong></div>
-
-> “我们采用了 **FastAPI** 库来生成一个 **REST** 服务器，该服务器可以被查询以获取**预测结果**。[用于 Ludwig]”
-> <div style="text-align: right; margin-right: 10%;">Piero Molino, Yaroslav Dudin, and Sai Sumanth Miryala - <strong>Uber</strong></div>
-
-> “**Netflix** 很高兴地宣布，我们开源了我们的**危机管理**编排框架：**Dispatch**！[使用 **FastAPI** 构建]”
-> <div style="text-align: right; margin-right: 10%;">Kevin Glisson, Marc Vilanova, Forest Monsen - <strong>Netflix</strong></div>
-
-### 后续步骤
-
-本概述让您得以一窥 FastAPI 成为 API 开发的有力选择的原因。您已经看到了它的主要特性、一个简单的代码示例以及其自动文档的强大功能。
-
-准备好构建您的第一个应用程序了吗？请前往我们的[入门指南](./getting-started.md)查看分步教程。
+<x-card data-title="入门指南" data-icon="lucide:play-circle" data-href="/getting-started" data-cta="开始教程">
+  一份关于如何安装 FastAPI 并创建您的第一个应用程序的分步指南。
+</x-card>

@@ -1,20 +1,20 @@
 # Dependency Injection
 
-FastAPI includes a powerful but intuitive Dependency Injection system. It's designed to be easy to use and helps you manage dependencies, share logic, handle authentication, manage database connections, and more, all while ensuring your code remains clean and well-structured.
+FastAPI includes a powerful but intuitive Dependency Injection (DI) system. It's a way for your code to declare things it requires to work, like database sessions, authentication credentials, or shared parameters. FastAPI then takes care of providing these dependencies to your code.
 
-This system allows you to declare dependencies that your *path operation functions* need, and FastAPI takes care of providing them.
+This is very useful for:
+- Sharing logic and code.
+- Sharing database connections.
+- Enforcing security, authentication, and role requirements.
+- And many other cases.
 
-## A Simple Dependency
+Let's start with a simple example.
 
-Let's start with a basic example. Imagine you have multiple endpoints that share common query parameters, like `q`, `skip`, and `limit`.
+## Create a Dependency, or "Dependable"
 
-Instead of repeating these parameters in every function signature, you can define them once in a dedicated function.
+Imagine you have multiple endpoints that share the same query parameters, for example, for pagination (`skip`, `limit`) and an optional query string (`q`).
 
-### Create a Dependency
-
-A dependency is simply a function (or a callable) that can take the same parameters as a *path operation function*.
-
-Here, we define a `common_parameters` function that will handle our shared query parameters:
+Instead of repeating these parameters in every path operation function, you can define them once in a shared function. This function is our dependency.
 
 ```python
 from typing import Union
@@ -40,22 +40,22 @@ async def read_users(commons: dict = Depends(common_parameters)):
     return commons
 ```
 
-### How it Works
+Here's what's happening:
+1.  We created a function `common_parameters` that takes the same parameters as a path operation function (`q`, `skip`, `limit`).
+2.  This function returns a dictionary containing these values.
+3.  In our path operation functions `read_items` and `read_users`, we declare a parameter `commons`.
+4.  We provide a default value for this parameter: `Depends(common_parameters)`. `Depends` is a special marker that tells FastAPI that this parameter depends on another function.
 
-1.  **Define the Dependency**: The `common_parameters` function is our dependency. It takes the standard query parameters `q`, `skip`, and `limit`.
-2.  **"Depend" on it**: In our *path operation functions* (`read_items` and `read_users`), we add a parameter `commons`.
-3.  **Use `Depends`**: We assign the default value `Depends(common_parameters)` to the `commons` parameter. This tells FastAPI that `commons` is not a regular parameter but a dependency that needs to be resolved.
+FastAPI will then:
+- Call the dependency function (`common_parameters`) with the required parameters from the request.
+- Take the return value of that function.
+- Assign that return value to the parameter in the path operation function (`commons`).
 
-When a request comes to `/items/` or `/users/`, FastAPI will:
-*   Call the `common_parameters` function with the query parameters from the request.
-*   Take the returned value (a dictionary).
-*   Pass that dictionary as the `commons` argument to `read_items` or `read_users`.
-
-This allows you to reuse the same parameter logic across multiple endpoints without duplicating code.
+Now, both the `/items/` and `/users/` endpoints share the same set of query parameters, defined in one place.
 
 ## Classes as Dependencies
 
-While functions are great for simple dependencies, classes offer better organization for more complex logic. You can use a class as a dependency, and FastAPI will handle its instantiation.
+While functions are great for simple dependencies, you can also use classes. This can be beneficial for organizing your code, especially as dependencies become more complex.
 
 Let's refactor the previous example to use a class.
 
@@ -87,21 +87,34 @@ async def read_items(commons: CommonQueryParams = Depends(CommonQueryParams)):
     return response
 ```
 
-Here, FastAPI sees `Depends(CommonQueryParams)` and understands it needs to:
-1.  Inspect the `__init__` method of the `CommonQueryParams` class.
-2.  Resolve the parameters for `__init__` (the query parameters `q`, `skip`, and `limit`) from the request.
-3.  Create an instance of `CommonQueryParams` using those parameters.
-4.  Pass that instance as the `commons` argument to `read_items`.
+When you declare a dependency with a class like `Depends(CommonQueryParams)`, FastAPI understands that it needs to create an instance of that class. It will inspect the `__init__` method and provide the necessary parameters from the request, just as it would for a function.
 
-This approach is more structured and aligns well with object-oriented principles.
+The benefit here is that your editor will provide better autocompletion and type-checking because it knows `commons` is an instance of `CommonQueryParams`.
 
-### A Simpler Syntax
+## Shortcut: `Depends()`
 
-FastAPI provides a convenient shortcut. If you use a type hint for the dependency, you don't need to pass the callable to `Depends` again.
+You might have noticed we are repeating `CommonQueryParams` in the type hint and inside `Depends`. FastAPI provides a convenient shortcut for this common pattern.
 
-You can simply use `Depends()`:
+If you pass nothing to `Depends()`, it will use the type annotation of the parameter to determine the dependency.
 
 ```python
+from typing import Union
+
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+
+class CommonQueryParams:
+    def __init__(self, q: Union[str, None] = None, skip: int = 0, limit: int = 100):
+        self.q = q
+        self.skip = skip
+        self.limit = limit
+
+
 @app.get("/items/")
 async def read_items(commons: CommonQueryParams = Depends()):
     response = {}
@@ -112,56 +125,62 @@ async def read_items(commons: CommonQueryParams = Depends()):
     return response
 ```
 
-FastAPI is smart enough to see the type hint `CommonQueryParams` and understand that it is the dependency you want to inject. This is the most common and recommended way to use class-based dependencies.
+This code is equivalent to the previous example but is more concise. The `commons: CommonQueryParams = Depends()` syntax is the most common and recommended way to declare a class-based dependency.
 
-## Dependency Injection Flow
+### Without Type Hint
 
-The dependency injection system follows a clear and predictable flow to resolve and provide dependencies to your path operations.
+You could also write `commons = Depends(CommonQueryParams)` without a type hint, but this is not recommended. You lose the benefits of type checking and editor autocompletion.
+
+## How it Works
+
+The dependency injection system follows a clear flow when a request comes in.
 
 ```d2
 direction: down
 
-request: "Incoming Request"
-path_op: "Path Operation Function"
-
-subgraph "FastAPI Engine" {
-  direction: right
-  
-  dep_marker: "Detects `Depends()`"
-  inspector: "Inspects Dependency Signature (e.g., `__init__`)"
-  param_solver: "Resolves Parameters (query, path, etc.) from Request"
-  dep_callable: "Calls Dependency (e.g., creates class instance)"
-  
-  dep_marker -> inspector -> param_solver -> dep_callable
+"Client": {
+  shape: person
 }
 
-request -> path_op
-path_op -> dep_marker
-param_solver -> request: "gets params"
+"FastAPI App": {
+  shape: package
+  grid-columns: 1
 
-dep_result: "Dependency Result"
-dep_callable -> dep_result
-dep_result -> path_op: "Injects result"
+  "/items/ endpoint": {
+    shape: rectangle
+    "read_items(commons: CommonQueryParams = Depends())"
+  }
 
+  "Dependency Injector": {
+    shape: diamond
+  }
+
+  "CommonQueryParams": {
+    label: "CommonQueryParams class"
+    shape: class
+    "__init__(self, q, skip, limit)"
+  }
+}
+
+"HTTP Response": {
+  shape: document
+}
+
+"Client" -> "FastAPI App"."/items/ endpoint": "1. GET /items/?q=foo"
+
+"FastAPI App"."/items/ endpoint" -> "FastAPI App"."Dependency Injector": "2. Sees Depends() on 'commons' parameter"
+
+"FastAPI App"."Dependency Injector" -> "FastAPI App"."CommonQueryParams": "3. Resolves dependency from type hint\n- Extracts q, skip, limit from request\n- Creates instance: CommonQueryParams(q='foo', skip=0, limit=100)"
+
+"FastAPI App"."CommonQueryParams" -> "FastAPI App"."/items/ endpoint": "4. Injects instance into 'commons' argument"
+
+"FastAPI App"."/items/ endpoint" -> "HTTP Response": "5. Path operation runs with the dependency result"
+
+"HTTP Response" -> "Client": "6. Sends response back"
 ```
 
-## Caching
+## Summary
 
-The dependency injection system includes a cache. For a single request, if multiple parts of your code depend on the same dependency (with the same parameters), it will only be called once. The result is cached and reused for all subsequent needs within that same request.
+FastAPI's dependency injection provides a simple yet powerful way to manage dependencies and reuse code. You can define dependencies as either functions or classes and inject them into your path operations using `Depends`. This system is the foundation for many advanced features, including security and database connection management.
 
-This is controlled by the `use_cache` parameter in `Depends`, which defaults to `True`.
-
-```python
-class Depends:
-    def __init__(
-        self, dependency: Optional[Callable[..., Any]] = None, *, use_cache: bool = True
-    ):
-        self.dependency = dependency
-        self.use_cache = use_cache
-```
-
-This is particularly useful for dependencies that establish database connections or perform expensive computations, ensuring they don't run unnecessarily multiple times per request.
-
-By mastering dependency injection, you can build complex, maintainable, and robust APIs. The principles you've learned here form the foundation for more advanced topics, such as authentication and authorization.
-
-For the next step, see how to apply these concepts to secure your application in the [Security](./advanced-security.md) guide.
+To dive deeper, explore the [Advanced Topics](./advanced.md) for more complex use cases and patterns.

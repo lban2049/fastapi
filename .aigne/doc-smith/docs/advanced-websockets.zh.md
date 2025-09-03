@@ -1,31 +1,33 @@
 # WebSockets
 
-FastAPI 支持 WebSockets，可以在客户端与服务器之间实现实时、双向的通信。
+FastAPI 为 WebSockets 提供了一流的支持，实现了客户端和服务器之间的实时双向通信。这对于聊天服务、实时通知和协作编辑工具等应用非常有用。
 
-这对于需要即时更新的应用（例如聊天应用、实时通知或协作编辑工具）非常有用。
+在底层，FastAPI 的 WebSocket 功能由 Starlette 提供支持。
 
-WebSocket 连接的生命周期如下图所示：
+WebSocket 连接的基本流程如下：
 
 ```d2
-shape: sequence_diagram
+direction: down
 
-Client; Server
+"Client": { shape: person }
+"Server": { shape: rectangle }
 
-Client -> Server: "HTTP GET /ws (Upgrade Request)"
-Server -> Client: "101 Switching Protocols"
-note over Client, Server: "WebSocket Connection Established"
-Client -> Server: "Send Message"
-Server -> Client: "Send Message"
-Client <-> Server: "Bidirectional Communication..."
+"Client" -> "Server": "1. 带有 'Upgrade: websocket' 头信息的 HTTP GET 请求"
+"Server" -> "Client": "2. HTTP 101 切换协议响应"
+"Client" <-> "Server": "3. 持久双向通信通道" {
+  style {
+    stroke-dash: 4
+  }
+}
 ```
 
-## 第一步
+## 初步入门
 
-创建 WebSocket 端点与创建 HTTP 端点类似，都需要使用 `@app.websocket()` 装饰器。
+我们从一个简单的示例开始，服务器会将从客户端收到的任何消息回显过去。
 
-下面是一个简单的 WebSocket 聊天服务器示例，它会将收到的任何消息回显。
+首先，你需要一个 `WebSocket` 端点。你可以使用 `@app.websocket()` 装饰器来创建它。
 
-### 服务器端代码
+下面是一个完整的应用程序：
 
 ```python
 from fastapi import FastAPI, WebSocket
@@ -37,13 +39,13 @@ html = """
 <!DOCTYPE html>
 <html>
     <head>
-        <title>聊天</title>
+        <title>Chat</title>
     </head>
     <body>
-        <h1>WebSocket 聊天</h1>
+        <h1>WebSocket Chat</h1>
         <form action="" onsubmit="sendMessage(event)">
             <input type="text" id="messageText" autocomplete="off"/>
-            <button>发送</button>
+            <button>Send</button>
         </form>
         <ul id='messages'>
         </ul>
@@ -82,29 +84,25 @@ async def websocket_endpoint(websocket: WebSocket):
 
 ```
 
-在此示例中：
+### 代码分解
 
-1.  `@app.websocket("/ws")` 声明了一个路径为 `/ws` 的 WebSocket 端点。
-2.  该函数接收一个 `WebSocket` 对象作为参数。
-3.  `await websocket.accept()` 用于建立并接受 WebSocket 连接。此操作必须在发送或接收消息前完成。
-4.  使用 `while True` 循环持续监听传入的消息。
-5.  `await websocket.receive_text()` 等待来自客户端的消息。
-6.  `await websocket.send_text(...)` 向客户端发回消息。
+1.  **HTML 前端**：在根路径 `/` 提供一个简单的网页。它包含用于建立到 `ws://localhost:8000/ws` 的 WebSocket 连接的 JavaScript。
+2.  **`@app.websocket("/ws")`**：此装饰器声明了一个 WebSocket 端点。
+3.  **`websocket: WebSocket`**：该函数接收一个 `WebSocket` 对象作为参数。
+4.  **`await websocket.accept()`**：这至关重要。在发送或接收消息之前，你必须 `accept` 连接。
+5.  **`while True:`**：连接在此循环中保持打开状态，允许持续进行消息交换。
+6.  **`await websocket.receive_text()`**：这将等待来自客户端的消息并将其作为文本读取。
+7.  **`await websocket.send_text(...)`**：这将向客户端回送一条消息。
 
-### 客户端代码 (HTML 和 JavaScript)
+如果客户端断开连接，`websocket.receive_text()` 将引发 `WebSocketDisconnect` 异常，这将中断循环并结束函数，从而有效关闭服务器端的连接。
 
-该 Python 脚本还提供了一个简单的 HTML 页面，其中包含用于与 WebSocket 端点交互的 JavaScript。
+## 使用 Depends 和其他参数
 
--   `var ws = new WebSocket("ws://localhost:8000/ws");`：此行代码用于建立与服务器的连接。请注意 `ws://` 协议。
--   `ws.onmessage`：此函数是一个事件处理程序，每当从服务器收到消息时就会被调用。它会创建一个新的列表项并将其添加到页面中。
--   `ws.send(input.value)`：此行代码用于将文本输入框的内容发送到服务器。
+WebSocket *路径操作函数* 可以接受与常规 HTTP *路径操作函数* 相同的参数和依赖项。这包括路径参数、查询参数、Cookie、标头以及使用 `Depends` 的依赖项。
 
+这对于身份验证特别有用。你可以创建一个依赖项来检查查询参数中的令牌或会话 Cookie。
 
-## 使用 `Depends` 和其他依赖项
-
-与常规的*路径操作*一样，你也可以在 WebSocket 端点中使用依赖项，包括 `Depends`、`Path`、`Query`、`Cookie` 等。
-
-这使你可以为 WebSocket 连接添加身份验证、数据验证或其他共享逻辑。
+下面是一个保护 WebSocket 端点的示例，它要求提供会话 `Cookie` 或 `token` 查询参数。
 
 ```python
 from typing import Union
@@ -121,6 +119,8 @@ from fastapi import (
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
+
+# ... (HTML is omitted for brevity, it's similar to the previous one but with fields for item ID and token)
 
 async def get_cookie_or_token(
     websocket: WebSocket,
@@ -151,17 +151,41 @@ async def websocket_endpoint(
 
 ```
 
-关键点：
+在此示例中：
 
--   `websocket_endpoint` 函数现在可以接受路径参数（`item_id`）、查询参数（`q`）和一个依赖项（`cookie_or_token`）。
--   `get_cookie_or_token` 依赖项函数需要 `session` Cookie 或 `token` 查询参数。如果两者均未提供，它将引发 `WebSocketException`，并使用特定的错误代码来正常关闭连接。
+*   WebSocket URL 包含一个路径参数 `item_id` 和一个可选的查询参数 `q`。
+*   `get_cookie_or_token` 依赖项通过 `Depends` 注入。它会尝试获取 `session` Cookie 或 `token` 查询参数。
+*   如果两者都不存在，它会引发 `WebSocketException`。这将向客户端发送一个关闭代码并干净地终止连接，从而阻止端点的任何进一步执行。
 
+## 处理多个客户端：聊天应用
 
-## 处理断开连接和广播
+对于聊天室等应用，你需要管理多个连接的客户端并向所有客户端广播消息。实现此目的的一个简单方法是创建一个管理器类来跟踪活动连接。
 
-WebSocket 的一个常见用例是聊天应用，其中消息需要广播给多个客户端。要实现此功能，你需要管理一个活动连接列表。
+```d2
+direction: down
 
-下面是一个使用 `ConnectionManager` 类来处理连接和广播消息的示例。
+"Manager": {
+  shape: class
+  label: "ConnectionManager"
+}
+
+"Clients": {
+  shape: package
+  grid-columns: 3
+  "Client A": { shape: person }
+  "Client B": { shape: person }
+  "Client C": { shape: person }
+}
+
+"Clients" <-> "Manager": "connect() / disconnect()"
+
+"Client A" -> "Manager": "send_text('Hello')"
+
+"Manager" -> "Client A": "send_personal_message('你写道：Hello')"
+"Manager" -> "Clients": "broadcast('客户端 A 说：Hello')"
+```
+
+下面是 `ConnectionManager` 的实现及其在聊天应用中的集成：
 
 ```python
 from typing import List
@@ -170,6 +194,8 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
+
+# ... (HTML is omitted for brevity)
 
 class ConnectionManager:
     def __init__(self):
@@ -192,6 +218,12 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+
+@app.get("/")
+async def get():
+    return HTMLResponse(html)
+
+
 @app.websocket("/ws/{client_id}")
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await manager.connect(websocket)
@@ -206,13 +238,14 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
 
 ```
 
-在这个更高级的示例中：
+### 聊天应用中的关键概念
 
--   `ConnectionManager` 类维护一个 `active_connections` 列表。
--   当客户端连接时，`connect` 方法会接受该连接并将其添加到列表中。
--   当收到消息时，该消息会作为个人消息发送回原始客户端，并同时广播给所有其他已连接的客户端。
--   主逻辑被包裹在 `try...except WebSocketDisconnect` 代码块中。当客户端断开连接时，会引发 `WebSocketDisconnect` 异常。`except` 代码块会捕获此异常，将该客户端从活动连接列表中移除，并广播一条消息，通知其他客户端该用户已离开。
+*   **`ConnectionManager`**：一个维护 `active_connections` 列表的简单类。
+*   **`connect(websocket)`**：接受新连接并将其添加到列表中。
+*   **`disconnect(websocket)`**：从活动连接列表中移除 WebSocket。
+*   **`broadcast(message)`**：遍历所有活动连接并向它们发送消息。
+*   **`try...except WebSocketDisconnect`**：这是处理客户端断开连接的标准方法。当客户端关闭连接时，`receive_text()` 将引发 `WebSocketDisconnect`。`except` 块会捕获此异常，允许你执行清理操作，例如从连接管理器中移除客户端并通知其他用户。
 
-现在你已经学会了如何创建 WebSocket 端点、使用依赖项以及管理多个连接以广播消息。
+现在，你拥有了一个功能齐全的多客户端聊天应用。要了解如何将其组织成一个更大的项目，你可以继续下一部分。
 
-接下来，你可能想学习如何使用多个文件来组织大型应用。你可以在[更大型的应用](./advanced-bigger-applications.md)中阅读相关内容。
+接下来，让我们探讨如何构建[更大型的应用](./advanced-bigger-applications.md)。

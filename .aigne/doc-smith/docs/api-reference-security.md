@@ -1,18 +1,66 @@
 # Security Utilities
 
-FastAPI provides a collection of dependency-callable classes to implement various security schemes in your API. These utilities handle the extraction of credentials (like tokens, API keys, or basic auth headers) from the request and integrate with the OpenAPI documentation.
+FastAPI provides a simple and powerful set of tools to handle security and authentication. These utilities, built on top of the dependency injection system, allow you to easily implement various security schemes like OAuth2, HTTP Basic/Bearer/Digest, and API Keys. They integrate directly with the automated OpenAPI documentation, making your API's security requirements clear and interactive.
 
-This reference covers the main security utilities available in `fastapi.security`.
+This reference guide provides detailed documentation for each security class and utility model available in `fastapi.security`.
 
----
+```d2
+direction: down
 
-## API Keys
+"Security Utilities": {
+  shape: package
+  grid-columns: 2
 
-API key authentication is a common pattern where a secret key is passed in the request. FastAPI provides utilities to extract keys from query parameters, headers, or cookies.
+  "API Key Auth": {
+    shape: rectangle
+    "APIKeyQuery": {label: "From Query Param"}
+    "APIKeyHeader": {label: "From Header"}
+    "APIKeyCookie": {label: "From Cookie"}
+  }
 
-### `APIKeyQuery`
+  "HTTP Auth": {
+    shape: rectangle
+    "HTTPBasic": {}
+    "HTTPBearer": {}
+    "HTTPDigest": {}
+    "HTTPBasicCredentials": {shape: document}
+    "HTTPAuthorizationCredentials": {shape: document}
+  }
 
-Extracts an API key from a query parameter.
+  "OAuth2": {
+    shape: rectangle
+    "OAuth2PasswordBearer": {}
+    "OAuth2AuthorizationCodeBearer": {}
+    "OAuth2PasswordRequestForm": {shape: document}
+    "OAuth2PasswordRequestFormStrict": {shape: document}
+    "SecurityScopes": {shape: document}
+  }
+
+  "OpenID Connect": {
+    shape: rectangle
+    "OpenIdConnect": {}
+  }
+}
+```
+
+## API Key Authentication
+
+API key authentication can be sourced from query parameters, headers, or cookies.
+
+### APIKeyQuery
+
+Extracts an API key from a query parameter. You create an instance and use it as a dependency.
+
+**Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `str` | The name of the query parameter for the API key. |
+| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
+| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
+| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
+
+**Example**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -28,18 +76,20 @@ async def read_items(api_key: str = Depends(query_scheme)):
     return {"api_key": api_key}
 ```
 
+### APIKeyHeader
+
+Extracts an API key from an HTTP header.
+
 **Parameters**
 
-| Name | Type | Description |
+| Parameter | Type | Description |
 |---|---|---|
-| `name` | `str` | **Required.** The name of the query parameter containing the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI documentation. Defaults to the class name. |
-| `description` | `Optional[str]` | A description for the security scheme, visible in the OpenAPI documentation. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the key is not found. If `False`, the dependency returns `None`. |
+| `name` | `str` | The name of the HTTP header for the API key. |
+| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
+| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
+| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
 
-### `APIKeyHeader`
-
-Extracts an API key from a request header.
+**Example**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -55,18 +105,20 @@ async def read_items(key: str = Depends(header_scheme)):
     return {"key": key}
 ```
 
-**Parameters**
-
-| Name | Type | Description |
-|---|---|---|
-| `name` | `str` | **Required.** The name of the header containing the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI documentation. Defaults to the class name. |
-| `description` | `Optional[str]` | A description for the security scheme, visible in the OpenAPI documentation. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the header is missing. If `False`, the dependency returns `None`. |
-
-### `APIKeyCookie`
+### APIKeyCookie
 
 Extracts an API key from a request cookie.
+
+**Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `name` | `str` | The name of the cookie for the API key. |
+| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
+| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
+| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
+
+**Example**
 
 ```python
 from fastapi import Depends, FastAPI
@@ -82,24 +134,24 @@ async def read_items(session: str = Depends(cookie_scheme)):
     return {"session": session}
 ```
 
-**Parameters**
-
-| Name | Type | Description |
-|---|---|---|
-| `name` | `str` | **Required.** The name of the cookie containing the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI documentation. Defaults to the class name. |
-| `description` | `Optional[str]` | A description for the security scheme, visible in the OpenAPI documentation. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the cookie is not found. If `False`, the dependency returns `None`. |
-
----
-
 ## HTTP Authentication
 
-These utilities implement standard HTTP authentication schemes defined in RFC documents, such as Basic, Bearer, and Digest.
+Implements standard HTTP authentication schemes.
 
-### `HTTPBasic`
+### HTTPBasic
 
-Implements HTTP Basic authentication. It extracts the `Authorization` header, decodes the Base64 credentials, and returns an `HTTPBasicCredentials` object.
+Handles HTTP Basic authentication. The dependency result is an `HTTPBasicCredentials` object.
+
+**Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
+| `realm` | `Optional[str]` | The HTTP Basic authentication realm. |
+| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
+| `auto_error` | `bool` | If `True` (default), raises an error if authentication is not provided. If `False`, returns `None`. |
+
+**Example**
 
 ```python
 from typing import Annotated
@@ -117,18 +169,20 @@ def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(secur
     return {"username": credentials.username, "password": credentials.password}
 ```
 
+### HTTPBearer
+
+Handles HTTP Bearer token authentication. The dependency result is an `HTTPAuthorizationCredentials` object.
+
 **Parameters**
 
-| Name | Type | Description |
+| Parameter | Type | Description |
 |---|---|---|
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. Defaults to the class name. |
-| `realm` | `Optional[str]` | The HTTP Basic authentication realm, included in the `WWW-Authenticate` header. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the header is invalid or missing. If `False`, the dependency returns `None`. |
+| `bearerFormat` | `Optional[str]` | The bearer token format (e.g., 'JWT'), visible in the OpenAPI docs. |
+| `scheme_name` | `Optional[str]` | The security scheme name. |
+| `description` | `Optional[str]` | A description for the security scheme. |
+| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
 
-### `HTTPBearer`
-
-Implements HTTP Bearer token authentication. It verifies the `Authorization` header starts with "Bearer " and returns an `HTTPAuthorizationCredentials` object.
+**Example**
 
 ```python
 from typing import Annotated
@@ -148,18 +202,19 @@ def read_current_user(
     return {"scheme": credentials.scheme, "credentials": credentials.credentials}
 ```
 
+### HTTPDigest
+
+Handles HTTP Digest authentication. The dependency result is an `HTTPAuthorizationCredentials` object.
+
 **Parameters**
 
-| Name | Type | Description |
+| Parameter | Type | Description |
 |---|---|---|
-| `bearerFormat` | `Optional[str]` | The expected format of the bearer token (e.g., "JWT"), used for OpenAPI documentation. |
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. Defaults to the class name. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the header is invalid or missing. If `False`, the dependency returns `None`. |
+| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
+| `description` | `Optional[str]` | A description for the security scheme. |
+| `auto_error` | `bool` | If `True` (default), raises an error if the digest is missing. If `False`, returns `None`. |
 
-### `HTTPDigest`
-
-Implements HTTP Digest authentication. It verifies the `Authorization` header starts with "Digest " and returns an `HTTPAuthorizationCredentials` object.
+**Example**
 
 ```python
 from typing import Annotated
@@ -179,128 +234,104 @@ def read_current_user(
     return {"scheme": credentials.scheme, "credentials": credentials.credentials}
 ```
 
-**Parameters**
+### HTTPBasicCredentials
 
-| Name | Type | Description |
+A data model containing the username and password from HTTP Basic auth.
+
+**Attributes**
+
+| Attribute | Type | Description |
 |---|---|---|
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. Defaults to the class name. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the header is invalid or missing. If `False`, the dependency returns `None`. |
+| `username` | `str` | The HTTP Basic username. |
+| `password` | `str` | The HTTP Basic password. |
 
-### Credentials Models
+### HTTPAuthorizationCredentials
 
-- **`HTTPBasicCredentials`**: The result of using `HTTPBasic`. It has two attributes:
-  - `username` (str): The provided username.
-  - `password` (str): The provided password.
+A data model containing the scheme and credentials from an `Authorization` header.
 
-- **`HTTPAuthorizationCredentials`**: The result of `HTTPBearer` or `HTTPDigest`. It has two attributes:
-  - `scheme` (str): The authentication scheme (e.g., "Bearer").
-  - `credentials` (str): The credential string (e.g., the token).
+**Attributes**
 
----
+| Attribute | Type | Description |
+|---|---|---|
+| `scheme` | `str` | The authorization scheme (e.g., 'Bearer', 'Digest'). |
+| `credentials` | `str` | The credentials part of the header value. |
 
 ## OAuth2
 
-FastAPI provides comprehensive tools for implementing OAuth2 flows.
+Utilities for implementing OAuth2 flows.
 
-### `OAuth2PasswordBearer`
+### OAuth2PasswordBearer
 
-A dependency class for the OAuth2 Password Bearer flow. It checks for a valid `Authorization: Bearer <token>` header and returns the token as a string.
-
-**Parameters**
-
-| Name | Type | Description |
-|---|---|---|
-| `tokenUrl` | `str` | **Required.** The URL of the endpoint that issues the token (e.g., `/token`). |
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions for OpenAPI. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the token is invalid or missing. If `False`, it returns `None`. |
-| `refreshUrl` | `Optional[str]` | The URL to refresh an expired token. |
-
-### `OAuth2AuthorizationCodeBearer`
-
-A dependency class for the OAuth2 Authorization Code flow. It also expects an `Authorization: Bearer <token>` header.
+Defines an OAuth2 password bearer flow. It extracts the token from the `Authorization` header.
 
 **Parameters**
 
-| Name | Type | Description |
+| Parameter | Type | Description |
 |---|---|---|
-| `authorizationUrl` | `str` | **Required.** The URL for the authorization endpoint. |
-| `tokenUrl` | `str` | **Required.** The URL for the token exchange endpoint. |
-| `refreshUrl` | `Optional[str]` | The URL to refresh an expired token. |
+| `tokenUrl` | `str` | The URL of the path operation that provides the token (e.g., `/token`). |
 | `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions for OpenAPI. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the token is invalid or missing. If `False`, it returns `None`. |
+| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions. |
+| `description` | `Optional[str]` | A description for the security scheme. |
+| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
+| `refreshUrl` | `Optional[str]` | The URL to refresh the token. |
 
-### `OAuth2PasswordRequestForm` and `OAuth2PasswordRequestFormStrict`
+### OAuth2AuthorizationCodeBearer
 
-These are dependency classes used in a token-issuing endpoint to receive credentials as form data (`application/x-www-form-urlencoded`).
+Defines an OAuth2 authorization code bearer flow. It extracts the token from the `Authorization` header.
 
-- `OAuth2PasswordRequestForm`: `grant_type` is optional.
-- `OAuth2PasswordRequestFormStrict`: `grant_type` is required to be `"password"`, as per the OAuth2 spec.
+**Parameters**
 
-```python
-from typing import Annotated
+| Parameter | Type | Description |
+|---|---|---|
+| `authorizationUrl` | `str` | The URL for the authorization step. |
+| `tokenUrl` | `str` | The URL to obtain the token. |
+| `refreshUrl` | `Optional[str]` | The URL to refresh the token. |
+| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
+| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions. |
+| `description` | `Optional[str]` | A description for the security scheme. |
+| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
 
-from fastapi import Depends, FastAPI
-from fastapi.security import OAuth2PasswordRequestForm
+### OAuth2PasswordRequestForm
 
-app = FastAPI()
+A dependency class that captures OAuth2 password flow form data from a request.
 
+**Attributes**
 
-@app.post("/login")
-def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
-    # In a real app, you would verify form_data.username and form_data.password
-    # and then create and return a token.
-    return {"access_token": form_data.username, "token_type": "bearer"}
-```
+| Attribute | Type | Description |
+|---|---|---|
+| `grant_type` | `Optional[str]` | Must be 'password'. Permissive, allows `None`. |
+| `username` | `str` | The username from the form data. |
+| `password` | `str` | The password from the form data. |
+| `scopes` | `List[str]` | A list of scopes requested, parsed from a space-separated string. |
+| `client_id` | `Optional[str]` | The client ID, if provided in the form. |
+| `client_secret` | `Optional[str]` | The client secret, if provided in the form. |
 
-The dependency instance will have the following attributes extracted from the form data:
-- `grant_type`: The grant type (e.g., "password").
-- `username`: The user's name.
-- `password`: The user's password.
-- `scopes`: A `list[str]` of requested scopes.
-- `client_id`: The client ID, if provided.
-- `client_secret`: The client secret, if provided.
+### OAuth2PasswordRequestFormStrict
 
-### `SecurityScopes`
+A stricter version of `OAuth2PasswordRequestForm` that requires the `grant_type` form field to be present with the value `'password'`, as mandated by the OAuth2 specification.
 
-A special dependency used to access the list of scopes required by other security dependencies in the same path operation.
+### SecurityScopes
 
-```python
-from fastapi import Depends, FastAPI, Security
-from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+A special dependency class used to get the security scopes required by other dependencies in the same *path operation*.
 
-app = FastAPI()
+**Attributes**
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token", scopes={"me": "Read information about the current user."}) 
-
-@app.get("/users/me")
-async def read_users_me(
-    security_scopes: SecurityScopes, token: str = Security(oauth2_scheme, scopes=["me"])
-):
-    return {"scopes": security_scopes.scopes, "token": token}
-```
-
-It provides two attributes:
-- `scopes` (`List[str]`): The list of required scopes.
-- `scope_str` (`str`): A single string with all scopes separated by spaces.
-
----
+| Attribute | Type | Description |
+|---|---|---|
+| `scopes` | `List[str]` | A list of all scopes required by the dependencies. |
+| `scope_str` | `str` | A single string containing all scopes, separated by spaces. |
 
 ## OpenID Connect
 
-### `OpenIdConnect`
+### OpenIdConnect
 
-Implements authentication based on an OpenID Connect URL. It extracts the `Authorization` header value.
+Defines OpenID Connect authentication. It extracts the token from the `Authorization` header.
 
 **Parameters**
 
-| Name | Type | Description |
+| Parameter | Type | Description |
 |---|---|---|
-| `openIdConnectUrl` | `str` | **Required.** The discovery URL for the OpenID Connect provider. |
+| `openIdConnectUrl` | `str` | The OpenID Connect discovery URL. |
 | `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `description` | `Optional[str]` | A description for the security scheme in OpenAPI. |
-| `auto_error` | `bool` | If `True` (default), an error is raised if the `Authorization` header is missing. If `False`, it returns `None`. |
+| `description` | `Optional[str]` | A description for the security scheme. |
+| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |

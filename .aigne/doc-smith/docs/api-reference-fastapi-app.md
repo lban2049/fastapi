@@ -1,10 +1,12 @@
 # FastAPI Application
 
-The `FastAPI` class is the main entry point of your application. It provides all the functionality for your API, inheriting from `starlette.applications.Starlette` but adding features like automatic documentation, data validation, and dependency injection.
+The `FastAPI` class is the main entry point for creating and managing your application. It provides the core functionality for defining routes, handling requests, and configuring your API.
+
+This document serves as a comprehensive API reference for the `FastAPI` class, its configuration parameters, instance attributes, and methods. For a step-by-step introduction, see the [Getting Started](./getting-started.md) tutorial.
 
 ## Basic Usage
 
-Creating an instance of `FastAPI` is the first step in building your API. Here's a simple example:
+To begin, import `FastAPI` and create an application instance:
 
 ```python
 from fastapi import FastAPI
@@ -16,94 +18,159 @@ def read_root():
     return {"Hello": "World"}
 ```
 
-This creates an application instance `app` and defines a single path operation for the root URL `/`.
+## Class Diagram
 
-## Application Configuration
-
-The `FastAPI` application can be configured with several parameters during initialization to customize its behavior, metadata, and documentation.
+This diagram illustrates the core components and relationships within the `FastAPI` application structure. `FastAPI` inherits from Starlette and is primarily composed of an `APIRouter` that manages all the routes.
 
 ```d2
 direction: down
 
-"FastAPI App": {
-  shape: cloud
-  "Configuration": {
-    "Metadata": "title, description, version, etc."
-    "API Docs": "docs_url, redoc_url, openapi_url"
-    "Behavior": "dependencies, middleware, lifespan"
-    "Routing": "routes, redirect_slashes"
-  }
+"Starlette": { shape: class }
+"APIRouter": { shape: class }
 
-  "Core Components": {
-    "Router": {
-      "Path Operations": "@app.get(), @app.post(), etc."
-      "Included Routers": "app.include_router()"
-    }
-    "Middleware Stack": "Processes requests/responses"
-    "Dependency Injection": "Manages dependencies"
-    "Exception Handlers": "Handles errors gracefully"
-  }
-  "Configuration" -> "Core Components": "Initializes"
+"FastAPI": {
+  shape: class
+  
+  "router: APIRouter"
 }
+
+"FastAPI" -> "Starlette": "Inherits from"
+"FastAPI"."router: APIRouter" -> "APIRouter": "Composed of"
+
+"Path Operation Decorators\n(@app.get, @app.post, etc)": {
+    shape: rectangle
+}
+
+"include_router()": {
+    shape: rectangle
+}
+
+"Path Operation Decorators\n(@app.get, @app.post, etc)" -> "FastAPI"."router: APIRouter": "Modify"
+"include_router()" -> "FastAPI"."router: APIRouter": "Modify"
 ```
 
-### Initialization Parameters
+## Parameters
 
-Here is a comprehensive list of parameters available when creating a `FastAPI` instance:
+The `FastAPI` class constructor accepts several parameters to configure your application's behavior, metadata, and documentation.
 
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `debug` | `bool` | `False` | Enable debug mode. If `True`, error tracebacks are returned in responses. |
-| `routes` | `Optional[List[BaseRoute]]` | `None` | A list of Starlette routes. It's recommended to use path operation decorators like `@app.get()` instead. |
-| `title` | `str` | `"FastAPI"` | The title of your API, which appears in the OpenAPI schema and documentation UIs. |
-| `summary` | `Optional[str]` | `None` | A short summary of the API. |
-| `description` | `str` | `""` | A detailed description of your API. Supports Markdown. |
-| `version` | `str` | `"0.1.0"` | The version of your application's API (e.g., "1.2.0" or "v2-beta"). |
-| `openapi_url` | `Optional[str]` | `"/openapi.json"` | The URL path for the OpenAPI schema. Set to `None` to disable it and the docs UIs. |
-| `openapi_tags` | `Optional[List[Dict[str, Any]]]` | `None` | A list of dictionaries to define and order tags used in path operations for documentation. |
-| `servers` | `Optional[List[Dict]]` | `None` | A list of server definitions for the OpenAPI schema, useful for specifying different environments (e.g., staging, production). |
-| `dependencies` | `Optional[Sequence[Depends]]` | `None` | A list of global dependencies that will be applied to all path operations in the application. |
-| `default_response_class` | `Type[Response]` | `JSONResponse` | The default response class to be used for path operations. |
-| `redirect_slashes` | `bool` | `True` | Whether to automatically redirect requests if a path is accessed without a trailing slash. |
-| `docs_url` | `Optional[str]` | `"/docs"` | The URL path for the interactive Swagger UI documentation. Set to `None` to disable. |
-| `redoc_url` | `Optional[str]` | `"/redoc"` | The URL path for the ReDoc documentation. Set to `None` to disable. |
-| `swagger_ui_oauth2_redirect_url` | `Optional[str]` | `"/docs/oauth2-redirect"` | The OAuth2 redirect URL for the Swagger UI. |
-| `swagger_ui_init_oauth` | `Optional[Dict]` | `None` | A dictionary for configuring OAuth2 in Swagger UI. |
-| `swagger_ui_parameters`| `Optional[Dict]` | `None` | A dictionary of parameters to customize the Swagger UI. |
-| `middleware` | `Optional[Sequence[Middleware]]` | `None` | A sequence of Starlette middleware to add to the application. Using `app.add_middleware()` is more common. |
-| `exception_handlers` | `Optional[Dict]` | `None` | A dictionary of exception handlers. Using the `@app.exception_handler()` decorator is preferred. |
-| `on_startup` | `Optional[Sequence[Callable]]` | `None` | (Deprecated) A list of functions to run on application startup. Use `lifespan` instead. |
-| `on_shutdown` | `Optional[Sequence[Callable]]` | `None` | (Deprecated) A list of functions to run on application shutdown. Use `lifespan` instead. |
-| `lifespan` | `Optional[Lifespan]` | `None` | A context manager for handling startup and shutdown events. This is the recommended approach. |
-| `terms_of_service` | `Optional[str]` | `None` | A URL to the terms of service for the API. |
-| `contact` | `Optional[Dict]` | `None` | A dictionary with contact information for the API (e.g., `name`, `url`, `email`). |
-| `license_info` | `Optional[Dict]` | `None` | A dictionary with license information for the API (e.g., `name`, `url`). |
-| `root_path` | `str` | `""` | A path prefix for the application, useful when behind a reverse proxy. |
-| `root_path_in_servers` | `bool` | `True` | If `True`, the `root_path` is automatically added to the `servers` list in the OpenAPI schema. |
-| `responses` | `Optional[Dict]` | `None` | Additional global responses to include in all path operations in the OpenAPI schema. |
-| `callbacks` | `Optional[List[BaseRoute]]` | `None` | A list of OpenAPI callbacks to apply to all path operations. |
-| `webhooks` | `Optional[APIRouter]` | `None` | An `APIRouter` instance to declare OpenAPI webhooks. |
-| `deprecated` | `Optional[bool]` | `None` | If `True`, marks all path operations in the application as deprecated. |
-| `include_in_schema` | `bool` | `True` | Whether to include all path operations in the OpenAPI schema by default. |
-| `generate_unique_id_function` | `Callable` | `generate_unique_id` | A function to generate unique IDs for each path operation in the OpenAPI schema. |
-| `separate_input_output_schemas` | `bool` | `True` | Whether to generate separate schemas for input (request) and output (response) models. |
+| Parameter | Type | Description |
+|---|---|---|
+| `title` | `str` | The title of your API. Default: `"FastAPI"`. |
+| `description` | `str` | A description of the API, supporting Markdown. Default: `""`. |
+| `summary` | `Optional[str]` | A short summary of the API. Default: `None`. |
+| `version` | `str` | The version of your application. Default: `"0.1.0"`. |
+| `openapi_url` | `Optional[str]` | The URL for the OpenAPI schema. Set to `None` to disable. Default: `"/openapi.json"`. |
+| `docs_url` | `Optional[str]` | The URL for the Swagger UI documentation. Set to `None` to disable. Default: `"/docs"`. |
+| `redoc_url` | `Optional[str]` | The URL for the ReDoc documentation. Set to `None` to disable. Default: `"/redoc"`. |
+| `dependencies` | `Optional[Sequence[Depends]]` | A sequence of global dependencies applied to all path operations. |
+| `default_response_class` | `Type[Response]` | The default response class to use. Default: `JSONResponse`. |
+| `exception_handlers` | `Optional[Dict]` | A dictionary of exception handlers. |
+| `lifespan` | `Optional[Lifespan]` | A lifespan context manager for handling startup and shutdown events. |
+| `openapi_tags` | `Optional[List[Dict]]` | Metadata for tags used in path operations. |
+| `servers` | `Optional[List[Dict]]` | A list of server definitions for the OpenAPI schema. |
+| `contact` | `Optional[Dict]` | Contact information for the API. |
+| `license_info` | `Optional[Dict]` | License information for the API. |
+| `root_path` | `str` | A path prefix handled by a proxy. |
+| `...and others` | | For a complete list, refer to the source code. |
 
-## Core Methods
+### Metadata and Documentation Configuration
+
+You can configure the metadata for your API, which is used in the OpenAPI schema and the automatic documentation interfaces.
+
+```python
+from fastapi import FastAPI
+
+tags_metadata = [
+    {
+        "name": "users",
+        "description": "Operations with users.",
+    },
+    {
+        "name": "items",
+        "description": "Manage items.",
+    },
+]
+
+app = FastAPI(
+    title="ChimichangApp",
+    description="ChimichangApp API helps you do awesome stuff. 🚀",
+    version="2.5.0",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "Deadpoolio the Amazing",
+        "url": "http://x-force.example.com/contact/",
+        "email": "dp@x-force.example.com",
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+    openapi_tags=tags_metadata
+)
+
+@app.get("/users/", tags=["users"])
+async def read_users():
+    return [{"username": "johndoe"}]
+```
+
+### Global Dependencies
+
+You can add dependencies that will be applied to all *path operations* in the application.
+
+```python
+from fastapi import Depends, FastAPI, Header, HTTPException
+
+async def verify_token(x_token: str = Header()):
+    if x_token != "fake-super-secret-token":
+        raise HTTPException(status_code=400, detail="X-Token header invalid")
+
+app = FastAPI(dependencies=[Depends(verify_token)])
+
+@app.get("/items/")
+async def read_items():
+    return [{"item": "Portal Gun"}, {"item": "Plumbus"}]
+```
+
+## Instance Attributes
+
+A `FastAPI` instance has several attributes you can access or modify.
+
+- `router` (`APIRouter`): The main router for the application. All path operations are registered here.
+- `dependency_overrides` (`Dict`): A dictionary to override dependencies, mainly used for testing. For more details, see [Testing Dependencies with Overrides](./advanced-testing.md).
+- `state` (`State`): An object to store arbitrary application state, inherited from Starlette.
+- `openapi_schema` (`Optional[Dict]`): Caches the generated OpenAPI schema. The first time it's accessed, the schema is generated and stored here.
+- `openapi_version` (`str`): The OpenAPI version string. Defaults to `"3.1.0"` but can be modified if needed for compatibility with older tools.
+- `webhooks` (`APIRouter`): An `APIRouter` for documenting OpenAPI webhooks.
+
+## Methods
 
 ### Path Operation Decorators
 
-FastAPI uses decorators to define API endpoints. These decorators correspond to HTTP methods and are the primary way to add routes to your application.
+FastAPI uses decorators to associate functions with specific URL paths and HTTP methods. These decorators share a common set of parameters for configuration.
 
-- `@app.get()`
-- `@app.post()`
-- `@app.put()`
-- `@app.delete()`
-- `@app.patch()`
-- `@app.options()`
-- `@app.head()`
-- `@app.trace()`
+- `@app.get(path, **kwargs)`
+- `@app.post(path, **kwargs)`
+- `@app.put(path, **kwargs)`
+- `@app.delete(path, **kwargs)`
+- `@app.patch(path, **kwargs)`
+- `@app.options(path, **kwargs)`
+- `@app.head(path, **kwargs)`
+- `@app.trace(path, **kwargs)`
 
-**Example:**
+**Common Parameters**
+
+| Parameter | Type | Description |
+|---|---|---|
+| `path` | `str` | The URL path for the endpoint. |
+| `response_model` | `Any` | The Pydantic model used for the response. |
+| `status_code` | `int` | The default HTTP status code for the response. |
+| `tags` | `List[str]` | A list of tags for grouping in the API docs. |
+| `summary` | `str` | A short summary of the endpoint. |
+| `description` | `str` | A detailed description, supporting Markdown. |
+| `dependencies` | `Sequence[Depends]` | A list of dependencies specific to this endpoint. |
+| `deprecated` | `bool` | Marks the endpoint as deprecated in the docs. |
+
+**Example: `@app.post()`**
 
 ```python
 from fastapi import FastAPI
@@ -111,55 +178,61 @@ from pydantic import BaseModel
 
 class Item(BaseModel):
     name: str
+    description: str | None = None
     price: float
+    tax: float | None = None
 
 app = FastAPI()
 
-@app.post("/items/")
-def create_item(item: Item):
-    return {"message": f"Item '{item.name}' created successfully."}
+@app.post("/items/", response_model=Item, status_code=201, tags=["items"])
+async def create_item(item: Item):
+    return item
 ```
 
-### Structuring Applications with Routers
+### `include_router`
 
-The `include_router` method allows you to structure your application by splitting it into multiple `APIRouter` instances, which is essential for larger applications.
+Includes an `APIRouter` in the application, which is useful for structuring larger applications. See [Bigger Applications](./advanced-bigger-applications.md) for more details.
 
 ```python
-from fastapi import FastAPI, APIRouter
+from fastapi import APIRouter, FastAPI
 
 app = FastAPI()
-
 router = APIRouter()
 
-@router.get("/users/")
-def read_users():
-    return [{"username": "user1"}, {"username": "user2"}]
+@router.get("/users/", tags=["users"])
+async def read_users():
+    return [{"username": "Rick"}, {"username": "Morty"}]
 
-app.include_router(router, prefix="/api/v1", tags=["users"])
+app.include_router(
+    router,
+    prefix="/api/v1",
+    responses={404: {"description": "Not found"}}
+)
 ```
-For more details, see the documentation on [Bigger Applications](./advanced-bigger-applications.md).
 
-### WebSockets
+### `@app.websocket`
 
-FastAPI provides first-class support for WebSockets via the `@app.websocket()` decorator.
+Decorates a function to handle WebSocket connections.
 
 ```python
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 app = FastAPI()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Message text was: {data}")
+    except WebSocketDisconnect:
+        print("Client disconnected")
 ```
-For more advanced use cases, refer to the [WebSockets](./advanced-websockets.md) guide.
 
-### Middleware
+### `@app.middleware`
 
-You can add middleware to your application to process every request before it reaches a path operation and every response before it's sent to the client.
+Adds middleware to the application. The only supported type is `"http"`.
 
 ```python
 import time
@@ -175,11 +248,10 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 ```
-Learn more about middleware in the [Advanced Middleware](./advanced-middleware.md) section.
 
-### Exception Handlers
+### `@app.exception_handler`
 
-Custom exception handlers allow you to define how your application responds to specific exceptions.
+Registers a function to handle a specific exception type.
 
 ```python
 from fastapi import FastAPI, Request
@@ -199,29 +271,15 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 ```
 
-### Lifespan Events
+## Next Steps
 
-The `lifespan` context manager is the recommended way to handle logic that needs to run before the application starts up (e.g., initializing a database connection pool) and when it shuts down.
+Now that you are familiar with the main `FastAPI` application class, you might want to explore how to structure your application with routers.
 
-```python
-from contextlib import asynccontextmanager
-from fastapi import FastAPI
-
-db_connections = {}
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Code to run on startup
-    print("Connecting to database...")
-    db_connections["main"] = {"status": "connected"}
-    yield
-    # Code to run on shutdown
-    print("Closing database connection...")
-    db_connections.clear()
-
-app = FastAPI(lifespan=lifespan)
-```
-
----
-
-This reference provides a comprehensive overview of the `FastAPI` application class. For more detailed information on structuring your routes, please proceed to the [Routing](./api-reference-routing.md) API reference.
+<x-cards>
+  <x-card data-title="Routing" data-icon="lucide:milestone" data-href="/api-reference/routing">
+    Learn about APIRouter to organize your path operations into separate modules.
+  </x-card>
+  <x-card data-title="Bigger Applications" data-icon="lucide:layout-grid" data-href="/advanced/bigger-applications">
+    Discover strategies for structuring large, production-ready applications.
+  </x-card>
+</x-cards>

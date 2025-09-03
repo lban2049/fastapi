@@ -1,12 +1,14 @@
 # 请求体
 
-当需要从客户端（例如浏览器）向 API 发送数据时，会以**请求体**的形式发送。这通常用于创建或更新数据的操作，例如 `POST`、`PUT` 和 `PATCH`。
+当需要从客户端（如浏览器）向 API 发送数据时，会以**请求体**的形式发送。请求体是客户端发送给 API 的数据。**响应体**是 API 发送给客户端的数据。
 
-FastAPI 利用 Pydantic 模型来定义、验证和记录这些请求体，从而可以用极少的代码轻松处理复杂的数据结构。
+API 几乎总是需要发送响应体。但客户端不一定总是需要发送请求体。要声明请求体，可以使用 Pydantic 模型，它功能强大且有很多优点。
 
-## 创建第一个请求体
+## 创建数据模型
 
-首先，将数据结构定义为 Pydantic 模型。该模型声明了所期望数据的结构、字段及其类型。
+首先，需要从 `pydantic` 导入 `BaseModel`。
+
+然后，将数据模型声明为继承自 `BaseModel` 的类。所有属性都使用标准的 Python 类型。
 
 ```python
 from typing import Union
@@ -30,20 +32,34 @@ async def create_item(item: Item):
     return item
 ```
 
-在此示例中：
-- 我们定义了一个 `Item` 模型，包含 `name`、`description`、`price` 和 `tax` 字段。
-- `create_item` 函数接受一个类型提示为 `Item` 的 `item` 参数。
+当模型属性有默认值时，它就不是必需的。否则，就是必需的。使用 `None` 可以使其变为可选。
 
-仅需这一个类型声明，FastAPI 就会：
-1.  读取 JSON 格式的请求体。
-2.  将类型转换为相应的 Python 类型。
-3.  验证数据。如果数据无效，它会返回一个清晰的错误，指明问题所在。
-4.  在 `item` 参数中提供接收到的数据。
-5.  为模型生成 JSON Schema，该 Schema 将用于 OpenAPI 文档。
+例如，在上面的模型中，`name` 和 `price` 是必需的，而 `description` 和 `tax` 是可选的。
+
+## 将其声明为参数
+
+要将其添加到*路径操作*中，可以像声明路径和查询参数一样声明它：
+
+```python
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+```
+
+...并将其类型声明为你创建的模型 `Item`。
+
+仅通过该 Python 类型声明，**FastAPI** 将会：
+
+*   以 JSON 格式读取请求体。
+*   转换相应的类型（如果需要）。
+*   验证数据。如果数据无效，它将返回一个清晰明了的错误，指明不正确数据的确切位置和描述。
+*   在参数 `item` 中提供接收到的数据。
+*   为模型生成 JSON Schema 定义，如果合理，也可以在项目的其他任何地方使用它们。
+*   这些模式将成为生成的 OpenAPI 模式的一部分，并被自动文档 UI 使用。
 
 ## 使用模型
 
-在函数内部，可以直接访问模型对象的所有属性。如果需要，也可以将模型转换为字典。
+在函数内部，可以直接访问模型对象的所有属性：
 
 ```python
 from typing import Union
@@ -71,11 +87,37 @@ async def create_item(item: Item):
     return item_dict
 ```
 
-在这里，如果提供了 `tax`，我们会将传入的 `item` 转换为字典，并添加一个计算得出的 `price_with_tax` 字段。
+## 请求体 + 路径参数
 
-## 组合路径、查询和请求体参数
+可以同时声明路径参数和请求体。**FastAPI** 会识别出与路径参数匹配的函数参数应从路径中获取，而声明为 Pydantic 模型的函数参数应从请求体中获取。
 
-可以在同一个函数中声明路径参数、查询参数和请求体参数。FastAPI 会正确识别每一个参数，并从相应的来源获取数据。
+```python
+from typing import Union
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+
+class Item(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+
+
+app = FastAPI()
+
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item):
+    return {"item_id": item_id, **item.dict()}
+```
+
+## 请求体 + 路径 + 查询参数
+
+也可以同时声明**请求体**、**路径**和**查询**参数。
+
+**FastAPI** 将会识别它们中的每一个，并从正确的位置获取数据。
 
 ```python
 from typing import Union
@@ -102,20 +144,81 @@ async def update_item(item_id: int, item: Item, q: Union[str, None] = None):
     return result
 ```
 
-在这个 `update_item` 函数中：
-- `item_id` 是一个**路径参数**。
-- `item` 是一个**请求体参数**。
-- `q` 是一个**查询参数**。
+函数参数将按以下方式被识别：
 
-FastAPI 会同时处理所有这些参数。
+*   如果参数也在**路径**中声明，它将被用作路径参数。
+*   如果参数是**单一类型**（如 `int`、`float`、`str`、`bool` 等），它将被解释为**查询**参数。
+*   如果参数被声明为 **Pydantic 模型**类型，它将被解释为请求**体**。
 
-## 多个请求体参数和字段
+## 混合多个参数
 
-有时可能需要接收多个请求体参数，或者将单个模型嵌入一个 JSON 键中。对于这些情况，可以使用 `Body` 工具。
+可以在*路径操作函数*中混合使用 `Path`、`Query` 和请求体声明，FastAPI 会处理所有这些声明。
 
-### 嵌入单个请求体参数
+```python
+from typing import Union
 
-如果希望请求体是一个 JSON 对象，且该对象包含一个特定键（例如 `"item"`），该键的值为模型数据，那么可以使用 `Body(embed=True)`。
+from fastapi import FastAPI, Path
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+
+
+@app.put("/items/{item_id}")
+async def update_item(
+    *,
+    item_id: int = Path(title="The ID of the item to get", ge=0, le=1000),
+    q: Union[str, None] = None,
+    item: Union[Item, None] = None,
+):
+    results = {"item_id": item_id}
+    if q:
+        results.update({"q": q})
+    if item:
+        results.update({"item": item})
+    return results
+```
+
+## 嵌套模型
+
+可以通过嵌套 Pydantic 模型，在请求体中定义复杂的嵌套 JSON 对象。
+
+例如，一个 item 可以有一个标签列表。为此，可以将 `tags` 属性定义为一个列表。
+
+```python
+from typing import Union
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    description: Union[str, None] = None
+    price: float
+    tax: Union[float, None] = None
+    tags: list = []
+
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item):
+    results = {"item_id": item_id, "item": item}
+    return results
+```
+
+为了更好的类型安全和编辑器支持，可以更具体地指定列表中的项目，例如 `tags: list[str] = []`。也可以使用其他 Pydantic 模型的列表来创建更深层次的嵌套。
+
+## 嵌入单个请求体参数
+
+默认情况下，如果在函数中声明单个 Pydantic 模型，其内容将被视为请求的直接主体。但是，可以指示 FastAPI 期望一个带有特定键的 JSON 对象。这可以通过使用 `Body` 实现。
 
 ```python
 from typing import Union
@@ -141,75 +244,34 @@ async def update_item(item_id: int, item: Item = Body(embed=True)):
     return results
 ```
 
-请求体将不再是这样：
-```json
-{
-    "name": "Foo",
-    "description": "A very nice Item",
-    "price": 35.4,
-    "tax": 3.2
-}
-```
+在这种情况下，FastAPI 将期望一个如下所示的请求体：
 
-FastAPI 现在将期望的请求体是这样：
 ```json
 {
     "item": {
         "name": "Foo",
-        "description": "A very nice Item",
-        "price": 35.4,
+        "description": "The pretender",
+        "price": 42.0,
         "tax": 3.2
     }
 }
 ```
 
-### 使用 `Field` 添加丰富验证
-
-注意，在上面的示例中，我们还使用了 Pydantic 的 `Field`。这允许为模型的属性添加额外的验证和元数据，例如 `title`、`description`、`max_length` 以及像 `gt`（大于）这样的数值约束。
-
-这些额外信息也会用于为 API 文档生成更详细、更准确的 OpenAPI schema。
-
-## 嵌套模型
-
-通过在 Pydantic 模型中嵌套使用其他 Pydantic 模型，可以定义复杂的嵌套 JSON 对象。例如，可以包含子模型列表，或将其他模型作为属性。
-
-下面是一个 `Item` 包含标签列表的示例。
-
-```python
-from typing import Union
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-app = FastAPI()
-
-
-class Item(BaseModel):
-    name: str
-    description: Union[str, None] = None
-    price: float
-    tax: Union[float, None] = None
-    tags: list = []
-
-
-@app.put("/items/{item_id}")
-async def update_item(item_id: int, item: Item):
-    results = {"item_id": item_id, "item": item}
-    return results
-```
-
-该端点的一个有效请求体可能如下所示：
+而不是：
 
 ```json
 {
     "name": "Foo",
-    "description": "A very nice Item",
-    "price": 35.4,
-    "tax": 3.2,
-    "tags": ["electronics", "hardware", "computer"]
+    "description": "The pretender",
+    "price": 42.0,
+    "tax": 3.2
 }
 ```
 
-FastAPI 会自动处理这些嵌套结构的验证。`tags` 字段甚至可以是 `list[OtherModel]`，以支持更深层嵌套的数据。
+这也演示了如何使用 `Field` 为 Pydantic 模型属性添加额外的验证和元数据。
 
-既然已经了解了如何处理客户端发送的数据，接下来让我们在[处理响应](./user-guide-handling-responses.md)部分探讨如何控制返回的数据。
+---
+
+现在已经了解了如何处理从客户端发送的数据，接下来将探讨如何控制返回的内容。
+
+接下来，学习如何配置[处理响应](./user-guide-handling-responses.md)。
