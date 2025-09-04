@@ -1,20 +1,18 @@
 # Query Parameters
 
-When you declare function parameters that are not part of the path parameters, they are automatically interpreted as "query" parameters.
+When you declare function parameters that are not part of the path, they are automatically interpreted as "query" parameters.
 
 The query is the set of key-value pairs that go after the `?` in a URL, separated by `&` characters. For example, in the URL `http://127.0.0.1:8000/items/?skip=0&limit=10`, the query parameters are `skip` and `limit`.
 
-Since they are part of the URL, they are "naturally" strings. But when you declare them with Python types (e.g. `int`, `float`, `bool`), they are converted to that type and validated against it.
+Since they are part of the URL, they are "naturally" strings. But when you declare them with Python types (e.g., `int`, `float`, `bool`), FastAPI automatically converts and validates them.
 
-This is all handled by FastAPI, which saves you from writing manual parsing and validation code.
-
-This page covers how to define and validate query parameters. For details on path parameters, refer to the [Path Parameters](./user-guide-path-parameters.md) guide.
+This guide covers how to define, validate, and document query parameters. For details on path parameters, refer to the [Path Parameters](./user-guide-path-parameters.md) guide.
 
 ## Defaults
 
-Query parameters can be defined with default values, just like any other function parameter in Python. If the client does not provide a value for a parameter with a default, FastAPI will use that default value.
+Query parameters can have default values. If the client doesn't provide a value for a parameter with a default, FastAPI will use that default value.
 
-Here's an example where `skip` and `limit` have default values:
+Here, `skip` and `limit` have default values of `0` and `10`:
 
 ```python
 from fastapi import FastAPI
@@ -29,7 +27,7 @@ async def read_item(skip: int = 0, limit: int = 10):
     return fake_items_db[skip : skip + limit]
 ```
 
-In this case, if you go to the URL:
+If you go to the URL:
 
 `http://127.0.0.1:8000/items/`
 
@@ -43,7 +41,7 @@ Then `skip` will be `20` and `limit` will remain `10`.
 
 ## Optional Parameters
 
-You can also declare optional query parameters by using `Union` (or `|` in Python 3.10+) and setting the default value to `None`.
+You can declare optional query parameters by using `Union` (or `|` in Python 3.10+) and setting the default value to `None`.
 
 ```python
 from typing import Union
@@ -60,7 +58,7 @@ async def read_item(item_id: str, q: Union[str, None] = None):
     return {"item_id": item_id}
 ```
 
-In this example, the parameter `q` is optional. If the client provides it, it will be used. If not, its value will be `None`.
+In this case, the parameter `q` is optional. If the client provides it, it will be used. If not, its value will be `None`.
 
 ## Query Parameter Type Conversion
 
@@ -114,7 +112,7 @@ async def read_user_item(
     return item
 ```
 
-FastAPI knows that `user_id` and `item_id` are part of the path, and `q` and `short` are query parameters.
+FastAPI knows that `user_id` and `item_id` are part of the path, while `q` and `short` are query parameters.
 
 ## Required Query Parameters
 
@@ -132,7 +130,7 @@ async def read_user_item(item_id: str, needy: str):
     return item
 ```
 
-In this case, the function expects a required query parameter `needy` of type `str`. If you try to call the URL `http://127.0.0.1:8000/items/foo-item` without adding the `needy` parameter, FastAPI will respond with a clear HTTP error.
+Here, the function expects a required query parameter `needy`. If you try to call `http://127.0.0.1:8000/items/foo-item` without adding the `needy` parameter, FastAPI will respond with a clear HTTP error.
 
 A valid request would be: `http://127.0.0.1:8000/items/foo-item?needy=sooooneedy`.
 
@@ -221,7 +219,35 @@ async def read_items(
 
 In this example, the value of `q` must be exactly `fixedquery`.
 
-### Summary
+### Other Validations
+
+`Query` supports many other validation parameters, including:
+
+- `alias`: To use a different name for the parameter in the URL (e.g., `item-query` instead of `q`).
+- `title`: A human-readable title for the parameter in the documentation.
+- `description`: A description for the parameter.
+- `deprecated`: To mark a parameter as deprecated in the OpenAPI documentation.
+- `gt`, `ge`, `lt`, `le`: For numeric validations (greater than, greater than or equal to, etc.).
+
+You can also declare a parameter to accept a list of values:
+
+```python
+from typing import List, Union
+
+from fastapi import FastAPI, Query
+
+app = FastAPI()
+
+
+@app.get("/items/")
+async def read_items(q: Union[List[str], None] = Query(default=None)):
+    query_items = {"q": q}
+    return query_items
+```
+
+With this, you can send requests like `http://127.0.0.1:8000/items/?q=foo&q=bar`, and FastAPI will correctly parse `q` as `["foo", "bar"]`.
+
+## Summary
 
 FastAPI provides a powerful and intuitive way to handle query parameters. You can define them with types and default values directly in your function signature. For more complex scenarios, `Query` offers a rich set of validation options.
 

@@ -1,44 +1,64 @@
-# 安全工具
+# 安全实用工具
 
-FastAPI 提供了一套简单而强大的工具来处理安全和身份验证。这些工具构建于依赖注入系统之上，让你可以轻松实现各种安全方案，如 OAuth2、HTTP Basic/Bearer/Digest 和 API 密钥。它们直接与自动生成的 OpenAPI 文档集成，使你的 API 的安全要求清晰且可交互。
+FastAPI 提供了一套简单而强大的工具来处理安全和身份验证。这些实用工具构建于依赖注入系统之上，可让你轻松实现各种安全方案，如 OAuth2、HTTP 基本/持有者/摘要式认证和 API 密钥。它们直接与自动生成的 OpenAPI 文档集成，使你的 API 的安全要求清晰明了且具有交互性。
 
 本参考指南为 `fastapi.security` 中可用的每个安全类和实用工具模型提供了详细文档。
 
 ```d2
 direction: down
 
-"安全工具": {
+Security-Utilities: {
+  label: "Security Utilities"
   shape: package
   grid-columns: 2
 
-  "API 密钥认证": {
+  API-Key-Auth: {
+    label: "API Key Auth"
     shape: rectangle
-    "APIKeyQuery": {label: "来自查询参数"}
-    "APIKeyHeader": {label: "来自标头"}
-    "APIKeyCookie": {label: "来自 Cookie"}
+    APIKeyQuery: {
+      label: "From Query Param"
+    }
+    APIKeyHeader: {
+      label: "From Header"
+    }
+    APIKeyCookie: {
+      label: "From Cookie"
+    }
   }
 
-  "HTTP 认证": {
+  HTTP-Auth: {
+    label: "HTTP Auth"
     shape: rectangle
-    "HTTPBasic": {}
-    "HTTPBearer": {}
-    "HTTPDigest": {}
-    "HTTPBasicCredentials": {shape: document}
-    "HTTPAuthorizationCredentials": {shape: document}
+    HTTPBasic: {}
+    HTTPBearer: {}
+    HTTPDigest: {}
+    HTTPBasicCredentials: {
+      shape: document
+    }
+    HTTPAuthorizationCredentials: {
+      shape: document
+    }
   }
 
-  "OAuth2": {
+  OAuth2: {
     shape: rectangle
-    "OAuth2PasswordBearer": {}
-    "OAuth2AuthorizationCodeBearer": {}
-    "OAuth2PasswordRequestForm": {shape: document}
-    "OAuth2PasswordRequestFormStrict": {shape: document}
-    "SecurityScopes": {shape: document}
+    OAuth2PasswordBearer: {}
+    OAuth2AuthorizationCodeBearer: {}
+    OAuth2PasswordRequestForm: {
+      shape: document
+    }
+    OAuth2PasswordRequestFormStrict: {
+      shape: document
+    }
+    SecurityScopes: {
+      shape: document
+    }
   }
 
-  "OpenID Connect": {
+  OpenID-Connect: {
+    label: "OpenID Connect"
     shape: rectangle
-    "OpenIdConnect": {}
+    OpenIdConnect: {}
   }
 }
 ```
@@ -57,8 +77,8 @@ API 密钥认证可以来源于查询参数、标头或 Cookie。
 |---|---|---|
 | `name` | `str` | 用于 API 密钥的查询参数的名称。 |
 | `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
-| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
+| `description` | `Optional[str]` | OpenAPI 文档中安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
 
 **示例**
 
@@ -86,8 +106,8 @@ async def read_items(api_key: str = Depends(query_scheme)):
 |---|---|---|
 | `name` | `str` | 用于 API 密钥的 HTTP 标头的名称。 |
 | `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
-| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
+| `description` | `Optional[str]` | OpenAPI 文档中安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
 
 **示例**
 
@@ -115,8 +135,8 @@ async def read_items(key: str = Depends(header_scheme)):
 |---|---|---|
 | `name` | `str` | 用于 API 密钥的 Cookie 的名称。 |
 | `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
-| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时会引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
+| `description` | `Optional[str]` | OpenAPI 文档中安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在密钥缺失时引发 HTTP 403 错误。如果为 `False`，依赖项将返回 `None`。 |
 
 **示例**
 
@@ -140,16 +160,16 @@ async def read_items(session: str = Depends(cookie_scheme)):
 
 ### HTTPBasic
 
-处理 HTTP Basic 认证。依赖项的结果是一个 `HTTPBasicCredentials` 对象。
+处理 HTTP 基本认证。依赖项的结果是一个 `HTTPBasicCredentials` 对象。
 
 **参数**
 
 | Parameter | Type | Description |
 |---|---|---|
 | `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
-| `realm` | `Optional[str]` | HTTP Basic 认证域。 |
-| `description` | `Optional[str]` | 在 OpenAPI 文档中对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在未提供认证时会引发错误。如果为 `False`，则返回 `None`。 |
+| `realm` | `Optional[str]` | HTTP 基本认证领域。 |
+| `description` | `Optional[str]` | OpenAPI 文档中安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在未提供认证时引发错误。如果为 `False`，则返回 `None`。 |
 
 **示例**
 
@@ -177,10 +197,10 @@ def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(secur
 
 | Parameter | Type | Description |
 |---|---|---|
-| `bearerFormat` | `Optional[str]` | Bearer 令牌的格式（例如，'JWT'），在 OpenAPI 文档中可见。 |
+| `bearerFormat` | `Optional[str]` | 持有者令牌的格式（例如，'JWT'），在 OpenAPI 文档中可见。 |
 | `scheme_name` | `Optional[str]` | 安全方案的名称。 |
-| `description` | `Optional[str]` | 对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `description` | `Optional[str]` | 安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时引发错误。如果为 `False`，则返回 `None`。 |
 
 **示例**
 
@@ -204,15 +224,15 @@ def read_current_user(
 
 ### HTTPDigest
 
-处理 HTTP Digest 认证。依赖项的结果是一个 `HTTPAuthorizationCredentials` 对象。
+处理 HTTP 摘要式认证。依赖项的结果是一个 `HTTPAuthorizationCredentials` 对象。
 
 **参数**
 
 | Parameter | Type | Description |
 |---|---|---|
 | `scheme_name` | `Optional[str]` | 安全方案的名称，在 OpenAPI 文档中可见。 |
-| `description` | `Optional[str]` | 对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在摘要缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `description` | `Optional[str]` | 安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在摘要缺失时引发错误。如果为 `False`，则返回 `None`。 |
 
 **示例**
 
@@ -236,14 +256,14 @@ def read_current_user(
 
 ### HTTPBasicCredentials
 
-一个包含来自 HTTP Basic 认证的用户名和密码的数据模型。
+一个包含来自 HTTP 基本认证的用户名和密码的数据模型。
 
 **属性**
 
 | Attribute | Type | Description |
 |---|---|---|
-| `username` | `str` | HTTP Basic 用户名。 |
-| `password` | `str` | HTTP Basic 密码。 |
+| `username` | `str` | HTTP 基本认证的用户名。 |
+| `password` | `str` | HTTP 基本认证的密码。 |
 
 ### HTTPAuthorizationCredentials
 
@@ -258,26 +278,26 @@ def read_current_user(
 
 ## OAuth2
 
-用于实现 OAuth2 流程的工具。
+用于实现 OAuth2 流的实用工具。
 
 ### OAuth2PasswordBearer
 
-定义一个 OAuth2 密码持有者流程。它从 `Authorization` 标头中提取令牌。
+定义一个 OAuth2 密码持有者流。它从 `Authorization` 标头中提取令牌。
 
 **参数**
 
 | Parameter | Type | Description |
 |---|---|---|
 | `tokenUrl` | `str` | 提供令牌的路径操作的 URL（例如，`/token`）。 |
-| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
+| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
 | `scopes` | `Optional[Dict[str, str]]` | 可用范围及其描述的字典。 |
-| `description` | `Optional[str]` | 对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `description` | `Optional[str]` | 安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时引发错误。如果为 `False`，则返回 `None`。 |
 | `refreshUrl` | `Optional[str]` | 刷新令牌的 URL。 |
 
 ### OAuth2AuthorizationCodeBearer
 
-定义一个 OAuth2 授权码持有者流程。它从 `Authorization` 标头中提取令牌。
+定义一个 OAuth2 授权码持有者流。它从 `Authorization` 标头中提取令牌。
 
 **参数**
 
@@ -286,40 +306,40 @@ def read_current_user(
 | `authorizationUrl` | `str` | 授权步骤的 URL。 |
 | `tokenUrl` | `str` | 获取令牌的 URL。 |
 | `refreshUrl` | `Optional[str]` | 刷新令牌的 URL。 |
-| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
+| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
 | `scopes` | `Optional[Dict[str, str]]` | 可用范围及其描述的字典。 |
-| `description` | `Optional[str]` | 对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `description` | `Optional[str]` | 安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时引发错误。如果为 `False`，则返回 `None`。 |
 
 ### OAuth2PasswordRequestForm
 
-一个从请求中捕获 OAuth2 密码流表单数据的依赖类。
+一个从请求中捕获 OAuth2 密码流表单数据的依赖项类。
 
 **属性**
 
 | Attribute | Type | Description |
 |---|---|---|
 | `grant_type` | `Optional[str]` | 必须是 'password'。此为宽容模式，允许 `None`。 |
-| `username` | `str` | 表单数据中的用户名。 |
-| `password` | `str` | 表单数据中的密码。 |
+| `username` | `str` | 来自表单数据的用户名。 |
+| `password` | `str` | 来自表单数据的密码。 |
 | `scopes` | `List[str]` | 请求的范围列表，从一个以空格分隔的字符串中解析得出。 |
 | `client_id` | `Optional[str]` | 客户端 ID，如果在表单中提供。 |
 | `client_secret` | `Optional[str]` | 客户端密钥，如果在表单中提供。 |
 
 ### OAuth2PasswordRequestFormStrict
 
-`OAuth2PasswordRequestForm` 的更严格版本，根据 OAuth2 规范的要求，该版本要求 `grant_type` 表单字段必须存在且值为 `'password'`。
+`OAuth2PasswordRequestForm` 的一个更严格的版本，它要求 `grant_type` 表单字段必须存在且值为 `'password'`，这是 OAuth2 规范所强制要求的。
 
 ### SecurityScopes
 
-一个特殊的依赖类，用于获取同一*路径操作*中其他依赖项所需的安全范围。
+一个特殊的依赖项类，用于获取同一*路径操作*中其他依赖项所需的安全范围。
 
 **属性**
 
 | Attribute | Type | Description |
 |---|---|---|
-| `scopes` | `List[str]` | 依赖项所需的所有范围的列表。 |
-| `scope_str` | `str` | 一个包含所有范围的单一字符串，以空格分隔。 |
+| `scopes` | `List[str]` | 所有依赖项所需的范围列表。 |
+| `scope_str` | `str` | 一个包含所有范围的字符串，以空格分隔。 |
 
 ## OpenID Connect
 
@@ -332,6 +352,6 @@ def read_current_user(
 | Parameter | Type | Description |
 |---|---|---|
 | `openIdConnectUrl` | `str` | OpenID Connect 发现 URL。 |
-| `scheme_name` | `Optional[str]` | 用于 OpenAPI 的安全方案名称。 |
-| `description` | `Optional[str]` | 对安全方案的描述。 |
-| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时会引发错误。如果为 `False`，则返回 `None`。 |
+| `scheme_name` | `Optional[str]` | OpenAPI 的安全方案名称。 |
+| `description` | `Optional[str]` | 安全方案的描述。 |
+| `auto_error` | `bool` | 如果为 `True`（默认值），则在令牌缺失时引发错误。如果为 `False`，则返回 `None`。 |

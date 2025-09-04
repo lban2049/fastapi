@@ -39,30 +39,31 @@ This separation of concerns allows FastAPI to excel at both web handling and dat
 ```d2
 direction: down
 
-"Your API Code": {
+"Your-API-Code": {
+  label: "Your API Code"
   shape: rectangle
   style.fill: "#DDF0FF"
 }
 
-"FastAPI": {
+FastAPI: {
   shape: package
-  "Your API Code"
+  "Your-API-Code"
 }
 
-"Starlette": {
+Starlette: {
   shape: hexagon
   label: "Starlette (Web layer)"
   style.fill: "#D5E8D4"
 }
 
-"Pydantic": {
+Pydantic: {
   shape: hexagon
   label: "Pydantic (Data layer)"
   style.fill: "#FAD7AC"
 }
 
-"FastAPI" -> "Starlette": "Uses for all web parts"
-"FastAPI" -> "Pydantic": "Uses for all data parts"
+FastAPI -> Starlette: "Uses for all web parts"
+FastAPI -> Pydantic: "Uses for all data parts"
 
 ```
 

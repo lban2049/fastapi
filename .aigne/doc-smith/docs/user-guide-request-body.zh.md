@@ -1,14 +1,18 @@
 # 请求体
 
-当需要从客户端（如浏览器）向 API 发送数据时，会以**请求体**的形式发送。请求体是客户端发送给 API 的数据。**响应体**是 API 发送给客户端的数据。
+当需要从客户端（如浏览器）发送数据到 API 时，会将其作为**请求体**发送。
 
-API 几乎总是需要发送响应体。但客户端不一定总是需要发送请求体。要声明请求体，可以使用 Pydantic 模型，它功能强大且有很多优点。
+请求体是客户端发送给 API 的数据。**响应体**是 API 发送给客户端的数据。
+
+API 几乎总是需要发送响应体，但客户端不一定总是需要发送请求体。
+
+要声明请求体，可以使用 Pydantic 模型，并利用其所有功能和优点。
 
 ## 创建数据模型
 
 首先，需要从 `pydantic` 导入 `BaseModel`。
 
-然后，将数据模型声明为继承自 `BaseModel` 的类。所有属性都使用标准的 Python 类型。
+然后，将数据模型声明为继承自 `BaseModel` 的类。为所有属性使用标准的 Python 类型。
 
 ```python
 from typing import Union
@@ -32,7 +36,7 @@ async def create_item(item: Item):
     return item
 ```
 
-当模型属性有默认值时，它就不是必需的。否则，就是必需的。使用 `None` 可以使其变为可选。
+当模型属性有默认值时，它就不是必需的。否则，它就是必需的。使用 `None` 使其变为可选。
 
 例如，在上面的模型中，`name` 和 `price` 是必需的，而 `description` 和 `tax` 是可选的。
 
@@ -46,13 +50,13 @@ async def create_item(item: Item):
     return item
 ```
 
-...并将其类型声明为你创建的模型 `Item`。
+……并将其类型声明为你创建的模型 `Item`。
 
 仅通过该 Python 类型声明，**FastAPI** 将会：
 
 *   以 JSON 格式读取请求体。
 *   转换相应的类型（如果需要）。
-*   验证数据。如果数据无效，它将返回一个清晰明了的错误，指明不正确数据的确切位置和描述。
+*   验证数据。如果数据无效，它将返回一个清晰明了的错误，指出不正确数据的确切位置和描述。
 *   在参数 `item` 中提供接收到的数据。
 *   为模型生成 JSON Schema 定义，如果合理，也可以在项目的其他任何地方使用它们。
 *   这些模式将成为生成的 OpenAPI 模式的一部分，并被自动文档 UI 使用。
@@ -89,7 +93,7 @@ async def create_item(item: Item):
 
 ## 请求体 + 路径参数
 
-可以同时声明路径参数和请求体。**FastAPI** 会识别出与路径参数匹配的函数参数应从路径中获取，而声明为 Pydantic 模型的函数参数应从请求体中获取。
+可以同时声明路径参数和请求体。**FastAPI** 会识别出与路径参数匹配的函数参数应从路径中获取，而已声明为 Pydantic 模型的函数参数应从请求体中获取。
 
 ```python
 from typing import Union
@@ -117,7 +121,7 @@ async def update_item(item_id: int, item: Item):
 
 也可以同时声明**请求体**、**路径**和**查询**参数。
 
-**FastAPI** 将会识别它们中的每一个，并从正确的位置获取数据。
+**FastAPI** 会识别它们中的每一个，并从正确的位置获取数据。
 
 ```python
 from typing import Union
@@ -187,9 +191,9 @@ async def update_item(
 
 ## 嵌套模型
 
-可以通过嵌套 Pydantic 模型，在请求体中定义复杂的嵌套 JSON 对象。
+可以通过嵌套 Pydantic 模型在请求体中定义复杂的嵌套 JSON 对象。
 
-例如，一个 item 可以有一个标签列表。为此，可以将 `tags` 属性定义为一个列表。
+例如，一个项目可以有一个标签列表。为此，可以将 `tags` 属性定义为一个列表。
 
 ```python
 from typing import Union
@@ -214,11 +218,11 @@ async def update_item(item_id: int, item: Item):
     return results
 ```
 
-为了更好的类型安全和编辑器支持，可以更具体地指定列表中的项目，例如 `tags: list[str] = []`。也可以使用其他 Pydantic 模型的列表来创建更深层次的嵌套。
+为了更好的类型安全和编辑器支持，可以更具体地指定列表中的项，例如 `tags: list[str] = []`。也可以使用其他 Pydantic 模型的列表来创建更深层次的嵌套。
 
 ## 嵌入单个请求体参数
 
-默认情况下，如果在函数中声明单个 Pydantic 模型，其内容将被视为请求的直接主体。但是，可以指示 FastAPI 期望一个带有特定键的 JSON 对象。这可以通过使用 `Body` 实现。
+默认情况下，如果在函数中声明单个 Pydantic 模型，其内容将被视为请求的直接主体。但是，可以指示 FastAPI 期望一个带有特定键的 JSON 对象。可以通过使用 `Body` 来实现这一点。
 
 ```python
 from typing import Union
@@ -244,7 +248,7 @@ async def update_item(item_id: int, item: Item = Body(embed=True)):
     return results
 ```
 
-在这种情况下，FastAPI 将期望一个如下所示的请求体：
+在这种情况下，FastAPI 会期望一个类似这样的请求体：
 
 ```json
 {

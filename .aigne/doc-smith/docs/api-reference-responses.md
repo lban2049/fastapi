@@ -18,9 +18,24 @@ These are the core response classes available for common use cases. They are all
 | `StreamingResponse` | Streams response body content from an async generator or a normal generator/iterator. |
 | `FileResponse` | Asynchronously streams a file as the response. |
 
-### Example: Using `HTMLResponse`
+### Response
 
-You can specify the response class directly in your path operation decorator.
+The base `Response` class can be used to return any `bytes` or `str` content with a specific media type.
+
+```python
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+
+@app.get("/legacy-data")
+def get_legacy_data():
+    data = "<legacyformat>some_data</legacyformat>"
+    return Response(content=data, media_type="application/xml")
+```
+
+### HTMLResponse
+
+Use `HTMLResponse` to return an HTML string that the browser will render.
 
 ```python
 from fastapi import FastAPI
@@ -40,6 +55,75 @@ async def get_html():
         </body>
     </html>
     """
+```
+
+### PlainTextResponse
+
+For returning simple text or any content that should be interpreted as plain text.
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
+
+app = FastAPI()
+
+@app.get("/readme", response_class=PlainTextResponse)
+async def get_readme():
+    return "This is a plain text response."
+```
+
+### RedirectResponse
+
+Performs an HTTP redirect. By default, it returns a `307 Temporary Redirect` status code.
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
+
+@app.get("/docs")
+async def redirect_to_swagger():
+    return RedirectResponse(url="/docs/index.html")
+```
+
+### StreamingResponse
+
+Streams the response body from an async generator or a standard generator/iterator. This is useful for large responses that you don't want to load into memory all at once.
+
+```python
+import asyncio
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+
+app = FastAPI()
+
+async def fake_video_streamer():
+    for i in range(10):
+        yield b"some chunk of data"
+        await asyncio.sleep(0.1)
+
+@app.get("/stream")
+async def stream_data():
+    return StreamingResponse(fake_video_streamer(), media_type="video/mp4")
+```
+
+### FileResponse
+
+Asynchronously streams a file as the response. It is efficient for sending large files.
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import FileResponse
+
+app = FastAPI()
+
+# Assume you have a file named 'my_image.png' in the same directory
+image_path = "my_image.png"
+
+@app.get("/file")
+async def get_file():
+    return FileResponse(image_path, media_type="image/png")
 ```
 
 ## High-Performance JSON Responses
@@ -71,7 +155,7 @@ async def read_items():
 
 ### ORJSONResponse
 
-`ORJSONResponse` uses the `orjson` library, another high-performance JSON library that is known for its speed and correctness. It supports serializing many types that standard libraries do not, such as dataclasses, `datetime`, `UUID`, and NumPy arrays, without extra configuration.
+`ORJSONResponse` uses the `orjson` library, another high-performance JSON library known for its speed and correctness. It supports serializing many types that standard libraries do not, such as dataclasses, `datetime`, `UUID`, and NumPy arrays, without extra configuration.
 
 To use it, you first need to install `orjson`:
 
@@ -79,7 +163,7 @@ To use it, you first need to install `orjson`:
 pip install orjson
 ```
 
-Then, set it as the `response_class` in your path operation. It's particularly useful for data-intensive applications, for example, with NumPy.
+Then, set it as the `response_class` in your path operation. It's particularly useful for data-intensive applications.
 
 ```python
 from fastapi import FastAPI
@@ -90,6 +174,7 @@ app = FastAPI()
 
 @app.get("/data", response_class=ORJSONResponse)
 async def read_numpy_data():
+    # orjson can serialize numpy arrays directly
     return {"matrix": np.arange(9).reshape(3, 3)}
 ```
 

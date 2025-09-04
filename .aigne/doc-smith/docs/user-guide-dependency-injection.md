@@ -1,6 +1,6 @@
 # Dependency Injection
 
-FastAPI includes a powerful but intuitive Dependency Injection (DI) system. It's a way for your code to declare things it requires to work, like database sessions, authentication credentials, or shared parameters. FastAPI then takes care of providing these dependencies to your code.
+FastAPI includes an intuitive Dependency Injection (DI) system. It's a way for your code to declare things it requires to work, like database sessions, authentication credentials, or shared parameters. FastAPI then takes care of providing these dependencies to your code.
 
 This is very useful for:
 - Sharing logic and code.
@@ -129,58 +129,136 @@ This code is equivalent to the previous example but is more concise. The `common
 
 ### Without Type Hint
 
-You could also write `commons = Depends(CommonQueryParams)` without a type hint, but this is not recommended. You lose the benefits of type checking and editor autocompletion.
+You could also write `commons = Depends(CommonQueryParams)` without a type hint, but this is not recommended as you lose the benefits of type checking and editor autocompletion.
 
-## How it Works
+## Sub-dependencies
 
-The dependency injection system follows a clear flow when a request comes in.
+Dependencies can declare their own dependencies. FastAPI's dependency injection system will resolve this chain of dependencies automatically.
 
-```d2
-direction: down
+Here's an example where one dependency relies on another:
 
-"Client": {
-  shape: person
-}
+```python
+from typing import Union, Annotated
 
-"FastAPI App": {
-  shape: package
-  grid-columns: 1
+from fastapi import Cookie, Depends, FastAPI
 
-  "/items/ endpoint": {
-    shape: rectangle
-    "read_items(commons: CommonQueryParams = Depends())"
-  }
+app = FastAPI()
 
-  "Dependency Injector": {
-    shape: diamond
-  }
 
-  "CommonQueryParams": {
-    label: "CommonQueryParams class"
-    shape: class
-    "__init__(self, q, skip, limit)"
-  }
-}
+def query_extractor(q: Union[str, None] = None):
+    # This dependency gets the raw query parameter 'q'
+    return q
 
-"HTTP Response": {
-  shape: document
-}
 
-"Client" -> "FastAPI App"."/items/ endpoint": "1. GET /items/?q=foo"
+def query_or_cookie_extractor(
+    q: Annotated[str, Depends(query_extractor)],
+    last_query: Union[str, None] = Cookie(default=None),
+):
+    # This dependency depends on query_extractor.
+    # It returns the query 'q' if it exists, otherwise it falls back to a cookie value.
+    if not q:
+        return last_query
+    return q
 
-"FastAPI App"."/items/ endpoint" -> "FastAPI App"."Dependency Injector": "2. Sees Depends() on 'commons' parameter"
 
-"FastAPI App"."Dependency Injector" -> "FastAPI App"."CommonQueryParams": "3. Resolves dependency from type hint\n- Extracts q, skip, limit from request\n- Creates instance: CommonQueryParams(q='foo', skip=0, limit=100)"
+@app.get("/items/")
+async def read_query(
+    query_or_default: Annotated[str, Depends(query_or_cookie_extractor)],
+):
+    # The path operation only needs to depend on the final dependency.
+    return {"q_or_cookie": query_or_default}
 
-"FastAPI App"."CommonQueryParams" -> "FastAPI App"."/items/ endpoint": "4. Injects instance into 'commons' argument"
-
-"FastAPI App"."/items/ endpoint" -> "HTTP Response": "5. Path operation runs with the dependency result"
-
-"HTTP Response" -> "Client": "6. Sends response back"
 ```
+
+In this flow:
+1. The path operation `read_query` depends on `query_or_cookie_extractor`.
+2. `query_or_cookie_extractor` in turn depends on `query_extractor`.
+3. FastAPI first resolves `query_extractor`, gets the value of `q`, and passes it to `query_or_cookie_extractor`.
+4. The result of `query_or_cookie_extractor` is then passed to the path operation.
+
+This creates a dependency graph that FastAPI traverses and resolves for each request.
+
+## Dependencies with `yield`
+
+For dependencies that need to perform cleanup actions after a response is sent (like closing a database connection), you can use a generator with `yield`.
+
+The code before the `yield` statement is executed before the response is generated. The yielded value is injected into the path operation. The code after the `yield` is executed after the response has been sent.
+
+This pattern is ideal for managing resources.
+
+```python
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+# A dummy "database" connection class for demonstration
+class DummyDB:
+    def __init__(self):
+        self.connected = True
+        print("Connecting to DB")
+
+    def close(self):
+        self.connected = False
+        print("Closing DB connection")
+
+def get_db_session():
+    db = DummyDB()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.get("/items/")
+async def read_items(db: DummyDB = Depends(get_db_session)):
+    # The 'db' object is the yielded value from get_db_session
+    return {"message": "Items read", "db_connected": db.connected}
+
+```
+
+When a request is made to `/items/`, FastAPI will:
+1. Call `get_db_session()`.
+2. Execute the code up to `yield db`, creating a `DummyDB` instance.
+3. Inject the `db` instance into `read_items`.
+4. Execute `read_items` and generate a response.
+5. After the response is sent, execute the code in the `finally` block, calling `db.close()`.
+
+This ensures that resources are always released, even if an error occurs during the request.
+
+## Dependency Caching
+
+By default, FastAPI caches the return value of a dependency within the scope of a single request. If multiple parts of your application (e.g., a path operation and a sub-dependency) depend on the same dependency, it will only be executed once, and the result will be reused.
+
+For example, if `dependency_b` depends on `dependency_a`, and the path operation depends on both `dependency_a` and `dependency_b`, `dependency_a` will only be run once.
+
+To disable this behavior and force the re-execution of a dependency every time it's called, you can set `use_cache=False`.
+
+```python
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+
+async def get_value(use_cache: bool = True):
+    # A dummy function to demonstrate caching
+    return {"value": "cached" if use_cache else "new"}
+
+# Cached dependency (default behavior)
+@app.get("/cached/")
+async def read_cached(val: dict = Depends(get_value)):
+    # 'get_value' is called once per request
+    return val
+
+# Non-cached dependency
+@app.get("/no-cache/")
+async def read_no_cache(val: dict = Depends(get_value, use_cache=False)):
+    # 'get_value' is called every time it appears as a dependency
+    return val
+```
+
+Caching is generally desirable as it prevents redundant computations, like repeatedly fetching a user's data from a database within the same request.
 
 ## Summary
 
-FastAPI's dependency injection provides a simple yet powerful way to manage dependencies and reuse code. You can define dependencies as either functions or classes and inject them into your path operations using `Depends`. This system is the foundation for many advanced features, including security and database connection management.
+FastAPI's dependency injection provides a simple yet powerful way to manage dependencies and reuse code. You can define dependencies as either functions or classes and inject them into your path operations using `Depends`. This system supports sub-dependencies, resource management with `yield`, and caching, forming the foundation for many features like security and database connection management.
 
-To dive deeper, explore the [Advanced Topics](./advanced.md) for more complex use cases and patterns.
+To see how this is applied for security, proceed to the [Security](./advanced-security.md) section.

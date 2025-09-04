@@ -1,16 +1,16 @@
 # Getting Started
 
-This tutorial guides you through installing FastAPI and creating your first application, step by step. You will build a simple but complete API from the ground up.
+This tutorial shows you how to set up FastAPI and build a simple API, from installation to a running application. By the end, you will have a working API with interactive documentation.
 
 ## Installation
 
-First, you need to install FastAPI. This process also installs the necessary dependencies, including a web server.
+First, you need to install FastAPI and a web server. You can do this with a single command.
 
 <x-card data-title="Prerequisite" data-icon="lucide:python" data-horizontal="true">
-  FastAPI requires Python 3.8 or higher. You can verify your installation by running `python --version` in your terminal.
+  FastAPI requires Python 3.8 or higher. You can check your version by running `python --version` in your terminal.
 </x-card>
 
-To install FastAPI and its standard dependencies, including the Uvicorn server, run the following command in your terminal:
+To install FastAPI along with its standard dependencies and the Uvicorn server, run the following command:
 
 ```console
 $ pip install "fastapi[standard]"
@@ -18,16 +18,18 @@ $ pip install "fastapi[standard]"
 ---> 100%
 ```
 
-This single command installs FastAPI, Pydantic for data validation, and Uvicorn to serve your application.
+This command installs FastAPI, Pydantic for data validation, Starlette for the web components, and Uvicorn to serve your application.
 
 ## Create It
 
-Now, let's create your first API.
+Now, let's create the API code.
 
 1.  Create a file named `main.py`.
-2.  Add the following code to it:
+2.  Add the following Python code to it:
 
 ```python
+from typing import Union
+
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -39,17 +41,18 @@ def read_root():
 
 
 @app.get("/items/{item_id}")
-def read_item(item_id: int, q: str | None = None):
+def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
 ```
 
 This code defines a simple API with two endpoints:
-*   `@app.get("/")`: Handles `GET` requests to the root URL `/`.
-*   `@app.get("/items/{item_id}")`: Handles `GET` requests to paths like `/items/5`. It captures a path parameter `item_id` and an optional query parameter `q`.
+
+*   `@app.get("/")`: This handles `GET` requests to the root URL `/`.
+*   `@app.get("/items/{item_id}")`: This handles `GET` requests to paths like `/items/5`. It captures a path parameter `item_id` and an optional query parameter `q` using standard Python type hints.
 
 ## Run It
 
-Run the development server from your terminal:
+Run the development server from your terminal using the `fastapi` command:
 
 ```console
 $ fastapi dev main.py
@@ -68,13 +71,13 @@ $ fastapi dev main.py
 
 INFO:     Will watch for changes in these directories: ['.']
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [12345] using StatReload
-INFO:     Started server process [12347]
+INFO:     Started reloader process [2248755] using WatchFiles
+INFO:     Started server process [2248757]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-The `fastapi dev` command starts a local server that automatically reloads when you make changes to your code, which is ideal for development.
+The `fastapi dev` command starts a local server that automatically reloads when you change your code, which is ideal for development.
 
 ## Check It
 
@@ -83,14 +86,14 @@ Open your browser and navigate to [http://127.0.0.1:8000/items/5?q=somequery](ht
 You will see the following JSON response:
 
 ```json
-{"item_id":5,"q":"somequery"}
+{"item_id": 5, "q": "somequery"}
 ```
 
-You have just created and run your first API that validates path and query parameters.
+You have just created an API that receives and validates a path parameter (`item_id` as an integer) and a query parameter (`q` as a string).
 
 ## Interactive API Docs
 
-One of FastAPI's key features is its automatically generated documentation. 
+One of FastAPI's most useful features is its automatically generated documentation.
 
 Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in your browser. You will see the interactive API documentation provided by Swagger UI:
 
@@ -100,11 +103,11 @@ FastAPI also provides an alternative documentation interface. Go to [http://127.
 
 ![ReDoc](https://fastapi.tiangolo.com/img/index/index-02-redoc-simple.png)
 
-These documentation pages are automatically generated from your code and can be used to test your API endpoints directly from the browser.
+These documentation pages are generated automatically from your code's type hints and allow you to test your API endpoints directly from the browser.
 
 ## Next Steps
 
-You've successfully created and run a basic FastAPI application. To learn how to handle more complex scenarios, such as receiving data in request bodies, proceed to the next section in our User Guide.
+You've successfully created and run a basic FastAPI application. To learn how to handle more complex scenarios, such as receiving data in request bodies or using dependency injection, proceed to the User Guide.
 
 <x-card data-title="Next: User Guide" data-icon="lucide:book-open" data-href="/user-guide/path-parameters" data-cta="Start the User Guide">
   Explore core concepts with practical examples, starting with Path Parameters.

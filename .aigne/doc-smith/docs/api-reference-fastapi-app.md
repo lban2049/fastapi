@@ -2,7 +2,7 @@
 
 The `FastAPI` class is the main entry point for creating and managing your application. It provides the core functionality for defining routes, handling requests, and configuring your API.
 
-This document serves as a comprehensive API reference for the `FastAPI` class, its configuration parameters, instance attributes, and methods. For a step-by-step introduction, see the [Getting Started](./getting-started.md) tutorial.
+This document serves as a comprehensive API reference for the `FastAPI` class, its configuration parameters, instance attributes, and methods. For a step-by-step introduction, see the [Getting Started](./getting-started.md) guide.
 
 ## Basic Usage
 
@@ -25,28 +25,30 @@ This diagram illustrates the core components and relationships within the `FastA
 ```d2
 direction: down
 
-"Starlette": { shape: class }
-"APIRouter": { shape: class }
+Starlette: { shape: class }
+APIRouter: { shape: class }
 
-"FastAPI": {
+FastAPI: {
   shape: class
   
   "router: APIRouter"
 }
 
-"FastAPI" -> "Starlette": "Inherits from"
-"FastAPI"."router: APIRouter" -> "APIRouter": "Composed of"
+FastAPI -> Starlette: "Inherits from"
+FastAPI."router: APIRouter" -> APIRouter: "Composed of"
 
-"Path Operation Decorators\n(@app.get, @app.post, etc)": {
+Path-Operation-Decorators: {
+    label: "Path Operation Decorators\n(@app.get, @app.post, etc)"
     shape: rectangle
 }
 
-"include_router()": {
+include_router: {
+    label: "include_router()"
     shape: rectangle
 }
 
-"Path Operation Decorators\n(@app.get, @app.post, etc)" -> "FastAPI"."router: APIRouter": "Modify"
-"include_router()" -> "FastAPI"."router: APIRouter": "Modify"
+Path-Operation-Decorators -> FastAPI."router: APIRouter": "Modify"
+include_router -> FastAPI."router: APIRouter": "Modify"
 ```
 
 ## Parameters
@@ -70,8 +72,24 @@ The `FastAPI` class constructor accepts several parameters to configure your app
 | `servers` | `Optional[List[Dict]]` | A list of server definitions for the OpenAPI schema. |
 | `contact` | `Optional[Dict]` | Contact information for the API. |
 | `license_info` | `Optional[Dict]` | License information for the API. |
-| `root_path` | `str` | A path prefix handled by a proxy. |
-| `...and others` | | For a complete list, refer to the source code. |
+| `root_path` | `str` | A path prefix handled by a proxy. Default: `""`. |
+| `debug` | `bool` | Enable debug mode. Default: `False`. |
+| `routes` | `Optional[List[BaseRoute]]` | A list of routes, inherited from Starlette for compatibility. |
+| `redirect_slashes` | `bool` | Whether to redirect trailing slashes. Default: `True`. |
+| `swagger_ui_oauth2_redirect_url` | `Optional[str]` | OAuth2 redirect URL for Swagger UI. Default: `"/docs/oauth2-redirect"`. |
+| `swagger_ui_init_oauth` | `Optional[Dict]` | OAuth2 configuration for Swagger UI. Default: `None`. |
+| `middleware` | `Optional[Sequence[Middleware]]` | A list of middleware to add on instantiation. |
+| `on_startup` / `on_shutdown` | `Optional[Sequence[Callable]]` | Deprecated event handlers. Use `lifespan` instead. |
+| `terms_of_service` | `Optional[str]` | A URL to the Terms of Service. |
+| `root_path_in_servers` | `bool` | Whether to include the `root_path` in the OpenAPI `servers` field. Default: `True`. |
+| `responses` | `Optional[Dict]` | Additional global responses for OpenAPI. |
+| `callbacks` | `Optional[List[BaseRoute]]` | OpenAPI callbacks for all path operations. |
+| `webhooks` | `Optional[APIRouter]` | An `APIRouter` for OpenAPI webhooks. |
+| `deprecated` | `Optional[bool]` | Mark all path operations as deprecated. Default: `None`. |
+| `include_in_schema` | `bool` | Whether to include all path operations in the OpenAPI schema. Default: `True`. |
+| `swagger_ui_parameters` | `Optional[Dict]` | Parameters to configure Swagger UI. |
+| `generate_unique_id_function` | `Callable[[APIRoute], str]` | Function to generate unique IDs for path operations. |
+| `separate_input_output_schemas` | `bool` | Generate separate schemas for request and response models. Default: `True`. |
 
 ### Metadata and Documentation Configuration
 

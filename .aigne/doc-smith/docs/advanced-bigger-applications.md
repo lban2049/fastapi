@@ -58,34 +58,45 @@ Here's a visual representation of how the main application includes different ro
 ```d2
 direction: down
 
-"app/main.py" {
+"app/main.py": {
   shape: document
-  "FastAPI App" {
+  label: "app/main.py"
+  "FastAPI App": {
     shape: rectangle
+    label: "FastAPI App"
   }
-  "app.include_router(users.router)" {}
-  "app.include_router(items.router)" {}
-  "app.include_router(admin.router)" {}
+  "app.include_router(users.router)": {label: "app.include_router(users.router)"}
+  "app.include_router(items.router)": {label: "app.include_router(items.router)"}
+  "app.include_router(admin.router)": {label: "app.include_router(admin.router)"}
 }
 
-"app/routers/users.py" {
+"app/routers/users.py": {
   shape: document
-  "users_router = APIRouter()"
+  label: "app/routers/users.py"
+  "users_router": {
+    label: "users_router = APIRouter()"
+  }
 }
 
-"app/routers/items.py" {
+"app/routers/items.py": {
   shape: document
-  "items_router = APIRouter()"
+  label: "app/routers/items.py"
+  "items_router": {
+    label: "items_router = APIRouter()"
+  }
 }
 
-"app/internal/admin.py" {
+"app/internal/admin.py": {
   shape: document
-  "admin_router = APIRouter()"
+  label: "app/internal/admin.py"
+  "admin_router": {
+    label: "admin_router = APIRouter()"
+  }
 }
 
-"app/main.py" -> "app/routers/users.py": "includes"
-"app/main.py" -> "app/routers/items.py": "includes"
-"app/main.py" -> "app/internal/admin.py": "includes"
+"app/main.py" -> "app/routers/users.py": includes
+"app/main.py" -> "app/routers/items.py": includes
+"app/main.py" -> "app/internal/admin.py": includes
 ```
 
 ## Router Parameters: `prefix`, `tags`, `dependencies`, and `responses`

@@ -7,38 +7,58 @@ This reference guide provides detailed documentation for each security class and
 ```d2
 direction: down
 
-"Security Utilities": {
+Security-Utilities: {
+  label: "Security Utilities"
   shape: package
   grid-columns: 2
 
-  "API Key Auth": {
+  API-Key-Auth: {
+    label: "API Key Auth"
     shape: rectangle
-    "APIKeyQuery": {label: "From Query Param"}
-    "APIKeyHeader": {label: "From Header"}
-    "APIKeyCookie": {label: "From Cookie"}
+    APIKeyQuery: {
+      label: "From Query Param"
+    }
+    APIKeyHeader: {
+      label: "From Header"
+    }
+    APIKeyCookie: {
+      label: "From Cookie"
+    }
   }
 
-  "HTTP Auth": {
+  HTTP-Auth: {
+    label: "HTTP Auth"
     shape: rectangle
-    "HTTPBasic": {}
-    "HTTPBearer": {}
-    "HTTPDigest": {}
-    "HTTPBasicCredentials": {shape: document}
-    "HTTPAuthorizationCredentials": {shape: document}
+    HTTPBasic: {}
+    HTTPBearer: {}
+    HTTPDigest: {}
+    HTTPBasicCredentials: {
+      shape: document
+    }
+    HTTPAuthorizationCredentials: {
+      shape: document
+    }
   }
 
-  "OAuth2": {
+  OAuth2: {
     shape: rectangle
-    "OAuth2PasswordBearer": {}
-    "OAuth2AuthorizationCodeBearer": {}
-    "OAuth2PasswordRequestForm": {shape: document}
-    "OAuth2PasswordRequestFormStrict": {shape: document}
-    "SecurityScopes": {shape: document}
+    OAuth2PasswordBearer: {}
+    OAuth2AuthorizationCodeBearer: {}
+    OAuth2PasswordRequestForm: {
+      shape: document
+    }
+    OAuth2PasswordRequestFormStrict: {
+      shape: document
+    }
+    SecurityScopes: {
+      shape: document
+    }
   }
 
-  "OpenID Connect": {
+  OpenID-Connect: {
+    label: "OpenID Connect"
     shape: rectangle
-    "OpenIdConnect": {}
+    OpenIdConnect: {}
   }
 }
 ```

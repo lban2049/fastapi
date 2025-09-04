@@ -1,10 +1,10 @@
 # Testing
 
-FastAPI provides a straightforward way to test your application using `TestClient`, which is built upon the powerful `httpx` library. This allows you to run tests against your app without needing a live server, making them fast and reliable.
+FastAPI provides a straightforward way to test your application using `TestClient`, which is built upon the `httpx` library. This allows you to run tests against your app without needing a live server, making them fast and reliable.
 
 ## Basic Testing with `TestClient`
 
-To start, you need to import `TestClient` and create an instance of it by passing your FastAPI application.
+To start, import `TestClient` and create an instance of it by passing your FastAPI application.
 
 Here's a complete example of testing a simple endpoint:
 
@@ -30,10 +30,11 @@ def test_read_main():
 ```
 
 In this test:
+
 1.  We import `TestClient`.
 2.  We create a `client` instance for our `app`.
 3.  We define a test function, `test_read_main`.
-4.  Inside the test, we use `client.get("/")` to make a request to the root path.
+4.  Inside the test, `client.get("/")` makes a request to the root path.
 5.  We then use `assert` statements to verify that the HTTP status code is `200` (OK) and that the JSON response body matches the expected output.
 
 ## Testing WebSockets
@@ -99,7 +100,7 @@ def test_read_items():
 
 By using `with TestClient(app) as client:`, the `startup_event` is guaranteed to run before any client requests are made, ensuring `items` is populated.
 
-## Testing with Dependency Overrides
+## Testing Dependencies with Overrides
 
 One of the most useful features for testing is the ability to override dependencies. This allows you to replace dependencies with mock versions for your tests, for example, to avoid making real database or network calls.
 
@@ -157,4 +158,4 @@ def test_override_in_items_with_params():
 In this example:
 - We define an `override_dependency` function with fixed `skip` and `limit` values.
 - We replace the original `common_parameters` dependency with our override: `app.dependency_overrides[common_parameters] = override_dependency`.
-- The test `test_override_in_items_with_params` shows that even when `skip` and `limit` are provided as query parameters, the values from the overridden dependency are used instead. The `q` parameter is still processed as it is part of the override function's signature.
+- The test `test_override_in_items_with_params` shows that even when `skip` and `limit` are provided as query parameters, the values from the overridden dependency are used instead. The `q` parameter is still processed because it is part of the override function's signature.

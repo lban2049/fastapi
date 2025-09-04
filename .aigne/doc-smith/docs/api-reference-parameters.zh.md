@@ -1,12 +1,12 @@
 # 参数
 
-FastAPI 使用参数定义函数来声明你的 API 端点接收的输入。这些函数不仅用于声明，还处理数据验证、序列化以及为 OpenAPI 自动生成文档。
+FastAPI 使用参数定义函数来声明 API 端点接收的输入。这些函数不仅用于声明，还处理数据验证、序列化以及 OpenAPI 的自动文档生成。
 
-当你需要为参数声明元数据或验证时，你可以在 `typing.Annotated` 内部使用这些函数。
+当需要为参数声明元数据或验证时，可以在 `typing.Annotated` 中使用这些函数。
 
-本页为每个核心参数定义函数提供了详细的参考。
+本页为每个核心参数定义函数提供了详细参考。
 
-## 参数来源概述
+## 参数来源概览
 
 下图说明了在传入的 HTTP 请求中，每种类型的参数是从哪里提取的。
 
@@ -88,7 +88,7 @@ direction: down
 
 ## `Path()`
 
-声明一个路径参数。路径参数是 URL 路径的一部分，因此始终是必需的。
+声明路径参数。路径参数是 URL 路径的一部分，因此始终为必需项。
 
 ### 示例
 
@@ -109,10 +109,10 @@ async def read_items(
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `default` | `Any` | 必须是 `...` ，因为路径参数始终是必需的。为兼容性而提供。 |
-| `alias` | `str` | 参数的备用名称，用于 OpenAPI 模式。 |
-| `title` | `str` | 参数的人类可读标题。 |
-| `description` | `str` | 人类可读的描述。 |
+| `default` | `Any` | 必须为 `...`，因为路径参数始终为必需项。为兼容性而提供。 |
+| `alias` | `str` | 参数的别名，用于 OpenAPI 模式。 |
+| `title` | `str` | 参数的可读标题。 |
+| `description` | `str` | 可读的描述。 |
 | `gt` | `float` | 值必须大于此值。 |
 | `ge` | `float` | 值必须大于或等于此值。 |
 | `lt` | `float` | 值必须小于此值。 |
@@ -124,13 +124,13 @@ async def read_items(
 | `examples` | `List[Any]` | 示例值列表。 |
 | `openapi_examples` | `Dict[str, Example]` | 包含更多详细信息的 OpenAPI 特定示例。 |
 | `include_in_schema`| `bool` | 是否在 OpenAPI 模式中包含此参数。默认为 `True`。 |
-| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何其他 JSON 模式数据。 |
+| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何附加 JSON 模式数据。 |
 
 ---
 
 ## `Query()`
 
-声明一个查询参数。这些是 URL 中 `?` 之后的键值对。
+声明查询参数。这些是 URL 中 `?` 之后的键值对。
 
 ### 示例
 
@@ -152,10 +152,10 @@ async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `default` | `Any` | 如果未提供参数，则为默认值。如果为 `...` ，则该参数是必需的。 |
-| `alias` | `str` | 参数的备用名称，用于提取数据和在 OpenAPI 中使用。 |
-| `title` | `str` | 参数的人类可读标题。 |
-| `description` | `str` | 人类可读的描述。 |
+| `default` | `Any` | 未提供参数时的默认值。如果为 `...`，则该参数为必需项。 |
+| `alias` | `str` | 参数的别名，用于提取数据和在 OpenAPI 中使用。 |
+| `title` | `str` | 参数的可读标题。 |
+| `description` | `str` | 可读的描述。 |
 | `gt` | `float` | 值必须大于此值。 |
 | `ge` | `float` | 值必须大于或等于此值。 |
 | `lt` | `float` | 值必须小于此值。 |
@@ -167,13 +167,13 @@ async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
 | `examples` | `List[Any]` | 示例值列表。 |
 | `openapi_examples` | `Dict[str, Example]` | 包含更多详细信息的 OpenAPI 特定示例。 |
 | `include_in_schema`| `bool` | 是否在 OpenAPI 模式中包含此参数。默认为 `True`。 |
-| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何其他 JSON 模式数据。 |
+| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何附加 JSON 模式数据。 |
 
 ---
 
 ## `Header()`
 
-声明一个标头参数。它从请求标头中读取。
+声明标头参数。它从请求标头中读取。
 
 ### 示例
 
@@ -192,11 +192,11 @@ async def read_items(user_agent: Annotated[str | None, Header()] = None):
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `default` | `Any` | 如果未提供标头，则为默认值。 |
-| `convert_underscores` | `bool` | 如果为 `True` （默认值），则将参数名称中的下划线 `_` 转换为连字符 `-` 来查找标头。 |
-| `alias` | `str` | 参数的备用名称。 |
-| `title` | `str` | 参数的人类可读标题。 |
-| `description` | `str` | 人类可读的描述。 |
+| `default` | `Any` | 未提供标头时的默认值。 |
+| `convert_underscores` | `bool` | 如果为 `True`（默认值），则将参数名称中的下划线 `_` 转换为连字符 `-` 来查找标头。 |
+| `alias` | `str` | 参数的别名。 |
+| `title` | `str` | 参数的可读标题。 |
+| `description` | `str` | 可读的描述。 |
 | `gt` | `float` | 值必须大于此值。 |
 | `ge` | `float` | 值必须大于或等于此值。 |
 | `lt` | `float` | 值必须小于此值。 |
@@ -213,7 +213,7 @@ async def read_items(user_agent: Annotated[str | None, Header()] = None):
 
 ## `Cookie()`
 
-声明一个 Cookie 参数。它从请求 Cookie 中读取。
+声明 Cookie 参数。它从请求 Cookie 中读取。
 
 ### 示例
 
@@ -230,13 +230,13 @@ async def read_items(ads_id: Annotated[str | None, Cookie()] = None):
 
 ### 参数
 
-`Cookie` 与 `Query` 和 `Header` 共享相同的验证和元数据参数，例如 `default`、`alias`、`title`、`description`、数值验证（`gt`、`ge` 等）和字符串验证（`min_length`、`max_length` 等）。
+`Cookie` 与 `Query` 和 `Header` 共享大部分相同的验证和元数据参数，例如 `default`、`alias`、`title`、`description`、数值验证（`gt`、`ge` 等）和字符串验证（`min_length`、`max_length` 等）。
 
 ---
 
 ## `Body()`
 
-声明一个来自请求正文的参数。它通常与 Pydantic 模型一起使用。
+声明来自请求正文的参数。它通常与 Pydantic 模型一起使用。
 
 ### 示例
 
@@ -260,15 +260,15 @@ async def create_item(item: Item, importance: Annotated[int, Body(gt=0)]):
 
 | Parameter | Type | Description |
 | --- | --- | --- |
-| `default` | `Any` | 如果字段不在正文中，则为默认值。 |
-| `embed` | `bool` | 如果为 `True`，则参数将被期望在一个 JSON 正文中，并以其参数名作为键。如果你声明了多个 `Body` 参数，这会自动发生。 |
+| `default` | `Any` | 如果字段不在正文中，则使用默认值。 |
+| `embed` | `bool` | 如果为 `True`，则参数应位于 JSON 正文内，并以其参数名称作为键。如果声明了多个 `Body` 参数，则会自动发生这种情况。 |
 | `media_type` | `str` | 请求正文的媒体类型。默认为 `application/json`。 |
-| `alias` | `str` | 参数字段的备用名称。 |
-| `title` | `str` | 人类可读的标题。 |
-| `description` | `str` | 人类可读的描述。 |
+| `alias` | `str` | 参数字段的别名。 |
+| `title` | `str` | 可读的标题。 |
+| `description` | `str` | 可读的描述。 |
 | `examples` | `List[Any]` | 示例值列表。 |
 | `openapi_examples` | `Dict[str, Example]` | 包含更多详细信息的 OpenAPI 特定示例。 |
-| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何其他 JSON 模式数据。 |
+| `json_schema_extra`| `Dict[str, Any]` | 要包含的任何附加 JSON 模式数据。 |
 
 它还支持与 `Path` 和 `Query` 相同的数值和字符串验证参数（`gt`、`ge`、`min_length` 等）。
 
@@ -276,7 +276,7 @@ async def create_item(item: Item, importance: Annotated[int, Body(gt=0)]):
 
 ## `Form()`
 
-声明一个表单字段。当请求的媒体类型为 `application/x-www-form-urlencoded` 时使用。
+声明表单字段。当请求的媒体类型为 `application/x-www-form-urlencoded` 时使用。
 
 ### 示例
 
@@ -299,7 +299,7 @@ async def login(username: Annotated[str, Form()], password: Annotated[str, Form(
 
 ## `File()`
 
-声明一个文件上传。当请求的媒体类型为 `multipart/form-data` 时使用。
+声明文件上传。当请求的媒体类型为 `multipart/form-data` 时使用。
 
 ### 示例
 
@@ -310,11 +310,11 @@ from fastapi import FastAPI, File, UploadFile
 app = FastAPI()
 
 @app.post("/files/")
-async def create_file(file: Annotated[bytes, File()]):
+async def create_file(file: Annotated[bytes, File()])-> dict:
     return {"file_size": len(file)}
 
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
+async def create_upload_file(file: UploadFile)-> dict:
     return {"filename": file.filename, "content_type": file.content_type}
 ```
 

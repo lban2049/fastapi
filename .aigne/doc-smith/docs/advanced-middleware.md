@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware is a function that works with every request before it is processed by any specific *path operation* and also with every response before returning it. It provides a mechanism for hooking into the request and response processing pipeline to perform cross-cutting operations.
+Middleware is a function that works with every request before it is processed by any specific *path operation*, and also with every response before it is returned. It provides a mechanism for hooking into the request and response processing pipeline to perform cross-cutting operations.
 
 Common use cases for middleware include:
 
@@ -15,41 +15,48 @@ Middleware processes requests in the order they are added and processes response
 ```d2
 direction: down
 
-"Client": {
+Client: {
   shape: person
 }
 
-"Middleware Stack": {
+Middleware-Stack: {
+  label: "Middleware Stack"
   shape: package
   grid-columns: 1
 
-  "Middleware 1 (e.g., GZip)": {
+  Middleware-1: {
+    label: "Middleware 1 (e.g., GZip)"
     shape: rectangle
   }
-  "Middleware 2 (e.g., CORS)": {
+  Middleware-2: {
+    label: "Middleware 2 (e.g., CORS)"
     shape: rectangle
   }
-  "Custom Middleware": {
+  Custom-Middleware: {
+    label: "Custom Middleware"
     shape: rectangle
   }
 }
 
-"FastAPI Application": {
+FastAPI-Application: {
+  label: "FastAPI Application"
   shape: rectangle
-  "Path Operation Code"
+  Path-Operation-Code: {
+    label: "Path Operation Code"
+  }
 }
 
-"Client" -> "Middleware Stack"."Middleware 1 (e.g., GZip)": "1. Request"
+Client -> Middleware-Stack.Middleware-1: "1. Request"
 
-"Middleware Stack"."Middleware 1 (e.g., GZip)" -> "Middleware Stack"."Middleware 2 (e.g., CORS)": "2. Request"
-"Middleware Stack"."Middleware 2 (e.g., CORS)" -> "Middleware Stack"."Custom Middleware": "3. Request"
-"Middleware Stack"."Custom Middleware" -> "FastAPI Application": "4. Request passed to endpoint"
+Middleware-Stack.Middleware-1 -> Middleware-Stack.Middleware-2: "2. Request"
+Middleware-Stack.Middleware-2 -> Middleware-Stack.Custom-Middleware: "3. Request"
+Middleware-Stack.Custom-Middleware -> FastAPI-Application: "4. Request to endpoint"
 
-"FastAPI Application" -> "Middleware Stack"."Custom Middleware": "5. Response from endpoint"
-"Middleware Stack"."Custom Middleware" -> "Middleware Stack"."Middleware 2 (e.g., CORS)": "6. Response"
-"Middleware Stack"."Middleware 2 (e.g., CORS)" -> "Middleware Stack"."Middleware 1 (e.g., GZip)": "7. Response"
+FastAPI-Application -> Middleware-Stack.Custom-Middleware: "5. Response from endpoint"
+Middleware-Stack.Custom-Middleware -> Middleware-Stack.Middleware-2: "6. Response"
+Middleware-Stack.Middleware-2 -> Middleware-Stack.Middleware-1: "7. Response"
 
-"Middleware Stack"."Middleware 1 (e.g., GZip)" -> "Client": "8. Final Response (e.g., GZipped)"
+Middleware-Stack.Middleware-1 -> Client: "8. Final Response"
 ```
 
 ## Creating Custom Middleware
@@ -67,7 +74,7 @@ app = FastAPI()
 
 
 @app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
+asnyc def add_process_time_header(request: Request, call_next):
     start_time = time.perf_counter()
     response = await call_next(request)
     process_time = time.perf_counter() - start_time
@@ -102,7 +109,6 @@ app.add_middleware(HTTPSRedirectMiddleware)
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
-
 ```
 
 ### TrustedHostMiddleware
@@ -123,7 +129,6 @@ app.add_middleware(
 @app.get("/")
 async def main():
     return {"message": "Hello World"}
-
 ```
 
 If a request's `Host` header does not match any of the patterns in `allowed_hosts`, it will receive a 400 Bad Request response.
@@ -146,12 +151,14 @@ async def main():
     # This response will be compressed if its size is > 1000 bytes
     # and the client supports gzip.
     return "somebigcontent" * 200
-
 ```
 
 Key parameters:
-*   `minimum_size`: Only compress responses that are larger than this number of bytes. Defaults to 500.
-*   `compresslevel`: An integer from 0 to 9 specifying the compression level. 9 is slowest and most compressed, 1 is fastest and least compressed. Defaults to 6.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `minimum_size` | `int` | Only compress responses that are larger than this number of bytes. Defaults to 500. |
+| `compresslevel` | `int` | An integer from 0 to 9 specifying the compression level. 9 is slowest and most compressed, 1 is fastest and least compressed. Defaults to 6. |
 
 ### CORSMiddleware
 

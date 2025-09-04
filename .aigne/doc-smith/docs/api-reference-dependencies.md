@@ -11,47 +11,55 @@ The following diagram illustrates the high-level process of how FastAPI resolves
 ```d2
 direction: down
 
-"Incoming Request": {
-  shape: circle
+Incoming-Request: { 
+  label: "Incoming Request"
+  shape: circle 
 }
 
-"FastAPI Router": {
+FastAPI-Router: {
+  label: "FastAPI Router"
   shape: rectangle
 }
 
-"Dependency Resolution Engine": {
+Dependency-Resolution-Engine: {
+  label: "Dependency Resolution Engine"
   shape: package
   grid-columns: 1
 
-  "Dependant Graph": {
+  Dependant-Graph: {
+    label: "Dependant Graph"
     shape: rectangle
 
-    "Sub-Dependency A": {
+    Sub-Dependency-A: {
+      label: "Sub-Dependency A"
       shape: class
     }
-    "Sub-Dependency B": {
+    Sub-Dependency-B: {
+      label: "Sub-Dependency B"
       shape: class
     }
-    "Path Operation Function": {
+    Path-Operation-Function: {
+      label: "Path Operation Function"
       shape: class
     }
 
-    "Sub-Dependency A" -> "Path Operation Function": "Result Injected"
-    "Sub-Dependency B" -> "Path Operation Function": "Result Injected"
+    Sub-Dependency-A -> Path-Operation-Function: "Result Injected"
+    Sub-Dependency-B -> Path-Operation-Function: "Result Injected"
   }
 }
 
-"Generated Response": {
+Generated-Response: {
+  label: "Generated Response"
   shape: circle
 }
 
-"Incoming Request" -> "FastAPI Router": "Matches path operation"
-"FastAPI Router" -> "Dependency Resolution Engine": "Triggers dependency resolution"
-"Dependency Resolution Engine" -> "Generated Response": "Executes function & returns"
+Incoming-Request -> FastAPI-Router: "Matches path operation"
+FastAPI-Router -> Dependency-Resolution-Engine: "Triggers dependency resolution"
+Dependency-Resolution-Engine -> Generated-Response: "Executes function & returns"
 
 ```
 
---- 
+---
 
 ## `Depends`
 
@@ -71,10 +79,10 @@ class Depends:
 
 ### Parameters
 
-| Name          | Type                           | Description                                                                                                                                                             |
-|---------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependency`  | `Optional[Callable[..., Any]]` | The dependency callable. This can be a function, a class, or any other callable. If not provided, the parameter's type annotation is used as the dependency.         |
-| `use_cache`   | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request. Subsequent dependencies requiring the same callable will receive the cached value. |
+| Name         | Type                           | Description                                                                                                                                                             |
+|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dependency` | `Optional[Callable[..., Any]]` | The dependency callable. This can be a function, a class, or any other callable. If not provided, the parameter's type annotation is used as the dependency.         |
+| `use_cache`  | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request. Subsequent dependencies requiring the same callable will receive the cached value. |
 
 ### Example Usage
 
@@ -118,11 +126,11 @@ class Security(Depends):
 
 ### Parameters
 
-| Name          | Type                           | Description                                                                                                                                                             |
-|---------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependency`  | `Optional[Callable[..., Any]]` | The security dependency callable, typically an instance of a security scheme like `OAuth2PasswordBearer`.                                                               |
-| `scopes`      | `Optional[Sequence[str]]`      | A list of security scope strings required to access this endpoint. These are used in the OpenAPI UI to request permissions.                                           |
-| `use_cache`   | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request.                                                                                   |
+| Name         | Type                           | Description                                                                                                                                                             |
+|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dependency` | `Optional[Callable[..., Any]]` | The security dependency callable, typically an instance of a security scheme like `OAuth2PasswordBearer`.                                                               |
+| `scopes`     | `Optional[Sequence[str]]`      | A list of security scope strings required to access this endpoint. These are used in the OpenAPI UI to request permissions.                                           |
+| `use_cache`  | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request.                                                                                   |
 
 ### Example Usage
 
@@ -143,7 +151,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: Annotated[dict, Security(get_current_user, scopes=["me"])]):
+async def read_users_me(current_user: Annotated[dict, Security(get_current_user, scopes=["me"])])
     return current_user
 
 ```

@@ -1,6 +1,6 @@
 # WebSockets
 
-FastAPI provides first-class support for WebSockets, enabling real-time, bidirectional communication between the client and the server. This is useful for applications like chat services, live notifications, and collaborative editing tools.
+FastAPI provides support for WebSockets, enabling real-time, bidirectional communication between the client and the server. This is useful for applications like chat services, live notifications, and collaborative editing tools.
 
 Under the hood, FastAPI's WebSocket functionality is powered by Starlette.
 
@@ -9,12 +9,17 @@ The basic flow of a WebSocket connection is as follows:
 ```d2
 direction: down
 
-"Client": { shape: person }
-"Server": { shape: rectangle }
+Client: { 
+  shape: person 
+}
 
-"Client" -> "Server": "1. HTTP GET Request with 'Upgrade: websocket' header"
-"Server" -> "Client": "2. HTTP 101 Switching Protocols Response"
-"Client" <-> "Server": "3. Persistent Bidirectional Communication Channel" {
+Server: { 
+  shape: rectangle 
+}
+
+Client -> Server: "1. HTTP GET Request with 'Upgrade: websocket' header"
+Server -> Client: "2. HTTP 101 Switching Protocols Response"
+Client <-> Server: "3. Persistent Bidirectional Communication Channel" {
   style {
     stroke-dash: 4
   }
@@ -164,12 +169,12 @@ For applications like a chat room, you need to manage multiple connected clients
 ```d2
 direction: down
 
-"Manager": {
+Manager: {
   shape: class
   label: "ConnectionManager"
 }
 
-"Clients": {
+Clients: {
   shape: package
   grid-columns: 3
   "Client A": { shape: person }
@@ -177,12 +182,12 @@ direction: down
   "Client C": { shape: person }
 }
 
-"Clients" <-> "Manager": "connect() / disconnect()"
+Clients <-> Manager: "connect() / disconnect()"
 
-"Client A" -> "Manager": "send_text('Hello')"
+"Client A" -> Manager: "send_text('Hello')"
 
-"Manager" -> "Client A": "send_personal_message('You wrote: Hello')"
-"Manager" -> "Clients": "broadcast('Client A says: Hello')"
+Manager -> "Client A": "send_personal_message('You wrote: Hello')"
+Manager -> Clients: "broadcast('Client A says: Hello')"
 ```
 
 Here is the implementation of a `ConnectionManager` and its integration into a chat application:

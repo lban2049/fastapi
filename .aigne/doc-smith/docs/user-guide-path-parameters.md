@@ -40,17 +40,15 @@ async def read_item(item_id: int):
     return {"item_id": item_id}
 ```
 
-In this case, `item_id` is declared to be an `int`. This provides editor support, checking for errors, and more.
+In this case, `item_id` is declared to be an `int`. With this type declaration, FastAPI gives you automatic request "parsing". If you go to `http://127.0.0.1:8000/items/3` in your browser, the value `"3"` from the path is parsed and converted into the integer `3`.
 
-With this type declaration, FastAPI gives you automatic request "parsing". If you go to `http://127.0.0.1:8000/items/3` in your browser, the response will be:
+The response will be:
 
 ```json
 {
   "item_id": 3
 }
 ```
-
-Because the value `"3"` from the path is parsed and converted into the integer `3`.
 
 ### Data Validation
 
@@ -160,7 +158,7 @@ First, import `Path` from `fastapi`:
 from fastapi import FastAPI, Path
 ```
 
-You can use `Path()` as the default value for your parameter, while still declaring its type. This allows you to add extra metadata and validation checks.
+You can use `Path()` to add extra metadata and validation checks.
 
 ### Add Metadata
 
@@ -187,7 +185,7 @@ async def read_items(
 
 ### Order the parameters as you need
 
-When you use `Path()`, you might want to reorder the parameters. For example, having a required query parameter `q` first. Python requires that parameters with default values come after those without. You can use a `*` in the function arguments to indicate that all subsequent arguments are keyword-only.
+When you use `Path()`, you might want to reorder the parameters. For example, having a required query parameter `q` before a path parameter. Python requires that parameters with default values come after those without. You can use a `*` in the function arguments to indicate that all subsequent arguments are keyword-only.
 
 ```python
 from fastapi import FastAPI, Path
@@ -279,7 +277,5 @@ You can declare path parameters using f-string-like syntax. FastAPI provides pow
 *   **Enums**: For predefined, allowed values.
 *   **Path Converter**: To capture paths that include slashes.
 *   **`Path()`**: For adding rich metadata and numeric validations (`gt`, `ge`, `lt`, `le`).
-
-Now that you know how to handle path parameters, let's look at another common type of parameter.
 
 Next, we will explore how to declare [Query Parameters](./user-guide-query-parameters.md).

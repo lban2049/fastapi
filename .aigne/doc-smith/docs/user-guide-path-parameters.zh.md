@@ -1,10 +1,10 @@
 # 路径参数
 
-你可以使用与 Python 格式化字符串相同的语法来声明路径“参数”或“变量”。这使你能够捕获 URL 路径的一部分，并在你的 *路径操作函数* 中使用它们。
+你可以使用与 Python 格式化字符串相同的语法来声明路径“参数”或“变量”。这允许你捕获 URL 路径的部分内容，并在你的*路径操作函数*中使用它们。
 
 ## 声明路径参数
 
-路径参数在路径中使用花括号 `{}` 定义。
+路径参数在路径中使用花括号 `{}` 进行定义。
 
 ```python
 from fastapi import FastAPI
@@ -40,9 +40,9 @@ async def read_item(item_id: int):
     return {"item_id": item_id}
 ```
 
-在这种情况下，`item_id` 被声明为 `int` 类型。这提供了编辑器支持、错误检查等功能。
+在这种情况下，`item_id` 被声明为 `int`。通过此类型声明，FastAPI 可以为你提供自动请求“解析”。如果你在浏览器中访问 `http://127.0.0.1:8000/items/3`，路径中的值 `"3"` 会被解析并转换为整数 `3`。
 
-通过这种类型声明，FastAPI 为你提供了自动请求“解析”功能。如果你在浏览器中访问 `http://127.0.0.1:8000/items/3`，响应将是：
+响应将是：
 
 ```json
 {
@@ -50,11 +50,9 @@ async def read_item(item_id: int):
 }
 ```
 
-因为路径中的值 `"3"` 被解析并转换为整数 `3`。
-
 ### 数据校验
 
-如果你使用 `int` 类型提示访问 URL `/items/foo`，你将看到一个明确的 HTTP 错误信息，指出路径参数的类型无效。
+如果你使用 `int` 类型提示访问 URL `/items/foo`，你将看到一条清晰的 HTTP 错误消息，指示路径参数的类型无效。
 
 ```json
 {
@@ -71,13 +69,13 @@ async def read_item(item_id: int):
 }
 ```
 
-这种自动校验由 FastAPI 底层使用的 Pydantic 提供。
+这种自动校验由 Pydantic 提供，FastAPI 在底层使用了 Pydantic。
 
 ## 顺序很重要
 
-在创建 *路径操作* 时，你可能会遇到这样的情况：你有一个固定路径（如 `/users/me`）和一个捕获参数的路径（如 `/users/{user_id}`）。
+在创建*路径操作*时，你可能会遇到这样的情况：你有一个固定路径（如 `/users/me`）和一个捕获参数的路径（如 `/users/{user_id}`）。
 
-由于路径操作是按顺序评估的，因此你需要确保固定端点的路径在带参数的路径 *之前* 声明。
+由于路径操作是按顺序评估的，你需要确保固定端点的路径在带参数的路径*之前*声明。
 
 ```python
 from fastapi import FastAPI
@@ -97,7 +95,7 @@ async def read_user(user_id: str):
 
 如果 `/users/{user_id}` 先声明，它将匹配 `/users/me`，并认为 `user_id` 参数是字符串 `"me"`。
 
-## 使用枚举预定义值
+## 使用枚举的预定义值
 
 如果你有一个只能接受少数预定义值的路径参数，你可以使用标准的 Python `Enum`。
 
@@ -129,13 +127,13 @@ async def get_model(model_name: ModelName):
     return {"model_name": model_name, "message": "Have some residuals"}
 ```
 
-FastAPI 将使用该枚举来校验路径参数，并且还将在交互式 API 文档中包含可用值。
+FastAPI 将使用该枚举来校验路径参数，并会在交互式 API 文档中包含可用值。
 
 ## 包含路径的路径参数
 
-在某些情况下，你可能需要一个路径参数来包含文件路径，其中包括斜杠 (`/`)。你可以使用 Starlette（底层 ASGI 框架）的路径转换器来实现这一点。
+在某些情况下，你可能需要路径参数包含文件路径，而文件路径中包含斜杠（`/`）。你可以使用 Starlette（底层的 ASGI 框架）提供的路径转换器来实现此目的。
 
-要捕获路径，请使用语法 `{file_path:path}`。
+要捕获路径，请使用 `{file_path:path}` 语法。
 
 ```python
 from fastapi import FastAPI
@@ -152,7 +150,7 @@ async def read_file(file_path: str):
 
 ## 数值校验
 
-对于更高级的校验，特别是针对数字的校验，你可以使用 `Path()` 函数。
+要进行更高级的校验，特别是针对数字的校验，你可以使用 `Path()` 函数。
 
 首先，从 `fastapi` 导入 `Path`：
 
@@ -160,7 +158,7 @@ async def read_file(file_path: str):
 from fastapi import FastAPI, Path
 ```
 
-你可以将 `Path()` 用作参数的默认值，同时仍然声明其类型。这使你可以添加额外的元数据和校验检查。
+你可以使用 `Path()` 添加额外的元数据和校验检查。
 
 ### 添加元数据
 
@@ -185,9 +183,9 @@ async def read_items(
     return results
 ```
 
-### 按需对参数排序
+### 按需对参数进行排序
 
-当你使用 `Path()` 时，你可能希望重新排序参数。例如，将必需的查询参数 `q` 放在前面。Python 要求带有默认值的参数必须在没有默认值的参数之后。你可以在函数参数中使用 `*` 来表示所有后续参数都为仅限关键字参数。
+当你使用 `Path()` 时，你可能需要对参数重新排序。例如，将一个必需的查询参数 `q` 放在路径参数之前。Python 要求带默认值的参数必须位于不带默认值的参数之后。你可以在函数参数中使用 `*` 来表示其后的所有参数都只能是关键字参数。
 
 ```python
 from fastapi import FastAPI, Path
@@ -245,9 +243,9 @@ async def read_items(
     return results
 ```
 
-### 浮点数数值校验
+### 使用浮点数进行数值校验
 
-数值校验也适用于 `float` 值。此示例展示了如何结合路径参数和查询参数的校验。
+数值校验也适用于 `float` 类型的值。此示例展示了如何结合路径参数和查询参数的校验。
 
 ```python
 from fastapi import FastAPI, Path, Query
@@ -270,16 +268,14 @@ async def read_items(
     return results
 ```
 
-## 小结
+## 总结
 
 你可以使用类似 f-string 的语法声明路径参数。FastAPI 为路径参数提供了强大的功能：
 
 *   **类型提示**：自动解析和数据校验。
-*   **顺序重要性**：固定路径应在带变量的路径之前声明。
+*   **顺序的重要性**：固定路径应在带变量的路径之前声明。
 *   **枚举**：用于预定义的允许值。
 *   **路径转换器**：用于捕获包含斜杠的路径。
 *   **`Path()`**：用于添加丰富的元数据和数值校验（`gt`、`ge`、`lt`、`le`）。
-
-现在你已经知道如何处理路径参数，让我们来看看另一种常见的参数类型。
 
 接下来，我们将探讨如何声明[查询参数](./user-guide-query-parameters.md)。

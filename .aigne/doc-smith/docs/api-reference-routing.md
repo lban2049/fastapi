@@ -62,11 +62,16 @@ All these decorators accept the same parameters as the `APIRoute` class, which a
 
 ```python
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 router = APIRouter()
 
+class Item(BaseModel):
+    name: str
+    description: str | None = None
+
 @router.post("/items/", status_code=201, tags=["items"])
-async def create_item(item: dict):
+async def create_item(item: Item):
     return {"message": "Item created successfully", "item": item}
 ```
 
@@ -82,16 +87,19 @@ To add a WebSocket endpoint, use the `@router.websocket()` decorator.
 
 **Example**
 ```python
-from fastapi import APIRouter, WebSocket
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 router = APIRouter()
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Message text was: {data}")
+    except WebSocketDisconnect:
+        print("Client disconnected")
 ```
 
 ### `include_router()`
@@ -99,8 +107,6 @@ async def websocket_endpoint(websocket: WebSocket):
 This method is used to mount another `APIRouter` onto the current one or onto a `FastAPI` app. This is the key to building modular applications.
 
 ```python
-from fastapi import FastAPI
-
 # In items.py
 from fastapi import APIRouter
 
@@ -111,6 +117,9 @@ def get_items():
     return ["Portal Gun", "Plumbus"]
 
 # In main.py
+from fastapi import FastAPI
+# from . import items # Assuming items.py is in the same directory
+
 app = FastAPI()
 app.include_router(router, prefix="/api/v1", tags=["items"])
 ```

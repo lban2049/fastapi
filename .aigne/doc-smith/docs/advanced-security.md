@@ -12,22 +12,23 @@ A typical authentication flow, like OAuth2 with a bearer token, involves the cli
 direction: down
 
 "User": { shape: person }
-"API Server": {
+"API-Server": {
+  label: "API Server"
   shape: package
   grid-columns: 1
-  "/token": {label: "Token Endpoint"}
-  "/users/me": {label: "Protected Endpoint"}
+  "token": {label: "/token Endpoint"}
+  "users-me": {label: "/users/me Protected Endpoint"}
 }
 
-"User" -> "API Server"."/token": "1. Authenticate with credentials" {
+"User" -> "API-Server"."token": "1. Authenticate with credentials" {
   label: "POST /token\n(username, password)"
 }
-"API Server"."/token" -> "User": "2. Receive Access Token (JWT)"
+"API-Server"."token" -> "User": "2. Receive Access Token (JWT)"
 
-"User" -> "API Server"."/users/me": "3. Request protected data with token" {
+"User" -> "API-Server"."users-me": "3. Request protected data with token" {
   label: "GET /users/me\n(Authorization: Bearer <token>)"
 }
-"API Server"."/users/me" -> "User": "4. Receive protected data"
+"API-Server"."users-me" -> "User": "4. Receive protected data"
 ```
 
 ## OAuth2 with Password and Bearer Tokens
@@ -106,14 +107,25 @@ Next, you need to create the `/token` path operation so that clients can send a 
 FastAPI provides `OAuth2PasswordRequestForm` to handle the incoming form data.
 
 ```python
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from typing import Union
 
-# ... (User models and fake_users_db from previous examples)
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "fakehashedsecret",
+        "disabled": False,
+    },
+}
 
 app = FastAPI()
 
-# ... (get_current_user, etc.)
+# ... (User, UserInDB models and other helper functions)
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -127,7 +139,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_user)):
+async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
 ```
 
@@ -169,11 +181,17 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: Union[str, None] = None
 
-# ... (User, UserInDB models)
+class User(BaseModel):
+    username: str
+    email: Union[str, None] = None
+    full_name: Union[str, None] = None
+    disabled: Union[bool, None] = None
+
+# ... (UserInDB model)
 
 # --- Hashing & DB ---
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# ... (fake_users_db with hashed password, verify_password, get_user)
+# ... (fake_users_db with hashed password, verify_password, get_user, authenticate_user)
 
 # --- JWT Creation ---
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
@@ -187,6 +205,8 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 # --- Dependency to Get Current User ---
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -205,6 +225,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+
+# ... (get_current_active_user dependency)
 
 # --- Token Endpoint ---
 @app.post("/token", response_model=Token)
@@ -418,4 +440,4 @@ If you believe you have found a security vulnerability, please report it private
 
 ---
 
-With these tools, you can implement robust and standard security practices in your FastAPI applications. For more detailed information on the security utilities, you can consult the [API Reference](./api-reference-security.md). To learn about processing requests before they hit your path operations, see the next chapter on [Middleware](./advanced-middleware.md).
+With these tools, you can implement robust and standard security practices in your FastAPI applications. For more detailed information on the security utilities, you can consult the [Security Utilities API Reference](./api-reference-security.md). To learn about processing requests before they hit your path operations, see the next chapter on [Middleware](./advanced-middleware.md).

@@ -230,7 +230,7 @@ async def read_items(ads_id: Annotated[str | None, Cookie()] = None):
 
 ### Parameters
 
-`Cookie` shares the same validation and metadata parameters as `Query` and `Header`, such as `default`, `alias`, `title`, `description`, numeric validations (`gt`, `ge`, etc.), and string validations (`min_length`, `max_length`, etc.).
+`Cookie` shares most of the same validation and metadata parameters as `Query` and `Header`, such as `default`, `alias`, `title`, `description`, numeric validations (`gt`, `ge`, etc.), and string validations (`min_length`, `max_length`, etc.).
 
 ---
 
@@ -310,11 +310,11 @@ from fastapi import FastAPI, File, UploadFile
 app = FastAPI()
 
 @app.post("/files/")
-async def create_file(file: Annotated[bytes, File()]):
+async def create_file(file: Annotated[bytes, File()])-> dict:
     return {"file_size": len(file)}
 
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
+async def create_upload_file(file: UploadFile)-> dict:
     return {"filename": file.filename, "content_type": file.content_type}
 ```
 
