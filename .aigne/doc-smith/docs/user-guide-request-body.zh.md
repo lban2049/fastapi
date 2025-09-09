@@ -1,20 +1,20 @@
 # 请求体
 
-当需要从客户端（如浏览器）发送数据到 API 时，会将其作为**请求体**发送。
+当您需要从客户端（例如浏览器）向 API 发送数据时，您会以**请求体**的形式发送。
 
 请求体是客户端发送给 API 的数据。**响应体**是 API 发送给客户端的数据。
 
-API 几乎总是需要发送响应体，但客户端不一定总是需要发送请求体。
+API 几乎总是需要发送响应体。但客户端不一定总是需要发送请求体。
 
-要声明请求体，可以使用 Pydantic 模型，并利用其所有功能和优点。
+您可以使用功能强大的 Pydantic 模型来声明请求体。
 
 ## 创建数据模型
 
-首先，需要从 `pydantic` 导入 `BaseModel`。
+首先，您需要从 `pydantic` 导入 `BaseModel`。
 
-然后，将数据模型声明为继承自 `BaseModel` 的类。为所有属性使用标准的 Python 类型。
+然后，将您的数据模型声明为一个继承自 `BaseModel` 的类。所有属性都使用标准的 Python 类型。
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -42,7 +42,7 @@ async def create_item(item: Item):
 
 ## 将其声明为参数
 
-要将其添加到*路径操作*中，可以像声明路径和查询参数一样声明它：
+要将其添加到*路径操作*中，声明方式与声明路径和查询参数的方式相同：
 
 ```python
 @app.post("/items/")
@@ -50,22 +50,22 @@ async def create_item(item: Item):
     return item
 ```
 
-……并将其类型声明为你创建的模型 `Item`。
+……并将其类型声明为您创建的模型 `Item`。
 
-仅通过该 Python 类型声明，**FastAPI** 将会：
+仅需使用该 Python 类型声明，**FastAPI** 将会：
 
 *   以 JSON 格式读取请求体。
-*   转换相应的类型（如果需要）。
-*   验证数据。如果数据无效，它将返回一个清晰明了的错误，指出不正确数据的确切位置和描述。
-*   在参数 `item` 中提供接收到的数据。
-*   为模型生成 JSON Schema 定义，如果合理，也可以在项目的其他任何地方使用它们。
-*   这些模式将成为生成的 OpenAPI 模式的一部分，并被自动文档 UI 使用。
+*   转换相应的数据类型（如果需要）。
+*   验证数据。如果数据无效，它将返回一个清晰明了的错误，指明不正确数据的确切位置和描述。
+*   在参数 `item` 中为您提供接收到的数据。
+*   为您的模型生成 JSON Schema 定义，如果合理，您也可以在项目的其他任何地方使用它们。
+*   这些 schema 将成为生成的 OpenAPI schema 的一部分，并被自动文档 UI 使用。
 
 ## 使用模型
 
-在函数内部，可以直接访问模型对象的所有属性：
+在函数内部，您可以直接访问模型对象的所有属性：
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial002.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -93,9 +93,9 @@ async def create_item(item: Item):
 
 ## 请求体 + 路径参数
 
-可以同时声明路径参数和请求体。**FastAPI** 会识别出与路径参数匹配的函数参数应从路径中获取，而已声明为 Pydantic 模型的函数参数应从请求体中获取。
+您可以同时声明路径参数和请求体。**FastAPI** 会识别出与路径参数匹配的函数参数应从路径中获取，而声明为 Pydantic 模型的函数参数应从请求体中获取。
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial003.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -119,11 +119,11 @@ async def update_item(item_id: int, item: Item):
 
 ## 请求体 + 路径 + 查询参数
 
-也可以同时声明**请求体**、**路径**和**查询**参数。
+您还可以同时声明**请求体**、**路径**和**查询**参数。
 
-**FastAPI** 会识别它们中的每一个，并从正确的位置获取数据。
+**FastAPI** 将会识别它们中的每一个，并从正确的位置获取数据。
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial004.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -154,11 +154,11 @@ async def update_item(item_id: int, item: Item, q: Union[str, None] = None):
 *   如果参数是**单一类型**（如 `int`、`float`、`str`、`bool` 等），它将被解释为**查询**参数。
 *   如果参数被声明为 **Pydantic 模型**类型，它将被解释为请求**体**。
 
-## 混合多个参数
+## 混合路径、查询和请求体参数
 
-可以在*路径操作函数*中混合使用 `Path`、`Query` 和请求体声明，FastAPI 会处理所有这些声明。
+您可以在*路径操作函数*中混合 `Path`、`Query` 和请求体声明，FastAPI 会处理所有这些。您还可以通过使用 `Union[Item, None] = None` 将请求体声明为可选。
 
-```python
+```python icon=logos:python title="docs_src/body_multiple_params/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI, Path
@@ -191,11 +191,11 @@ async def update_item(
 
 ## 嵌套模型
 
-可以通过嵌套 Pydantic 模型在请求体中定义复杂的嵌套 JSON 对象。
+通过嵌套 Pydantic 模型，您可以在请求体中定义复杂的嵌套 JSON 对象。
 
-例如，一个项目可以有一个标签列表。为此，可以将 `tags` 属性定义为一个列表。
+例如，一个 item 可以有一个标签列表。为此，您可以将 `tags` 属性定义为一个列表。
 
-```python
+```python icon=logos:python title="docs_src/body_nested_models/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -218,13 +218,13 @@ async def update_item(item_id: int, item: Item):
     return results
 ```
 
-为了更好的类型安全和编辑器支持，可以更具体地指定列表中的项，例如 `tags: list[str] = []`。也可以使用其他 Pydantic 模型的列表来创建更深层次的嵌套。
+为了更好的类型安全和编辑器支持，您可以更具体地指定列表中的项，例如 `tags: list[str] = []`。您还可以使用其他 Pydantic 模型的列表来创建更深层次的嵌套。
 
 ## 嵌入单个请求体参数
 
-默认情况下，如果在函数中声明单个 Pydantic 模型，其内容将被视为请求的直接主体。但是，可以指示 FastAPI 期望一个带有特定键的 JSON 对象。可以通过使用 `Body` 来实现这一点。
+默认情况下，如果在函数中声明单个 Pydantic 模型，其内容将被视为请求的直接正文。但是，您可以指示 FastAPI 期望一个带有特定键的 JSON 对象。这可以通过使用 `Body` 来实现。
 
-```python
+```python icon=logos:python title="docs_src/body_fields/tutorial001.py"
 from typing import Union
 
 from fastapi import Body, FastAPI
@@ -248,7 +248,7 @@ async def update_item(item_id: int, item: Item = Body(embed=True)):
     return results
 ```
 
-在这种情况下，FastAPI 会期望一个类似这样的请求体：
+在这种情况下，FastAPI 将期望一个如下所示的请求体：
 
 ```json
 {
@@ -276,6 +276,6 @@ async def update_item(item_id: int, item: Item = Body(embed=True)):
 
 ---
 
-现在已经了解了如何处理从客户端发送的数据，接下来将探讨如何控制返回的内容。
+现在您已经了解了如何处理从客户端发送的数据，让我们来探讨如何控制您返回的数据。
 
 接下来，学习如何配置[处理响应](./user-guide-handling-responses.md)。

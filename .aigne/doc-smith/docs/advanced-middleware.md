@@ -12,16 +12,16 @@ Common use cases for middleware include:
 
 Middleware processes requests in the order they are added and processes responses in the reverse order. This can be visualized as layers of an onion that a request must pass through to reach your application code, and then pass back through on its way out.
 
-```d2
+```d2 Middleware Request/Response Flow
 direction: down
 
 Client: {
-  shape: person
+  shape: c4-person
 }
 
 Middleware-Stack: {
   label: "Middleware Stack"
-  shape: package
+  shape: rectangle
   grid-columns: 1
 
   Middleware-1: {
@@ -65,7 +65,7 @@ You can create your own middleware using the `@app.middleware("http")` decorator
 
 Here's an example that calculates the processing time for a request and adds it as a custom header `X-Process-Time` to the response.
 
-```python
+```python tutorial001.py icon=logos:python
 import time
 
 from fastapi import FastAPI, Request
@@ -74,7 +74,7 @@ app = FastAPI()
 
 
 @app.middleware("http")
-asnyc def add_process_time_header(request: Request, call_next):
+async def add_process_time_header(request: Request, call_next):
     start_time = time.perf_counter()
     response = await call_next(request)
     process_time = time.perf_counter() - start_time
@@ -97,7 +97,7 @@ FastAPI includes several useful middleware implementations from Starlette that y
 
 This middleware enforces that all incoming requests must be either `https` or `wss`. If a request arrives with `http` or `ws`, it is redirected to the secure scheme.
 
-```python
+```python tutorial001.py icon=logos:python
 from fastapi import FastAPI
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
@@ -115,7 +115,7 @@ async def main():
 
 This middleware enforces that all incoming requests have a correctly set `Host` header to protect against HTTP Host header attacks. You must specify a list of allowed hostnames.
 
-```python
+```python tutorial002.py icon=logos:python
 from fastapi import FastAPI
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
@@ -137,7 +137,7 @@ If a request's `Host` header does not match any of the patterns in `allowed_host
 
 This middleware handles GZip compression for responses. If the client supports GZip (`Accept-Encoding` header), responses will be compressed, which can reduce bandwidth usage.
 
-```python
+```python tutorial003.py icon=logos:python
 from fastapi import FastAPI
 from fastapi.middleware.gzip import GZipMiddleware
 
@@ -164,7 +164,7 @@ Key parameters:
 
 This middleware handles Cross-Origin Resource Sharing (CORS), which is necessary when a frontend application running on a different domain needs to communicate with your API. It allows you to specify which origins, methods, and headers are permitted.
 
-```python
+```python cors_example.py icon=logos:python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

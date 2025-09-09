@@ -6,7 +6,7 @@ You can declare path "parameters" or "variables" with the same syntax used by Py
 
 A path parameter is defined in the path using curly braces `{}`.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -29,7 +29,7 @@ The value of the path parameter `item_id` will be passed to your function as the
 
 You can declare the type of a path parameter in the function, using standard Python type hints.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -77,7 +77,7 @@ When creating *path operations*, you might have a situation where you have a fix
 
 Because path operations are evaluated in order, you need to make sure that the path for the fixed endpoint is declared *before* the one with the parameter.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -101,7 +101,7 @@ If you have a path parameter that can only accept a few predefined values, you c
 
 Create an `Enum` class that inherits from `str` and `Enum`.
 
-```python
+```python title="main.py" icon=logos:python
 from enum import Enum
 
 from fastapi import FastAPI
@@ -135,7 +135,7 @@ There might be cases where you need a path parameter to contain a file path, whi
 
 To capture a path, use the syntax `{file_path:path}`.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -164,7 +164,7 @@ You can use `Path()` to add extra metadata and validation checks.
 
 You can add a `title` and other metadata to your path parameter. This information will be used in the generated OpenAPI schema and the interactive API docs.
 
-```python
+```python title="main.py" icon=logos:python
 from typing import Union
 
 from fastapi import FastAPI, Path, Query
@@ -187,7 +187,7 @@ async def read_items(
 
 When you use `Path()`, you might want to reorder the parameters. For example, having a required query parameter `q` before a path parameter. Python requires that parameters with default values come after those without. You can use a `*` in the function arguments to indicate that all subsequent arguments are keyword-only.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI, Path
 
 app = FastAPI()
@@ -205,7 +205,7 @@ async def read_items(*, item_id: int = Path(title="The ID of the item to get"), 
 
 With `Path()`, you can declare numeric constraints. For instance, to ensure `item_id` is an integer greater than or equal to 1, you can use `ge=1`.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI, Path
 
 app = FastAPI()
@@ -225,7 +225,7 @@ async def read_items(
 
 You can also use `gt` (greater than) and `le` (less than or equal to).
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI, Path
 
 app = FastAPI()
@@ -247,7 +247,7 @@ async def read_items(
 
 Number validations also work for `float` values. This example shows how you can combine path and query parameter validations.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI, Path, Query
 
 app = FastAPI()

@@ -12,7 +12,7 @@ The `APIRouter` class allows you to group *path operations*. You can think of it
 
 Here's a simple example of how to use `APIRouter`:
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import APIRouter, FastAPI
 
 app = FastAPI()
@@ -43,11 +43,12 @@ When you create an instance of `APIRouter`, you can pass several parameters to c
 | `include_in_schema` | `bool` | If `False`, excludes all *path operations* in this router from the generated OpenAPI schema. Defaults to `True`. |
 | `generate_unique_id_function` | `Callable[[APIRoute], str]` | A function to customize the generation of unique IDs for *path operations*. |
 | `route_class` | `Type[APIRoute]` | A custom `APIRoute` class to be used for the routes in this router. |
-| `lifespan` | `Optional[Lifespan[Any]]` | A `Lifespan` context manager to handle startup and shutdown events for this router. |
+| `lifespan` | `Optional[Lifespan[Any]]` | A `Lifespan` context manager to handle startup and shutdown events for this router. This is the recommended approach for event handling. |
+| `on_startup` / `on_shutdown` | `Optional[Sequence[Callable[[], Any]]]` | **Deprecated.** A list of startup or shutdown event handlers. Use `lifespan` instead. |
 
 ### Path Operation Decorators
 
-`APIRouter` provides decorators for all standard HTTP methods to add new *path operations*.
+`APIRouter` provides decorators for all standard HTTP methods to add new *path operations*. These decorators create `APIRoute` instances and accept all the parameters documented under the `APIRoute` section below.
 
 - `@router.get()`
 - `@router.put()`
@@ -58,9 +59,7 @@ When you create an instance of `APIRouter`, you can pass several parameters to c
 - `@router.patch()`
 - `@router.trace()`
 
-All these decorators accept the same parameters as the `APIRoute` class, which are detailed below.
-
-```python
+```python icon=logos:python
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -70,7 +69,7 @@ class Item(BaseModel):
     name: str
     description: str | None = None
 
-@router.post("/items/", status_code=201, tags=["items"])
+@router.post("/items/", status_code=201, tags=["items"], summary="Create an item")
 async def create_item(item: Item):
     return {"message": "Item created successfully", "item": item}
 ```
@@ -86,7 +85,7 @@ To add a WebSocket endpoint, use the `@router.websocket()` decorator.
 | `dependencies` | `Optional[Sequence[params.Depends]]` | A list of dependencies for this WebSocket. |
 
 **Example**
-```python
+```python icon=logos:python
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 router = APIRouter()
@@ -106,8 +105,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 This method is used to mount another `APIRouter` onto the current one or onto a `FastAPI` app. This is the key to building modular applications.
 
-```python
-# In items.py
+```python title="routers/items.py" icon=logos:python
+# In routers/items.py
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -115,13 +114,17 @@ router = APIRouter()
 @router.get("/items/")
 def get_items():
     return ["Portal Gun", "Plumbus"]
+```
 
+```python title="main.py" icon=logos:python
 # In main.py
 from fastapi import FastAPI
-# from . import items # Assuming items.py is in the same directory
+from .routers import items
 
 app = FastAPI()
-app.include_router(router, prefix="/api/v1", tags=["items"])
+
+# Include the items router with a prefix and tags
+app.include_router(items.router, prefix="/api/v1", tags=["items"])
 ```
 
 **Parameters**

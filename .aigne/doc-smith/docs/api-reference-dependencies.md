@@ -1,19 +1,19 @@
 # Dependencies
 
-FastAPI's dependency injection system is a powerful mechanism for managing shared logic, database connections, authentication, and more. This reference details the classes used to declare dependencies.
+FastAPI's dependency injection system is a powerful mechanism for managing shared logic, database connections, authentication, and more. This document provides a technical reference for the classes used to declare and manage dependencies.
 
-For a step-by-step guide and more conceptual examples, please refer to the [User Guide on Dependency Injection](./user-guide-dependency-injection.md).
+For a step-by-step guide and more conceptual examples, please see the [Dependency Injection User Guide](./user-guide-dependency-injection.md).
 
-## Dependency Injection Flow
+## Dependency Resolution Flow
 
 The following diagram illustrates the high-level process of how FastAPI resolves dependencies for an incoming request.
 
 ```d2
 direction: down
 
-Incoming-Request: { 
+Incoming-Request: {
   label: "Incoming Request"
-  shape: circle 
+  shape: circle
 }
 
 FastAPI-Router: {
@@ -23,7 +23,7 @@ FastAPI-Router: {
 
 Dependency-Resolution-Engine: {
   label: "Dependency Resolution Engine"
-  shape: package
+  shape: rectangle
   grid-columns: 1
 
   Dependant-Graph: {
@@ -56,22 +56,21 @@ Generated-Response: {
 Incoming-Request -> FastAPI-Router: "Matches path operation"
 FastAPI-Router -> Dependency-Resolution-Engine: "Triggers dependency resolution"
 Dependency-Resolution-Engine -> Generated-Response: "Executes function & returns"
-
 ```
 
 ---
 
 ## `Depends`
 
-The `Depends` class is the primary tool for declaring a dependency in a *path operation function*. It signals to FastAPI that a parameter should be populated by the result of the specified dependency function (or callable).
+The `Depends` class is the primary tool for declaring a dependency in a *path operation function*. It signals to FastAPI that a parameter should be populated by the result of the specified dependency callable.
 
-```python
+```python class Depends icon=logos:python
 class Depends:
     def __init__(
-        self, 
-        dependency: Optional[Callable[..., Any]] = None, 
-        *, 
-        use_cache: bool = True
+        self,
+        dependency: Optional[Callable[..., Any]] = None,
+        *,
+        use_cache: bool = True,
     ):
         self.dependency = dependency
         self.use_cache = use_cache
@@ -79,14 +78,14 @@ class Depends:
 
 ### Parameters
 
-| Name         | Type                           | Description                                                                                                                                                             |
-|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependency` | `Optional[Callable[..., Any]]` | The dependency callable. This can be a function, a class, or any other callable. If not provided, the parameter's type annotation is used as the dependency.         |
-| `use_cache`  | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request. Subsequent dependencies requiring the same callable will receive the cached value. |
+| Name         | Type                           | Description                                                                                                                                                                                  |
+|--------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dependency` | `Optional[Callable[..., Any]]` | The dependency callable (e.g., a function or class). If `None`, the parameter's type annotation is used as the dependency.                                                                 |
+| `use_cache`  | `bool`                         | If `True` (default), the dependency's result is cached for the scope of a single request. Subsequent dependencies requiring the same callable (with the same scopes) will receive the cached value. |
 
 ### Example Usage
 
-```python
+```python Example icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -109,16 +108,16 @@ In this example, `read_items` depends on `common_parameters`. FastAPI will call 
 
 ## `Security`
 
-The `Security` class is a subclass of `Depends` and is used specifically for dependencies related to security schemes. It provides an additional `scopes` parameter that integrates with the OpenAPI documentation to specify required security scopes.
+The `Security` class is a subclass of `Depends` used specifically for dependencies related to security schemes. It adds a `scopes` parameter to integrate with OpenAPI documentation, specifying required security scopes for an endpoint.
 
-```python
+```python class Security icon=logos:python
 class Security(Depends):
     def __init__(
-        self, 
-        dependency: Optional[Callable[..., Any]] = None, 
-        *, 
-        scopes: Optional[Sequence[str]] = None, 
-        use_cache: bool = True
+        self,
+        dependency: Optional[Callable[..., Any]] = None,
+        *,
+        scopes: Optional[Sequence[str]] = None,
+        use_cache: bool = True,
     ):
         super().__init__(dependency=dependency, use_cache=use_cache)
         self.scopes = scopes or []
@@ -126,15 +125,15 @@ class Security(Depends):
 
 ### Parameters
 
-| Name         | Type                           | Description                                                                                                                                                             |
-|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependency` | `Optional[Callable[..., Any]]` | The security dependency callable, typically an instance of a security scheme like `OAuth2PasswordBearer`.                                                               |
-| `scopes`     | `Optional[Sequence[str]]`      | A list of security scope strings required to access this endpoint. These are used in the OpenAPI UI to request permissions.                                           |
-| `use_cache`  | `bool`                         | If `True` (the default), the result of the dependency is cached for a single request.                                                                                   |
+| Name         | Type                           | Description                                                                                                       |
+|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------| 
+| `dependency` | `Optional[Callable[..., Any]]` | The security dependency callable, typically an instance of a security scheme like `OAuth2PasswordBearer`.         |
+| `scopes`     | `Optional[Sequence[str]]`      | A list of security scope strings required for this endpoint. These are used in the OpenAPI schema.              |
+| `use_cache`  | `bool`                         | If `True` (the default), the result is cached for the duration of the request.                                    |
 
 ### Example Usage
 
-```python
+```python Example icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Security
@@ -147,39 +146,65 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     # In a real app, you would decode the token and get the user
-    return {"token": token}
+    return {"token": token, "scopes": ["me", "items"]}
 
 
 @app.get("/users/me")
-async def read_users_me(current_user: Annotated[dict, Security(get_current_user, scopes=["me"])])
+async def read_users_me(
+    current_user: Annotated[dict, Security(get_current_user, scopes=["me"])],
+):
     return current_user
-
 ```
-In this example, the `read_users_me` endpoint requires the `me` scope. The `Security` function ensures that the dependency `get_current_user` is called and also documents the scope requirement in the API schema.
 
 ---
 
-## Internal Model: `Dependant`
+## Internal Models
 
-The `Dependant` class is an internal data structure that FastAPI uses to model a dependency and all of its sub-dependencies. Developers typically do not interact with this class directly, but it is documented here for reference and for those building tools on top of FastAPI.
+The following data classes are used internally by FastAPI to build and manage the dependency graph. While you typically don't interact with them directly, understanding them can be useful for building tools or advanced customizations on top of FastAPI.
 
-FastAPI analyzes each *path operation function* and its parameters to build a `Dependant` object, which forms a graph of all dependencies.
+### `Dependant`
 
-### Key Attributes
+The `Dependant` class models a single dependency and all of its sub-dependencies, parameters, and security requirements. FastAPI analyzes each *path operation function* and its parameters to build a `Dependant` object, which forms a node in the dependency graph.
+
+#### Key Attributes
 
 | Attribute                 | Type                                | Description                                                                                             |
 |---------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `path_params`             | `List[ModelField]`                  | A list of Pydantic model fields representing path parameters.                                           |
-| `query_params`            | `List[ModelField]`                  | A list of Pydantic model fields representing query parameters.                                          |
-| `header_params`           | `List[ModelField]`                  | A list of Pydantic model fields representing header parameters.                                         |
-| `cookie_params`           | `List[ModelField]`                  | A list of Pydantic model fields representing cookie parameters.                                         |
-| `body_params`             | `List[ModelField]`                  | A list of Pydantic model fields representing body parameters.                                           |
-| `dependencies`            | `List["Dependant"]`                | A list of `Dependant` objects for sub-dependencies.                                                     |
-| `security_requirements`   | `List[SecurityRequirement]`         | A list of security requirements for this dependency.                                                    |
-| `name`                    | `Optional[str]`                     | The name of the parameter that this dependency will be injected into.                                   |
-| `call`                    | `Optional[Callable[..., Any]]`      | The callable that will be executed to resolve the dependency.                                           |
-| `use_cache`               | `bool`                              | Whether to cache the result of this dependency for the scope of a single request.                       |
+| `path_params`             | `List[ModelField]`                  | List of Pydantic model fields for path parameters.                                                      |
+| `query_params`            | `List[ModelField]`                  | List of Pydantic model fields for query parameters.                                                     |
+| `header_params`           | `List[ModelField]`                  | List of Pydantic model fields for header parameters.                                                    |
+| `cookie_params`           | `List[ModelField]`                  | List of Pydantic model fields for cookie parameters.                                                    |
+| `body_params`             | `List[ModelField]`                  | List of Pydantic model fields for body parameters.                                                      |
+| `dependencies`            | `List["Dependant"]`                | List of `Dependant` objects for sub-dependencies.                                                       |
+| `security_requirements`   | `List[SecurityRequirement]`         | List of security requirements for this dependency.                                                      |
+| `name`                    | `Optional[str]`                     | The name of the parameter this dependency is injected into.                                             |
+| `call`                    | `Optional[Callable[..., Any]]`      | The callable that is executed to resolve the dependency.                                                |
+| `use_cache`               | `bool`                              | Whether to cache the result of this dependency.                                                         |
 | `path`                    | `Optional[str]`                     | The path of the operation this dependency belongs to.                                                   |
-| `cache_key`               | `Tuple`                             | A tuple used as the key for caching the dependency's result. It's composed of the `call` and `security_scopes`. |
+| `cache_key`               | `Tuple`                             | A unique key for caching, composed of the `call` and sorted `security_scopes`.                          |
 
-Next, you may want to learn about the utilities used for security. See the [Security Utilities API Reference](./api-reference-security.md) for more details.
+### `SecurityRequirement`
+
+This data class represents a specific security scheme and the scopes required for it.
+
+```python class SecurityRequirement icon=logos:python
+from dataclasses import dataclass
+from typing import Optional, Sequence
+from fastapi.security.base import SecurityBase
+
+@dataclass
+class SecurityRequirement:
+    security_scheme: SecurityBase
+    scopes: Optional[Sequence[str]] = None
+```
+
+#### Attributes
+
+| Attribute         | Type                         | Description                                                              |
+|-------------------|------------------------------|--------------------------------------------------------------------------|
+| `security_scheme` | `SecurityBase`               | The security scheme instance (e.g., an `OAuth2` instance).               |
+| `scopes`          | `Optional[Sequence[str]]`    | The list of required scopes for this scheme.                             |
+
+---
+
+This reference covers the core components of FastAPI's dependency injection system. For details on the security schemes that are often used as dependencies, see the [Security Utilities API Reference](./api-reference-security.md).

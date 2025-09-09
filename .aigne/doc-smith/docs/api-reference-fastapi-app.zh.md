@@ -2,13 +2,13 @@
 
 `FastAPI` 类是创建和管理应用程序的主要入口点。它提供了定义路由、处理请求和配置 API 的核心功能。
 
-本文档是 `FastAPI` 类及其配置参数、实例属性和方法的综合 API 参考。有关分步介绍，请参阅 [入门](./getting-started.md) 指南。
+本文档是 `FastAPI` 类及其配置参数、实例属性和方法的综合 API 参考。有关分步介绍，请参阅[入门指南](./getting-started.md)。
 
 ## 基本用法
 
 首先，导入 `FastAPI` 并创建一个应用程序实例：
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -20,7 +20,7 @@ def read_root():
 
 ## 类图
 
-此图说明了 `FastAPI` 应用程序结构中的核心组件和关系。`FastAPI` 继承自 Starlette，主要由一个管理所有路由的 `APIRouter` 组成。
+该图说明了 `FastAPI` 应用程序结构中的核心组件和关系。`FastAPI` 继承自 Starlette，主要由一个管理所有路由的 `APIRouter` 组成。
 
 ```d2
 direction: down
@@ -30,7 +30,6 @@ APIRouter: { shape: class }
 
 FastAPI: {
   shape: class
-  
   "router: APIRouter"
 }
 
@@ -53,7 +52,7 @@ include_router -> FastAPI."router: APIRouter": "修改"
 
 ## 参数
 
-`FastAPI` 类的构造函数接受多个参数，用于配置应用程序的行为、元数据和文档。
+`FastAPI` 类构造函数接受多个参数，用于配置应用程序的行为、元数据和文档。
 
 | Parameter | Type | Description |
 |---|---|---|
@@ -75,37 +74,37 @@ include_router -> FastAPI."router: APIRouter": "修改"
 | `root_path` | `str` | 由代理处理的路径前缀。默认值：`""`。 |
 | `debug` | `bool` | 启用调试模式。默认值：`False`。 |
 | `routes` | `Optional[List[BaseRoute]]` | 路由列表，为兼容性而从 Starlette 继承。 |
-| `redirect_slashes` | `bool` | 是否重定向尾部斜杠。默认值：`True`。 |
+| `redirect_slashes` | `bool` | 是否重定向末尾的斜杠。默认值：`True`。 |
 | `swagger_ui_oauth2_redirect_url` | `Optional[str]` | Swagger UI 的 OAuth2 重定向 URL。默认值：`"/docs/oauth2-redirect"`。 |
 | `swagger_ui_init_oauth` | `Optional[Dict]` | Swagger UI 的 OAuth2 配置。默认值：`None`。 |
 | `middleware` | `Optional[Sequence[Middleware]]` | 实例化时要添加的中间件列表。 |
 | `on_startup` / `on_shutdown` | `Optional[Sequence[Callable]]` | 已弃用的事件处理程序。请改用 `lifespan`。 |
 | `terms_of_service` | `Optional[str]` | 服务条款的 URL。 |
 | `root_path_in_servers` | `bool` | 是否在 OpenAPI `servers` 字段中包含 `root_path`。默认值：`True`。 |
-| `responses` | `Optional[Dict]` | 用于 OpenAPI 的额外全局响应。 |
+| `responses` | `Optional[Dict]` | 用于 OpenAPI 的其他全局响应。 |
 | `callbacks` | `Optional[List[BaseRoute]]` | 所有路径操作的 OpenAPI 回调。 |
 | `webhooks` | `Optional[APIRouter]` | 用于 OpenAPI Webhook 的 `APIRouter`。 |
 | `deprecated` | `Optional[bool]` | 将所有路径操作标记为已弃用。默认值：`None`。 |
 | `include_in_schema` | `bool` | 是否在 OpenAPI 规范中包含所有路径操作。默认值：`True`。 |
 | `swagger_ui_parameters` | `Optional[Dict]` | 用于配置 Swagger UI 的参数。 |
 | `generate_unique_id_function` | `Callable[[APIRoute], str]` | 为路径操作生成唯一 ID 的函数。 |
-| `separate_input_output_schemas` | `bool` | 为请求和响应模型生成单独的规范。默认值：`True`。 |
+| `separate_input_output_schemas` | `bool` | 为请求和响应模型生成单独的模式。默认值：`True`。 |
 
 ### 元数据和文档配置
 
-您可以配置 API 的元数据，这些元数据将用于 OpenAPI 规范和自动文档界面。
+你可以配置 API 的元数据，这些元数据用于 OpenAPI 规范和自动文档界面。
 
-```python
+```python Metadata Configuration icon=logos:python
 from fastapi import FastAPI
 
 tags_metadata = [
     {
         "name": "users",
-        "description": "用户相关操作。",
+        "description": "Operations with users.",
     },
     {
         "name": "items",
-        "description": "管理物品。",
+        "description": "Manage items.",
     },
 ]
 
@@ -131,11 +130,11 @@ async def read_users():
     return [{"username": "johndoe"}]
 ```
 
-### 全局依赖项
+### 全局依赖
 
-您可以添加将应用于应用程序中所有*路径操作*的依赖项。
+你可以添加将应用于应用程序中所有*路径操作*的依赖项。
 
-```python
+```python Global Dependencies icon=logos:python
 from fastapi import Depends, FastAPI, Header, HTTPException
 
 async def verify_token(x_token: str = Header()):
@@ -151,14 +150,14 @@ async def read_items():
 
 ## 实例属性
 
-一个 `FastAPI` 实例有几个可以访问或修改的属性。
+`FastAPI` 实例有几个可以访问或修改的属性。
 
 - `router` (`APIRouter`)：应用程序的主路由器。所有路径操作都在此处注册。
-- `dependency_overrides` (`Dict`)：一个用于覆盖依赖项的字典，主要用于测试。更多详情请参阅[使用覆盖测试依赖项](./advanced-testing.md)。
+- `dependency_overrides` (`Dict`)：用于覆盖依赖项的字典，主要用于测试。更多详情请参阅[使用覆盖项测试依赖项](./advanced-testing.md)。
 - `state` (`State`)：一个用于存储任意应用程序状态的对象，继承自 Starlette。
-- `openapi_schema` (`Optional[Dict]`)：缓存生成的 OpenAPI 规范。首次访问时，将生成并存储规范于此。
-- `openapi_version` (`str`)：OpenAPI 版本字符串。默认为 `"3.1.0"`，但如果需要与旧工具兼容，可以修改。
-- `webhooks` (`APIRouter`)：一个用于记录 OpenAPI Webhook 的 `APIRouter`。
+- `openapi_schema` (`Optional[Dict]`)：缓存生成的 OpenAPI 规范。首次访问时，将生成规范并存储在此处。
+- `openapi_version` (`str`)：OpenAPI 版本字符串。默认为 `"3.1.0"`，但如果需要与旧工具兼容，可以进行修改。
+- `webhooks` (`APIRouter`)：用于记录 OpenAPI Webhook 的 `APIRouter`。
 
 ## 方法
 
@@ -182,7 +181,7 @@ FastAPI 使用装饰器将函数与特定的 URL 路径和 HTTP 方法关联起�
 | `path` | `str` | 端点的 URL 路径。 |
 | `response_model` | `Any` | 用于响应的 Pydantic 模型。 |
 | `status_code` | `int` | 响应的默认 HTTP 状态码。 |
-| `tags` | `List[str]` | 用于在 API 文档中分组的标签列表。 |
+| `tags` | `List[str]` | 用于在 API 文档中进行分组的标签列表。 |
 | `summary` | `str` | 端点的简短摘要。 |
 | `description` | `str` | 详细描述，支持 Markdown。 |
 | `dependencies` | `Sequence[Depends]` | 此端点特定的依赖项列表。 |
@@ -190,7 +189,7 @@ FastAPI 使用装饰器将函数与特定的 URL 路径和 HTTP 方法关联起�
 
 **示例：`@app.post()`**
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -209,9 +208,9 @@ async def create_item(item: Item):
 
 ### `include_router`
 
-在应用程序中包含一个 `APIRouter`，这对于构建大型应用程序很有用。更多详情请参阅[大型应用](./advanced-bigger-applications.md)。
+在应用程序中包含一个 `APIRouter`，这对于构建更大型的应用程序很有用。更多详情请参阅[更大型的应用程序](./advanced-bigger-applications.md)。
 
-```python
+```python icon=logos:python
 from fastapi import APIRouter, FastAPI
 
 app = FastAPI()
@@ -232,7 +231,7 @@ app.include_router(
 
 装饰一个函数以处理 WebSocket 连接。
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 app = FastAPI()
@@ -245,14 +244,14 @@ async def websocket_endpoint(websocket: WebSocket):
             data = await websocket.receive_text()
             await websocket.send_text(f"Message text was: {data}")
     except WebSocketDisconnect:
-        print("客户端已断开连接")
+        print("Client disconnected")
 ```
 
 ### `@app.middleware`
 
 向应用程序添加中间件。唯一支持的类型是 `"http"`。
 
-```python
+```python icon=logos:python
 import time
 from fastapi import FastAPI, Request
 
@@ -269,9 +268,9 @@ async def add_process_time_header(request: Request, call_next):
 
 ### `@app.exception_handler`
 
-注册一个函数以处理特定的异常类型。
+注册一个函数以处理特定类型的异常。
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -289,15 +288,43 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 ```
 
+### `openapi`
+
+此方法生成并返回应用程序的 OpenAPI 规范。FastAPI 在内部调用它，结果缓存在 `app.openapi_schema` 属性中。你可以重写此方法或修改 `app.openapi_schema` 属性来自定义生成的规范。
+
+```python Customizing OpenAPI Schema icon=logos:python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/items/")
+def read_items():
+    return [{"name": "Plumbus"}]
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Custom title",
+        version="2.5.0",
+        summary="This is a very custom OpenAPI schema",
+        routes=app.routes,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+```
+
 ## 后续步骤
 
-现在您已经熟悉了 FastAPI 主应用程序类，您可能想探索如何使用路由器来构建您的应用程序。
+既然你已经熟悉了主要的 `FastAPI` 应用程序类，你可能想探索如何使用路由器来构建你的应用程序。
 
 <x-cards>
   <x-card data-title="路由" data-icon="lucide:milestone" data-href="/api-reference/routing">
-    了解 APIRouter 如何将您的路径操作组织到独立的模块中。
+    了解 APIRouter 以将路径操作组织到单独的模块中。
   </x-card>
-  <x-card data-title="大型应用" data-icon="lucide:layout-grid" data-href="/advanced/bigger-applications">
+  <x-card data-title="更大型的应用程序" data-icon="lucide:layout-grid" data-href="/advanced/bigger-applications">
     探索构建大型、生产就绪型应用程序的策略。
   </x-card>
 </x-cards>

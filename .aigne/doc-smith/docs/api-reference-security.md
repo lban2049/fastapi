@@ -9,7 +9,7 @@ direction: down
 
 Security-Utilities: {
   label: "Security Utilities"
-  shape: package
+  shape: rectangle
   grid-columns: 2
 
   API-Key-Auth: {
@@ -80,9 +80,7 @@ Extracts an API key from a query parameter. You create an instance and use it as
 | `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
 | `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyQuery
 
@@ -109,9 +107,7 @@ Extracts an API key from an HTTP header.
 | `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
 | `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyHeader
 
@@ -138,9 +134,7 @@ Extracts an API key from a request cookie.
 | `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
 | `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyCookie
 
@@ -171,9 +165,7 @@ Handles HTTP Basic authentication. The dependency result is an `HTTPBasicCredent
 | `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
 | `auto_error` | `bool` | If `True` (default), raises an error if authentication is not provided. If `False`, returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -202,9 +194,7 @@ Handles HTTP Bearer token authentication. The dependency result is an `HTTPAutho
 | `description` | `Optional[str]` | A description for the security scheme. |
 | `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -234,9 +224,7 @@ Handles HTTP Digest authentication. The dependency result is an `HTTPAuthorizati
 | `description` | `Optional[str]` | A description for the security scheme. |
 | `auto_error` | `bool` | If `True` (default), raises an error if the digest is missing. If `False`, returns `None`. |
 
-**Example**
-
-```python
+```python Example icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI

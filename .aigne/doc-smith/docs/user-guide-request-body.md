@@ -14,7 +14,7 @@ First, you need to import `BaseModel` from `pydantic`.
 
 Then, you declare your data model as a class that inherits from `BaseModel`. Use standard Python types for all the attributes.
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -65,7 +65,7 @@ With just that Python type declaration, **FastAPI** will:
 
 Inside of the function, you can access all the attributes of the model object directly:
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial002.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -95,7 +95,7 @@ async def create_item(item: Item):
 
 You can declare path parameters and a request body at the same time. **FastAPI** will recognize that the function parameters that match path parameters should be taken from the path, and that function parameters that are declared to be Pydantic models should be taken from the request body.
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial003.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -123,7 +123,7 @@ You can also declare **body**, **path** and **query** parameters, all at the sam
 
 **FastAPI** will recognize each of them and take the data from the correct place.
 
-```python
+```python icon=logos:python title="docs_src/body/tutorial004.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -154,11 +154,11 @@ The function parameters will be recognized as follows:
 *   If the parameter is of a **singular type** (like `int`, `float`, `str`, `bool`, etc) it will be interpreted as a **query** parameter.
 *   If the parameter is declared to be of a **Pydantic model** type, it will be interpreted as a request **body**.
 
-## Mix multiple parameters
+## Mix Path, Query and Body parameters
 
-You can mix `Path`, `Query` and request body declarations in your *path operation function* and FastAPI will handle all of them.
+You can mix `Path`, `Query` and request body declarations in your *path operation function* and FastAPI will handle all of them. You can also declare the body as optional by using `Union[Item, None] = None`.
 
-```python
+```python icon=logos:python title="docs_src/body_multiple_params/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI, Path
@@ -195,7 +195,7 @@ You can define complex, nested JSON objects in your request bodies by nesting Py
 
 For example, an item can have a list of tags. For this, you can define the `tags` attribute as a list.
 
-```python
+```python icon=logos:python title="docs_src/body_nested_models/tutorial001.py"
 from typing import Union
 
 from fastapi import FastAPI
@@ -224,7 +224,7 @@ For better type safety and editor support, you can be more specific about the it
 
 By default, if you declare a single Pydantic model in your function, its content is expected as the direct body of the request. However, you can instruct FastAPI to expect a JSON object with a specific key. You can achieve this by using `Body`.
 
-```python
+```python icon=logos:python title="docs_src/body_fields/tutorial001.py"
 from typing import Union
 
 from fastapi import Body, FastAPI
@@ -278,4 +278,4 @@ This also demonstrates using `Field` to add extra validation and metadata to you
 
 Now that you know how to handle data sent from the client, let's explore how to control what you send back.
 
-Next up, learn how to configure the [Handling Responses](./user-guide-handling-responses.md).
+Next up, learn how to configure [Handling Responses](./user-guide-handling-responses.md).

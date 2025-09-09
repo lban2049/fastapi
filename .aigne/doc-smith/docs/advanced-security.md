@@ -11,24 +11,33 @@ A typical authentication flow, like OAuth2 with a bearer token, involves the cli
 ```d2
 direction: down
 
-"User": { shape: person }
-"API-Server": {
-  label: "API Server"
-  shape: package
-  grid-columns: 1
-  "token": {label: "/token Endpoint"}
-  "users-me": {label: "/users/me Protected Endpoint"}
+User: { 
+  shape: c4-person 
 }
 
-"User" -> "API-Server"."token": "1. Authenticate with credentials" {
+API-Server: {
+  label: "API Server"
+  shape: rectangle
+  grid-columns: 1
+
+  token: {
+    label: "/token Endpoint"
+  }
+
+  users-me: {
+    label: "/users/me Protected Endpoint"
+  }
+}
+
+User -> API-Server.token: "1. Authenticate with credentials" {
   label: "POST /token\n(username, password)"
 }
-"API-Server"."token" -> "User": "2. Receive Access Token (JWT)"
+API-Server.token -> User: "2. Receive Access Token (JWT)"
 
-"User" -> "API-Server"."users-me": "3. Request protected data with token" {
+User -> API-Server.users-me: "3. Request protected data with token" {
   label: "GET /users/me\n(Authorization: Bearer <token>)"
 }
-"API-Server"."users-me" -> "User": "4. Receive protected data"
+API-Server.users-me -> User: "4. Receive protected data"
 ```
 
 ## OAuth2 with Password and Bearer Tokens
@@ -41,7 +50,7 @@ First, you need an instance of `OAuth2PasswordBearer`. This object is a dependen
 
 The `tokenUrl` parameter points to the URL that the client will use to get the token (which we will create later).
 
-```python
+```python tutorial001.py
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordBearer
 
@@ -63,7 +72,7 @@ Just having the token string isn't enough; you need to verify it and get the cor
 
 This new dependency will take the token, decode it, and return the user's data.
 
-```python
+```python tutorial002.py
 from typing import Union
 
 from fastapi import Depends, FastAPI
@@ -106,26 +115,8 @@ Next, you need to create the `/token` path operation so that clients can send a 
 
 FastAPI provides `OAuth2PasswordRequestForm` to handle the incoming form data.
 
-```python
-from typing import Union
-
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "fakehashedsecret",
-        "disabled": False,
-    },
-}
-
-app = FastAPI()
-
-# ... (User, UserInDB models and other helper functions)
+```python tutorial003.py
+# ... (imports and user models)
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
@@ -133,14 +124,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user_dict:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     user = UserInDB(**user_dict)
-    # For now, we are not checking the password, just the username
-    # The token is also just the username
+    hashed_password = fake_hash_password(form_data.password)
+    if not hashed_password == user.hashed_password:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
     return {"access_token": user.username, "token_type": "bearer"}
 
-
-@app.get("/users/me")
-async def read_users_me(current_user: User = Depends(get_current_active_user)):
-    return current_user
+# ... (other endpoints)
 ```
 
 This endpoint validates the user from a fake database and returns an object containing the `access_token` and `token_type`.
@@ -157,7 +147,7 @@ pip install "passlib[bcrypt]" python-jwt
 
 Here is a more complete example incorporating password hashing and JWT creation:
 
-```python
+```python tutorial004.py
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
@@ -187,11 +177,10 @@ class User(BaseModel):
     full_name: Union[str, None] = None
     disabled: Union[bool, None] = None
 
-# ... (UserInDB model)
+class UserInDB(User):
+    hashed_password: str
 
-# --- Hashing & DB ---
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# ... (fake_users_db with hashed password, verify_password, get_user, authenticate_user)
+# ... (fake_users_db, hashing functions, etc.)
 
 # --- JWT Creation ---
 def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None):
@@ -229,10 +218,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 # ... (get_current_active_user dependency)
 
 # --- Token Endpoint ---
-@app.post("/token", response_model=Token)
+@app.post("/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-):
+) -> Token:
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -244,7 +233,8 @@ async def login_for_access_token(
     access_token = create_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
+
 
 # --- Protected Endpoint ---
 @app.get("/users/me/", response_model=User)
@@ -296,7 +286,7 @@ Scopes are used to grant specific permissions to a client. You can define availa
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Not enough permissions",
-                    # ...
+                    headers={"WWW-Authenticate": f'Bearer scope="{security_scopes.scope_str}"'}
                 )
         return user
     ```
@@ -319,7 +309,7 @@ HTTP Basic Auth is a simpler scheme where the username and password are included
 
 FastAPI provides `HTTPBasic` and `HTTPBasicCredentials` for this.
 
-```python
+```python tutorial007.py
 import secrets
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -377,46 +367,43 @@ API Keys are a common way to grant access to specific clients or services. The k
 
 Use `APIKeyQuery` to expect an API key in a query parameter.
 
-```python
+```python APIKeyQuery Example
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyQuery
 
 app = FastAPI()
 
-api_key_query = APIKeyQuery(name="api-key", auto_error=False)
+query_scheme = APIKeyQuery(name="api_key")
 
 
 @app.get("/items/")
-async def read_items(api_key: str = Depends(api_key_query)):
-    if api_key:
-        return {"api_key": api_key}
-    else:
-        return {"message": "No API Key provided."}
+async def read_items(api_key: str = Depends(query_scheme)):
+    return {"api_key": api_key}
 ```
 
 ### API Key in a Header
 
-Use `APIKeyHeader` to expect an API key in a custom header (e.g., `X-API-Key`).
+Use `APIKeyHeader` to expect an API key in a custom header (e.g., `x-key`).
 
-```python
+```python APIKeyHeader Example
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyHeader
 
 app = FastAPI()
 
-api_key_header = APIKeyHeader(name="X-API-Key")
+header_scheme = APIKeyHeader(name="x-key")
 
 
 @app.get("/items/")
-async def read_items(api_key: str = Depends(api_key_header)):
-    return {"api_key": api_key}
+async def read_items(key: str = Depends(header_scheme)):
+    return {"key": key}
 ```
 
 ### API Key in a Cookie
 
 Use `APIKeyCookie` to expect an API key in a cookie.
 
-```python
+```python APIKeyCookie Example
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyCookie
 

@@ -15,23 +15,20 @@ Incoming-Request: {
 FastAPI-App: {
   label: "FastAPI App"
   shape: rectangle
-  style.fill: "#e6f7ff"
 
   APIRouter: {
     label: "APIRouter"
-    shape: package
-    style.fill: "#f6ffed"
+    shape: rectangle
 
     Path-Operation: {
       label: "Path Operation\n(@app.get, etc.)"
       shape: rectangle
-      style.fill: "#fffbe6"
     }
   }
 }
 
 Parameters: {
-  shape: package
+  shape: rectangle
   grid-columns: 2
   Path: {}
   Query: {}
@@ -42,7 +39,7 @@ Parameters: {
 }
 
 Dependencies: {
-  shape: package
+  shape: rectangle
   grid-columns: 2
   Depends: {}
   Security: {}

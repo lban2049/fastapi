@@ -2,7 +2,7 @@
 
 FastAPI provides a variety of response classes to send specific types of data, status codes, and headers. Most of these are inherited directly from Starlette, providing a robust and flexible system for crafting API responses. Additionally, FastAPI offers specialized classes that leverage high-performance JSON libraries for improved serialization speed.
 
-For a more task-oriented guide on using responses, see the [User Guide - Handling Responses](./user-guide-handling-responses.md).
+For a more task-oriented guide on using responses, see the [Handling Responses](./user-guide-handling-responses.md) user guide.
 
 ## Standard Response Classes
 
@@ -72,6 +72,21 @@ async def get_readme():
     return "This is a plain text response."
 ```
 
+### JSONResponse
+
+This is the default response used by FastAPI. You can use it directly to return a JSON response, for example, when returning a dictionary from a path operation.
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+@app.get("/items/")
+async def read_items():
+    return JSONResponse(content={"message": "Here are your items"})
+```
+
 ### RedirectResponse
 
 Performs an HTTP redirect. By default, it returns a `307 Temporary Redirect` status code.
@@ -82,9 +97,9 @@ from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
-@app.get("/docs")
-async def redirect_to_swagger():
-    return RedirectResponse(url="/docs/index.html")
+@app.get("/portal")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
 ```
 
 ### StreamingResponse
@@ -110,7 +125,7 @@ async def stream_data():
 
 ### FileResponse
 
-Asynchronously streams a file as the response. It is efficient for sending large files.
+Asynchronously streams a file as the response. It is highly efficient for sending large files.
 
 ```python
 from fastapi import FastAPI

@@ -16,7 +16,7 @@ The most common way to control the response is by declaring a `response_model` i
 
 Here's how you can declare a `response_model` for an endpoint that creates an item. Even though the function receives and returns the same `item` object, the `response_model` guarantees the output matches the `Item` model's structure.
 
-```python
+```python title="main.py" icon=logos:python
 from typing import Any, List, Union
 
 from fastapi import FastAPI
@@ -44,7 +44,7 @@ FastAPI will use this `response_model` to filter, validate, and document the out
 
 You can also use type hints from Python's `typing` module, like `List`, in the `response_model`.
 
-```python
+```python title="main.py" icon=logos:python
 @app.get("/items/", response_model=List[Item])
 async def read_items() -> Any:
     return [
@@ -59,7 +59,7 @@ In this case, FastAPI will ensure the response is a JSON array where each object
 
 By default, successful responses use the `200 OK` status code. You can easily override this by adding a `status_code` argument to the *path operation decorator*. This is particularly useful for creation endpoints, where a `201 Created` status code is more appropriate.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -68,7 +68,6 @@ app = FastAPI()
 @app.post("/items/", status_code=201)
 async def create_item(name: str):
     return {"name": name}
-
 ```
 
 Now, a successful POST request to `/items/` will return a `201 Created` status code.
@@ -81,7 +80,7 @@ For more advanced control, such as setting custom headers or cookies, you can re
 
 To add custom headers to your response, create a `JSONResponse` instance and pass the headers as a dictionary.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -101,7 +100,7 @@ The client will now receive the custom `X-Cat-Dog` and `Content-Language` header
 
 Similarly, you can set cookies by creating a `JSONResponse` object and using its `set_cookie` method.
 
-```python
+```python title="main.py" icon=logos:python
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -120,7 +119,7 @@ def create_cookie():
 
 Returning a `Response` object gives you full control. This is also useful when you need to serialize data types that are not native to JSON, such as `datetime` objects. FastAPI provides a `jsonable_encoder` utility for this purpose.
 
-```python
+```python title="main.py" icon=logos:python
 from datetime import datetime
 from typing import Union
 

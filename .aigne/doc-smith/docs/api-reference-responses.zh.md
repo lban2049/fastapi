@@ -1,26 +1,26 @@
 # 响应
 
-FastAPI 提供了多种响应类，用于发送特定类型的数据、状态码和标头。这些类大多直接继承自 Starlette，为构建 API 响应提供了一个健壮而灵活的系统。此外，FastAPI 还提供了利用高性能 JSON 库来提高序列化速度的专用类。
+FastAPI 提供了多种响应类，用于发送特定类型的数据、状态码和标头。这些类大部分直接继承自 Starlette，为创建 API 响应提供了一个强大而灵活的系统。此外，FastAPI 还提供了利用高性能 JSON 库的专用类，以提高序列化速度。
 
-如需更侧重于任务的响应使用指南，请参阅[用户指南 - 处理响应](./user-guide-handling-responses.md)。
+如需了解更多关于使用响应的面向任务的指南，请参阅 [处理响应](./user-guide-handling-responses.md) 用户指南。
 
 ## 标准响应类
 
-这些是适用于常见用例的核心响应类。为方便起见，它们都从 `starlette.responses` 导入，并由 `fastapi.responses` 重新导出。
+这些是可用于常见用例的核心响应类。它们都从 `starlette.responses` 中导入，并为方便起见由 `fastapi.responses` 重新导出。
 
-| Class | Description |
+| 类 | 描述 |
 |---|---|
 | `Response` | 所有响应对象的基类。可用于包含原始字节的自定义响应。 |
 | `HTMLResponse` | 用于返回媒体类型为 `text/html` 的内容。 |
 | `PlainTextResponse` | 用于返回媒体类型为 `text/plain` 的内容。 |
 | `JSONResponse` | 路径操作的默认响应。将 Python `dict` 或 Pydantic 模型序列化为 JSON。 |
-| `RedirectResponse` | 用于通过返回 `307` 状态码和 `Location` 标头来执行 HTTP 重定向。 |
-| `StreamingResponse` | 从异步生成器或普通生成器/迭代器中流式传输响应正文内容。 |
-| `FileResponse` | 异步地将文件作为响应流式传输。 |
+| `RedirectResponse` | 用于执行 HTTP 重定向，返回 `307` 状态码和 `Location` 标头。 |
+| `StreamingResponse` | 从异步生成器或普通生成器/迭代器流式传输响应正文内容。 |
+| `FileResponse` | 以异步方式将文件作为响应流式传输。 |
 
 ### Response
 
-`Response` 基类可用于返回任何带有特定媒体类型的 `bytes` 或 `str` 内容。
+基类 `Response` 可用于返回带有特定媒体类型的任何 `bytes` 或 `str` 内容。
 
 ```python
 from fastapi import FastAPI, Response
@@ -35,7 +35,7 @@ def get_legacy_data():
 
 ### HTMLResponse
 
-使用 `HTMLResponse` 返回一个 HTML 字符串，浏览器将对其进行渲染。
+使用 `HTMLResponse` 返回浏览器将渲染的 HTML 字符串。
 
 ```python
 from fastapi import FastAPI
@@ -59,7 +59,7 @@ async def get_html():
 
 ### PlainTextResponse
 
-用于返回纯文本或任何应被解释为纯文本的内容。
+用于返回应被解释为纯文本的简单文本或任何内容。
 
 ```python
 from fastapi import FastAPI
@@ -72,9 +72,24 @@ async def get_readme():
     return "This is a plain text response."
 ```
 
+### JSONResponse
+
+这是 FastAPI 使用的默认响应。你可以直接使用它来返回 JSON 响应，例如，从路径操作返回字典时。
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+@app.get("/items/")
+async def read_items():
+    return JSONResponse(content={"message": "Here are your items"})
+```
+
 ### RedirectResponse
 
-执行 HTTP 重定向。默认情况下，它会返回 `307 Temporary Redirect` 状态码。
+执行 HTTP 重定向。默认情况下，它返回 `307 Temporary Redirect` 状态码。
 
 ```python
 from fastapi import FastAPI
@@ -82,14 +97,14 @@ from fastapi.responses import RedirectResponse
 
 app = FastAPI()
 
-@app.get("/docs")
-async def redirect_to_swagger():
-    return RedirectResponse(url="/docs/index.html")
+@app.get("/portal")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
 ```
 
 ### StreamingResponse
 
-从异步生成器或标准生成器/迭代器中流式传输响应正文。这对于不想一次性将全部内容加载到内存中的大型响应非常有用。
+从异步生成器或标准生成器/迭代器流式传输响应正文。这对于不希望一次性加载到内存中的大型响应非常有用。
 
 ```python
 import asyncio
@@ -110,7 +125,7 @@ async def stream_data():
 
 ### FileResponse
 
-异步地将文件作为响应流式传输。它对于发送大文件非常高效。
+以异步方式将文件作为响应流式传输。对于发送大文件而言，它非常高效。
 
 ```python
 from fastapi import FastAPI
@@ -118,7 +133,7 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-# 假设在同一目录下有一个名为 'my_image.png' 的文件
+# Assume you have a file named 'my_image.png' in the same directory
 image_path = "my_image.png"
 
 @app.get("/file")
@@ -132,7 +147,7 @@ async def get_file():
 
 ### UJSONResponse
 
-`UJSONResponse` 使用 `ujson` 库序列化数据，其速度可能远快于标准的 `json` 库。
+`UJSONResponse` 使用 `ujson` 库来序列化数据，其速度可能远快于标准 `json` 库。
 
 要使用它，首先需要安装 `ujson`：
 
@@ -155,7 +170,7 @@ async def read_items():
 
 ### ORJSONResponse
 
-`ORJSONResponse` 使用 `orjson` 库，这是另一个以其速度和正确性而闻名的高性能 JSON 库。它支持序列化许多标准库不支持的类型，例如 dataclasses、`datetime`、`UUID` 和 NumPy 数组，且无需额外配置。
+`ORJSONResponse` 使用 `orjson` 库，这是另一个以速度和正确性著称的高性能 JSON 库。它支持序列化许多标准库不支持的类型，例如 dataclasses、`datetime`、`UUID` 和 NumPy 数组，无需额外配置。
 
 要使用它，首先需要安装 `orjson`：
 
@@ -163,7 +178,7 @@ async def read_items():
 pip install orjson
 ```
 
-然后，在路径操作中将其设置为 `response_class`。它对于数据密集型应用程序特别有用。
+然后，在路径操作中将其设置为 `response_class`。它对数据密集型应用程序尤其有用。
 
 ```python
 from fastapi import FastAPI
@@ -174,7 +189,7 @@ app = FastAPI()
 
 @app.get("/data", response_class=ORJSONResponse)
 async def read_numpy_data():
-    # orjson 可以直接序列化 numpy 数组
+    # orjson can serialize numpy arrays directly
     return {"matrix": np.arange(9).reshape(3, 3)}
 ```
 

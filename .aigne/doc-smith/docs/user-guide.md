@@ -9,45 +9,51 @@ This guide explores the typical request-response lifecycle and how FastAPI's fea
 ```d2
 direction: down
 
-"Client Request" {
+Client-Request: {
+  label: "Client Request"
   shape: circle
 }
 
-"FastAPI Application" {
+FastAPI-Application: {
+  label: "FastAPI Application"
   shape: rectangle
   grid-columns: 1
 
-  "Parameter Handling" {
-    shape: package
+  Parameter-Handling: {
+    label: "Parameter Handling"
+    shape: rectangle
     grid-columns: 2
 
-    "Path Parameters": {
+    Path-Parameters: {
       label: "Path Parameters\n/items/{item_id}"
     }
-    "Query Parameters": {
+    Query-Parameters: {
       label: "Query Parameters\n/items/?skip=0"
     }
   }
 
-  "Data Validation" {
-    shape: package
-    "Request Body": "Pydantic Models"
+  Data-Validation: {
+    label: "Data Validation"
+    shape: rectangle
+    Request-Body: "Pydantic Models"
   }
 
-  "Shared Logic" {
-    shape: package
-    "Dependency Injection": "Reusable Components"
+  Shared-Logic: {
+    label: "Shared Logic"
+    shape: rectangle
+    Dependency-Injection: "Reusable Components"
   }
 }
 
-"API Response" {
+API-Response: {
+  label: "API Response"
   shape: circle
 }
 
-"Client Request" -> "FastAPI Application"."Parameter Handling": "Receives Request"
-"FastAPI Application"."Parameter Handling" -> "FastAPI Application"."Data Validation": "Extracts Data"
-"FastAPI Application"."Data Validation" -> "FastAPI Application"."Shared Logic": "Runs Dependencies"
-"FastAPI Application"."Shared Logic" -> "API Response": "Sends Response"
+Client-Request -> FastAPI-Application.Parameter-Handling: "Receives Request"
+FastAPI-Application.Parameter-Handling -> FastAPI-Application.Data-Validation: "Extracts Data"
+FastAPI-Application.Data-Validation -> FastAPI-Application.Shared-Logic: "Runs Dependencies"
+FastAPI-Application.Shared-Logic -> API-Response: "Sends Response"
 ```
 
 Explore the core concepts in detail:

@@ -1,16 +1,16 @@
 # Getting Started
 
-This tutorial shows you how to set up FastAPI and build a simple API, from installation to a running application. By the end, you will have a working API with interactive documentation.
+This tutorial guides you through creating a simple API with FastAPI, from installation to a running application. By the end, you will have a fully functional API complete with interactive documentation.
 
 ## Installation
 
-First, you need to install FastAPI and a web server. You can do this with a single command.
+First, you need to install FastAPI and an ASGI server like Uvicorn.
 
 <x-card data-title="Prerequisite" data-icon="lucide:python" data-horizontal="true">
   FastAPI requires Python 3.8 or higher. You can check your version by running `python --version` in your terminal.
 </x-card>
 
-To install FastAPI along with its standard dependencies and the Uvicorn server, run the following command:
+To install FastAPI along with its standard dependencies, including the Uvicorn server, run the following command:
 
 ```console
 $ pip install "fastapi[standard]"
@@ -18,16 +18,16 @@ $ pip install "fastapi[standard]"
 ---> 100%
 ```
 
-This command installs FastAPI, Pydantic for data validation, Starlette for the web components, and Uvicorn to serve your application.
+This single command installs FastAPI, Pydantic for data validation, Starlette for the underlying web functionality, and Uvicorn to serve your application.
 
-## Create It
+## Create Your First API
 
-Now, let's create the API code.
+Now, let's write the code for your API.
 
 1.  Create a file named `main.py`.
 2.  Add the following Python code to it:
 
-```python
+```python main.py icon=logos:python
 from typing import Union
 
 from fastapi import FastAPI
@@ -47,12 +47,12 @@ def read_item(item_id: int, q: Union[str, None] = None):
 
 This code defines a simple API with two endpoints:
 
-*   `@app.get("/")`: This handles `GET` requests to the root URL `/`.
-*   `@app.get("/items/{item_id}")`: This handles `GET` requests to paths like `/items/5`. It captures a path parameter `item_id` and an optional query parameter `q` using standard Python type hints.
+*   A `GET` endpoint at the root URL `/`.
+*   A `GET` endpoint at `/items/{item_id}` which accepts an integer `item_id` as a path parameter and an optional string `q` as a query parameter.
 
-## Run It
+## Run the Development Server
 
-Run the development server from your terminal using the `fastapi` command:
+With the code in place, run the development server from your terminal:
 
 ```console
 $ fastapi dev main.py
@@ -77,7 +77,7 @@ INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
 
-The `fastapi dev` command starts a local server that automatically reloads when you change your code, which is ideal for development.
+The `fastapi dev` command starts a local server with auto-reload enabled, which is perfect for development.
 
 ## Check It
 
@@ -89,11 +89,11 @@ You will see the following JSON response:
 {"item_id": 5, "q": "somequery"}
 ```
 
-You have just created an API that receives and validates a path parameter (`item_id` as an integer) and a query parameter (`q` as a string).
+Congratulations! You have just created an API that receives and validates a path parameter (`item_id` as an integer) and a query parameter (`q` as a string).
 
 ## Interactive API Docs
 
-One of FastAPI's most useful features is its automatically generated documentation.
+One of FastAPI's best features is its automatically generated documentation. 
 
 Navigate to [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) in your browser. You will see the interactive API documentation provided by Swagger UI:
 
@@ -105,10 +105,67 @@ FastAPI also provides an alternative documentation interface. Go to [http://127.
 
 These documentation pages are generated automatically from your code's type hints and allow you to test your API endpoints directly from the browser.
 
+## Upgrade Your API
+
+Now, let's enhance the API to handle request bodies. Modify `main.py` to include a `PUT` request that accepts data using a Pydantic model.
+
+```python main.py icon=logos:python
+from typing import Union
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+
+class Item(BaseModel):
+    name: str
+    price: float
+    is_offer: Union[bool, None] = None
+
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: Union[str, None] = None):
+    return {"item_id": item_id, "q": q}
+
+
+@app.put("/items/{item_id}")
+def update_item(item_id: int, item: Item):
+    return {"item_name": item.name, "item_id": item_id}
+```
+
+Your development server will automatically reload. Now, refresh the interactive docs at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs). The documentation will be updated to include the new `PUT` endpoint:
+
+![Swagger UI Updated](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)
+
+Click the "Try it out" button to fill in the parameters and interact with the API directly from your browser:
+
+![Swagger UI Interaction](https://fastapi.tiangolo.com/img/index/index-04-swagger-03.png)
+
+After clicking "Execute", the UI sends the request to your API and displays the results:
+
+![Swagger UI Result](https://fastapi.tiangolo.com/img/index/index-05-swagger-04.png)
+
+## Recap
+
+By declaring types with standard Python, you get:
+
+*   **Editor Support**: Autocompletion and type-checking.
+*   **Data Validation**: Automatic validation of incoming data with clear errors.
+*   **Data Conversion**: Conversion of network data to Python types.
+*   **Automatic Docs**: Interactive documentation interfaces.
+
+FastAPI handles the validation, conversion, and documentation, letting you focus on your application's logic.
+
 ## Next Steps
 
-You've successfully created and run a basic FastAPI application. To learn how to handle more complex scenarios, such as receiving data in request bodies or using dependency injection, proceed to the User Guide.
+You've successfully created, run, and upgraded a FastAPI application. To learn how to handle more complex scenarios, such as validation constraints and dependency injection, continue to the User Guide.
 
-<x-card data-title="Next: User Guide" data-icon="lucide:book-open" data-href="/user-guide/path-parameters" data-cta="Start the User Guide">
-  Explore core concepts with practical examples, starting with Path Parameters.
+<x-card data-title="Next: User Guide" data-icon="lucide:book-open" data-href="/user-guide/path-parameters" data-cta="Explore Path Parameters">
+  Dive into core concepts with practical examples, starting with how to handle path parameters.
 </x-card>

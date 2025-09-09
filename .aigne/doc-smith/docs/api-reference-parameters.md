@@ -81,7 +81,6 @@ direction: down
 "HTTP Request"."Headers"."Header" -> "FastAPI Parameter Functions"."Header()": "Extracts User-Agent" { style.stroke-dash: 2 }
 "HTTP Request"."Headers"."Cookie" -> "FastAPI Parameter Functions"."Cookie()": "Extracts session_id" { style.stroke-dash: 2 }
 "HTTP Request"."Body" -> "FastAPI Parameter Functions"."Body()": "Parses JSON" { style.stroke-dash: 2 }
-
 ```
 
 ---
@@ -92,7 +91,7 @@ Declares a path parameter. Path parameters are always required as they are part 
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Path
 
@@ -134,14 +133,14 @@ Declares a query parameter. These are the key-value pairs in the URL that come a
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Query
 
 app = FastAPI()
 
 @app.get("/items/")
-async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
+async def read_items(q: Annotated[str | None, Query(max_length=50, description="Query string to search for items")] = None):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
         results.update({"q": q})
@@ -177,7 +176,7 @@ Declares a header parameter. It reads from the request headers.
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Header
 
@@ -217,7 +216,7 @@ Declares a cookie parameter. It reads from the request cookies.
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import Cookie, FastAPI
 
@@ -240,7 +239,7 @@ Declares a parameter that comes from the request body. It is often used with Pyd
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
@@ -280,7 +279,7 @@ Declares a form field. This is used when the request has a media type of `applic
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Form
 
@@ -303,7 +302,7 @@ Declares a file upload. This is used when the request has a media type of `multi
 
 ### Example
 
-```python
+```python icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, File, UploadFile
 

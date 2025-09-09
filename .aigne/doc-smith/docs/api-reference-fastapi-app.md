@@ -8,7 +8,7 @@ This document serves as a comprehensive API reference for the `FastAPI` class, i
 
 To begin, import `FastAPI` and create an application instance:
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -30,7 +30,6 @@ APIRouter: { shape: class }
 
 FastAPI: {
   shape: class
-  
   "router: APIRouter"
 }
 
@@ -95,7 +94,7 @@ The `FastAPI` class constructor accepts several parameters to configure your app
 
 You can configure the metadata for your API, which is used in the OpenAPI schema and the automatic documentation interfaces.
 
-```python
+```python Metadata Configuration icon=logos:python
 from fastapi import FastAPI
 
 tags_metadata = [
@@ -135,7 +134,7 @@ async def read_users():
 
 You can add dependencies that will be applied to all *path operations* in the application.
 
-```python
+```python Global Dependencies icon=logos:python
 from fastapi import Depends, FastAPI, Header, HTTPException
 
 async def verify_token(x_token: str = Header()):
@@ -190,7 +189,7 @@ FastAPI uses decorators to associate functions with specific URL paths and HTTP 
 
 **Example: `@app.post()`**
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -211,7 +210,7 @@ async def create_item(item: Item):
 
 Includes an `APIRouter` in the application, which is useful for structuring larger applications. See [Bigger Applications](./advanced-bigger-applications.md) for more details.
 
-```python
+```python icon=logos:python
 from fastapi import APIRouter, FastAPI
 
 app = FastAPI()
@@ -232,7 +231,7 @@ app.include_router(
 
 Decorates a function to handle WebSocket connections.
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 app = FastAPI()
@@ -252,7 +251,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 Adds middleware to the application. The only supported type is `"http"`.
 
-```python
+```python icon=logos:python
 import time
 from fastapi import FastAPI, Request
 
@@ -271,7 +270,7 @@ async def add_process_time_header(request: Request, call_next):
 
 Registers a function to handle a specific exception type.
 
-```python
+```python icon=logos:python
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
@@ -287,6 +286,34 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
         status_code=418,
         content={"message": f"Oops! {exc.name} did something wrong."},
     )
+```
+
+### `openapi`
+
+This method generates and returns the OpenAPI schema for the application. FastAPI calls it internally, and the result is cached in the `app.openapi_schema` attribute. You can override this method or modify the `app.openapi_schema` attribute to customize the generated schema.
+
+```python Customizing OpenAPI Schema icon=logos:python
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/items/")
+def read_items():
+    return [{"name": "Plumbus"}]
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="Custom title",
+        version="2.5.0",
+        summary="This is a very custom OpenAPI schema",
+        routes=app.routes,
+    )
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
 ```
 
 ## Next Steps

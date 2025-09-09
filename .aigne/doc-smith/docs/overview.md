@@ -46,18 +46,18 @@ direction: down
 }
 
 FastAPI: {
-  shape: package
+  shape: rectangle
   "Your-API-Code"
 }
 
 Starlette: {
-  shape: hexagon
+  shape: rectangle
   label: "Starlette (Web layer)"
   style.fill: "#D5E8D4"
 }
 
 Pydantic: {
-  shape: hexagon
+  shape: rectangle
   label: "Pydantic (Data layer)"
   style.fill: "#FAD7AC"
 }
@@ -75,7 +75,7 @@ See how simple it is to create a fully functional API with automatic documentati
 
 Create a file `main.py` with the following content:
 
-```python
+```python title="main.py"
 from typing import Union
 
 from fastapi import FastAPI

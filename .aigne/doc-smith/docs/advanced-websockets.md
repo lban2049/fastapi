@@ -1,6 +1,6 @@
 # WebSockets
 
-FastAPI provides support for WebSockets, enabling real-time, bidirectional communication between the client and the server. This is useful for applications like chat services, live notifications, and collaborative editing tools.
+FastAPI provides full support for WebSockets, enabling real-time, bidirectional communication between the client and the server. This is useful for applications like chat services, live notifications, and collaborative editing tools.
 
 Under the hood, FastAPI's WebSocket functionality is powered by Starlette.
 
@@ -10,7 +10,7 @@ The basic flow of a WebSocket connection is as follows:
 direction: down
 
 Client: { 
-  shape: person 
+  shape: c4-person 
 }
 
 Server: { 
@@ -34,7 +34,7 @@ First, you need a `WebSocket` endpoint. You create it using the `@app.websocket(
 
 Here's a complete application:
 
-```python
+```python title="tutorial001.py"
 from fastapi import FastAPI, WebSocket
 from fastapi.responses import HTMLResponse
 
@@ -109,7 +109,7 @@ This is particularly useful for authentication. You can create a dependency that
 
 Here's an example that secures a WebSocket endpoint, requiring either a session `Cookie` or a `token` query parameter.
 
-```python
+```python title="tutorial002.py"
 from typing import Union
 
 from fastapi import (
@@ -125,7 +125,8 @@ from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
-# ... (HTML is omitted for brevity, it's similar to the previous one but with fields for item ID and token)
+# ... (HTML is omitted for brevity, it's similar to the previous one 
+# but with fields for item ID and token)
 
 async def get_cookie_or_token(
     websocket: WebSocket,
@@ -175,11 +176,11 @@ Manager: {
 }
 
 Clients: {
-  shape: package
+  shape: rectangle
   grid-columns: 3
-  "Client A": { shape: person }
-  "Client B": { shape: person }
-  "Client C": { shape: person }
+  "Client A": { shape: c4-person }
+  "Client B": { shape: c4-person }
+  "Client C": { shape: c4-person }
 }
 
 Clients <-> Manager: "connect() / disconnect()"
@@ -192,7 +193,7 @@ Manager -> Clients: "broadcast('Client A says: Hello')"
 
 Here is the implementation of a `ConnectionManager` and its integration into a chat application:
 
-```python
+```python title="tutorial003.py"
 from typing import List
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
