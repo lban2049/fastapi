@@ -1,86 +1,27 @@
-# Security Utilities
+# Security
 
-FastAPI provides a simple and powerful set of tools to handle security and authentication. These utilities, built on top of the dependency injection system, allow you to easily implement various security schemes like OAuth2, HTTP Basic/Bearer/Digest, and API Keys. They integrate directly with the automated OpenAPI documentation, making your API's security requirements clear and interactive.
+FastAPI provides a collection of tools to handle security and authentication within your API. These utilities are designed to be used as dependencies in your *path operations*, integrating seamlessly with the dependency injection system. They handle extracting credentials from the request and can automatically return the appropriate HTTP errors when credentials are missing or invalid.
 
-This reference guide provides detailed documentation for each security class and utility model available in `fastapi.security`.
-
-```d2
-direction: down
-
-Security-Utilities: {
-  label: "Security Utilities"
-  shape: rectangle
-  grid-columns: 2
-
-  API-Key-Auth: {
-    label: "API Key Auth"
-    shape: rectangle
-    APIKeyQuery: {
-      label: "From Query Param"
-    }
-    APIKeyHeader: {
-      label: "From Header"
-    }
-    APIKeyCookie: {
-      label: "From Cookie"
-    }
-  }
-
-  HTTP-Auth: {
-    label: "HTTP Auth"
-    shape: rectangle
-    HTTPBasic: {}
-    HTTPBearer: {}
-    HTTPDigest: {}
-    HTTPBasicCredentials: {
-      shape: document
-    }
-    HTTPAuthorizationCredentials: {
-      shape: document
-    }
-  }
-
-  OAuth2: {
-    shape: rectangle
-    OAuth2PasswordBearer: {}
-    OAuth2AuthorizationCodeBearer: {}
-    OAuth2PasswordRequestForm: {
-      shape: document
-    }
-    OAuth2PasswordRequestFormStrict: {
-      shape: document
-    }
-    SecurityScopes: {
-      shape: document
-    }
-  }
-
-  OpenID-Connect: {
-    label: "OpenID Connect"
-    shape: rectangle
-    OpenIdConnect: {}
-  }
-}
-```
+For a step-by-step guide on implementing security, please refer to the [Dependencies and Security Tutorial](./tutorials-dependencies-and-security.md).
 
 ## API Key Authentication
 
-API key authentication can be sourced from query parameters, headers, or cookies.
+API key authentication is a common method for securing endpoints. FastAPI provides classes to extract API keys from different parts of the request: query parameters, headers, or cookies.
 
 ### APIKeyQuery
 
-Extracts an API key from a query parameter. You create an instance and use it as a dependency.
+`APIKeyQuery` is a dependency class for handling API key authentication via a query parameter.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `name` | `str` | The name of the query parameter for the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
-| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
-| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
+<x-field data-name="name" data-type="string" data-required="true" data-desc="The name of the query parameter that holds the API key."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an HTTP 403 error if the key is missing. If false, the dependency returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python APIKeyQuery Usage icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyQuery
 
@@ -96,18 +37,18 @@ async def read_items(api_key: str = Depends(query_scheme)):
 
 ### APIKeyHeader
 
-Extracts an API key from an HTTP header.
+`APIKeyHeader` is a dependency class for handling API key authentication via a request header.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `name` | `str` | The name of the HTTP header for the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
-| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
-| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
+<x-field data-name="name" data-type="string" data-required="true" data-desc="The name of the header that holds the API key (e.g., 'X-API-Key')."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an HTTP 403 error if the key is missing. If false, the dependency returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python APIKeyHeader Usage icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyHeader
 
@@ -123,18 +64,18 @@ async def read_items(key: str = Depends(header_scheme)):
 
 ### APIKeyCookie
 
-Extracts an API key from a request cookie.
+`APIKeyCookie` is a dependency class for handling API key authentication via a request cookie.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `name` | `str` | The name of the cookie for the API key. |
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
-| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
-| `auto_error` | `bool` | If `True` (default), raises an HTTP 403 error if the key is missing. If `False`, the dependency returns `None`. |
+<x-field data-name="name" data-type="string" data-required="true" data-desc="The name of the cookie that holds the API key."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an HTTP 403 error if the key is missing. If false, the dependency returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python APIKeyCookie Usage icon=logos:python
 from fastapi import Depends, FastAPI
 from fastapi.security import APIKeyCookie
 
@@ -150,22 +91,24 @@ async def read_items(session: str = Depends(cookie_scheme)):
 
 ## HTTP Authentication
 
-Implements standard HTTP authentication schemes.
+FastAPI supports standard HTTP authentication schemes like Basic, Bearer, and Digest.
 
 ### HTTPBasic
 
-Handles HTTP Basic authentication. The dependency result is an `HTTPBasicCredentials` object.
+`HTTPBasic` implements HTTP Basic authentication. It extracts the username and password from the `Authorization` header.
+
+The dependency result is an `HTTPBasicCredentials` object.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
-| `realm` | `Optional[str]` | The HTTP Basic authentication realm. |
-| `description` | `Optional[str]` | A description for the security scheme in the OpenAPI docs. |
-| `auto_error` | `bool` | If `True` (default), raises an error if authentication is not provided. If `False`, returns `None`. |
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="realm" data-type="string" data-required="false" data-desc="The HTTP Basic authentication realm, included in the 'WWW-Authenticate' header of a 401 response."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an HTTP 401 error if credentials are not provided. If false, returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python HTTPBasic Usage icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -183,18 +126,20 @@ def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(secur
 
 ### HTTPBearer
 
-Handles HTTP Bearer token authentication. The dependency result is an `HTTPAuthorizationCredentials` object.
+`HTTPBearer` implements HTTP Bearer token authentication, commonly used with OAuth2.
+
+The dependency result is an `HTTPAuthorizationCredentials` object.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `bearerFormat` | `Optional[str]` | The bearer token format (e.g., 'JWT'), visible in the OpenAPI docs. |
-| `scheme_name` | `Optional[str]` | The security scheme name. |
-| `description` | `Optional[str]` | A description for the security scheme. |
-| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
+<x-field data-name="bearerFormat" data-type="string" data-required="false" data-desc="An optional hint to clients about the format of the bearer token (e.g., 'JWT'). Used in OpenAPI documentation."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an error if the token is not provided. If false, returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python HTTPBearer Usage icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -214,17 +159,19 @@ def read_current_user(
 
 ### HTTPDigest
 
-Handles HTTP Digest authentication. The dependency result is an `HTTPAuthorizationCredentials` object.
+`HTTPDigest` implements HTTP Digest authentication.
+
+The dependency result is an `HTTPAuthorizationCredentials` object.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `scheme_name` | `Optional[str]` | The security scheme name, visible in the OpenAPI docs. |
-| `description` | `Optional[str]` | A description for the security scheme. |
-| `auto_error` | `bool` | If `True` (default), raises an error if the digest is missing. If `False`, returns `None`. |
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in the OpenAPI documentation."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme, visible in the OpenAPI documentation."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically sends an error if the digest is not provided. If false, returns `None`."></x-field>
 
-```python Example icon=logos:python
+**Example**
+
+```python HTTPDigest Usage icon=logos:python
 from typing import Annotated
 
 from fastapi import Depends, FastAPI
@@ -242,104 +189,101 @@ def read_current_user(
     return {"scheme": credentials.scheme, "credentials": credentials.credentials}
 ```
 
-### HTTPBasicCredentials
+### Helper Models
 
-A data model containing the username and password from HTTP Basic auth.
+#### HTTPBasicCredentials
 
-**Attributes**
+A data model containing the decoded `username` and `password` from HTTP Basic auth.
 
-| Attribute | Type | Description |
-|---|---|---|
-| `username` | `str` | The HTTP Basic username. |
-| `password` | `str` | The HTTP Basic password. |
+<x-field data-name="username" data-type="string" data-required="true" data-desc="The HTTP Basic username."></x-field>
+<x-field data-name="password" data-type="string" data-required="true" data-desc="The HTTP Basic password."></x-field>
 
-### HTTPAuthorizationCredentials
+#### HTTPAuthorizationCredentials
 
-A data model containing the scheme and credentials from an `Authorization` header.
+A data model containing the `scheme` and `credentials` from the `Authorization` header.
 
-**Attributes**
-
-| Attribute | Type | Description |
-|---|---|---|
-| `scheme` | `str` | The authorization scheme (e.g., 'Bearer', 'Digest'). |
-| `credentials` | `str` | The credentials part of the header value. |
+<x-field data-name="scheme" data-type="string" data-required="true" data-desc="The authentication scheme (e.g., 'Bearer', 'Digest')."></x-field>
+<x-field data-name="credentials" data-type="string" data-required="true" data-desc="The credentials string, such as the token."></x-field>
 
 ## OAuth2
 
-Utilities for implementing OAuth2 flows.
+FastAPI provides comprehensive support for implementing OAuth2 flows.
 
 ### OAuth2PasswordBearer
 
-Defines an OAuth2 password bearer flow. It extracts the token from the `Authorization` header.
+This is a dependency class that implements the OAuth2 "Password" flow with a Bearer token. It checks for a valid `Authorization: Bearer <token>` header and returns the token as a string.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `tokenUrl` | `str` | The URL of the path operation that provides the token (e.g., `/token`). |
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions. |
-| `description` | `Optional[str]` | A description for the security scheme. |
-| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
-| `refreshUrl` | `Optional[str]` | The URL to refresh the token. |
+<x-field data-name="tokenUrl" data-type="string" data-required="true" data-desc="The URL of the endpoint that issues the token (e.g., '/token')."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in OpenAPI."></x-field>
+<x-field data-name="scopes" data-type="Dict[str, str]" data-required="false" data-desc="A dictionary of scope names to descriptions, used in OpenAPI."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically raises an error if the 'Authorization' header is missing or invalid."></x-field>
+<x-field data-name="refreshUrl" data-type="string" data-required="false" data-desc="The URL to refresh the token and obtain a new one."></x-field>
 
 ### OAuth2AuthorizationCodeBearer
 
-Defines an OAuth2 authorization code bearer flow. It extracts the token from the `Authorization` header.
+This dependency class implements the OAuth2 "Authorization Code" flow with a Bearer token.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `authorizationUrl` | `str` | The URL for the authorization step. |
-| `tokenUrl` | `str` | The URL to obtain the token. |
-| `refreshUrl` | `Optional[str]` | The URL to refresh the token. |
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `scopes` | `Optional[Dict[str, str]]` | A dictionary of available scopes and their descriptions. |
-| `description` | `Optional[str]` | A description for the security scheme. |
-| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
+<x-field data-name="authorizationUrl" data-type="string" data-required="true" data-desc="The URL for the authorization endpoint."></x-field>
+<x-field data-name="tokenUrl" data-type="string" data-required="true" data-desc="The URL of the endpoint that issues the token."></x-field>
+<x-field data-name="refreshUrl" data-type="string" data-required="false" data-desc="The URL to refresh the token and obtain a new one."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme, used in OpenAPI."></x-field>
+<x-field data-name="scopes" data-type="Dict[str, str]" data-required="false" data-desc="A dictionary of scope names to descriptions, used in OpenAPI."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically raises an error if the 'Authorization' header is missing or invalid."></x-field>
 
-### OAuth2PasswordRequestForm
+### OAuth2PasswordRequestForm & OAuth2PasswordRequestFormStrict
 
-A dependency class that captures OAuth2 password flow form data from a request.
+These are dependency classes that parse OAuth2 password flow request bodies sent as form data. They extract `username`, `password`, `scope`, and other fields. `OAuth2PasswordRequestFormStrict` additionally requires the `grant_type` field to be present with the value `"password"`.
 
-**Attributes**
+**Form Fields**
 
-| Attribute | Type | Description |
-|---|---|---|
-| `grant_type` | `Optional[str]` | Must be 'password'. Permissive, allows `None`. |
-| `username` | `str` | The username from the form data. |
-| `password` | `str` | The password from the form data. |
-| `scopes` | `List[str]` | A list of scopes requested, parsed from a space-separated string. |
-| `client_id` | `Optional[str]` | The client ID, if provided in the form. |
-| `client_secret` | `Optional[str]` | The client secret, if provided in the form. |
+<x-field data-name="grant_type" data-type="str" data-required="false" data-desc="Required by `OAuth2PasswordRequestFormStrict`. Must be 'password'. Optional for `OAuth2PasswordRequestForm`."></x-field>
+<x-field data-name="username" data-type="str" data-required="true" data-desc="The user's username."></x-field>
+<x-field data-name="password" data-type="str" data-required="true" data-desc="The user's password."></x-field>
+<x-field data-name="scope" data-type="str" data-default="" data-required="false" data-desc="A space-separated string of scopes."></x-field>
+<x-field data-name="client_id" data-type="str | None" data-required="false" data-desc="The client ID."></x-field>
+<x-field data-name="client_secret" data-type="str | None" data-required="false" data-desc="The client secret."></x-field>
 
-### OAuth2PasswordRequestFormStrict
+**Example**
 
-A stricter version of `OAuth2PasswordRequestForm` that requires the `grant_type` form field to be present with the value `'password'`, as mandated by the OAuth2 specification.
+```python OAuth2PasswordRequestForm Usage icon=logos:python
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.security import OAuth2PasswordRequestForm
+
+app = FastAPI()
+
+
+@app.post("/login")
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()])
+    # The form_data object will have attributes like username, password, scopes, etc.
+    return {"username": form_data.username, "scopes": form_data.scopes}
+```
 
 ### SecurityScopes
 
-A special dependency class used to get the security scopes required by other dependencies in the same *path operation*.
+A special dependency class used to access the list of security scopes required by other dependencies in the same *path operation*.
 
 **Attributes**
 
-| Attribute | Type | Description |
-|---|---|---|
-| `scopes` | `List[str]` | A list of all scopes required by the dependencies. |
-| `scope_str` | `str` | A single string containing all scopes, separated by spaces. |
+<x-field data-name="scopes" data-type="List[str]" data-desc="A list of all scopes required by dependencies."></x-field>
+<x-field data-name="scope_str" data-type="str" data-desc="A single string containing all scopes, separated by spaces."></x-field>
 
 ## OpenID Connect
 
 ### OpenIdConnect
 
-Defines OpenID Connect authentication. It extracts the token from the `Authorization` header.
+`OpenIdConnect` is a dependency class for handling OpenID Connect authentication. It primarily serves to document the security scheme in OpenAPI.
 
 **Parameters**
 
-| Parameter | Type | Description |
-|---|---|---|
-| `openIdConnectUrl` | `str` | The OpenID Connect discovery URL. |
-| `scheme_name` | `Optional[str]` | The security scheme name for OpenAPI. |
-| `description` | `Optional[str]` | A description for the security scheme. |
-| `auto_error` | `bool` | If `True` (default), raises an error if the token is missing. If `False`, returns `None`. |
+<x-field data-name="openIdConnectUrl" data-type="string" data-required="true" data-desc="The OpenID Connect discovery URL."></x-field>
+<x-field data-name="scheme_name" data-type="string" data-required="false" data-desc="An optional name for the security scheme."></x-field>
+<x-field data-name="description" data-type="string" data-required="false" data-desc="An optional description for the security scheme."></x-field>
+<x-field data-name="auto_error" data-type="boolean" data-default="true" data-required="false" data-desc="If true, automatically raises an error if the 'Authorization' header is missing."></x-field>

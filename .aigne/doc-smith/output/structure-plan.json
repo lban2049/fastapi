@@ -1,309 +1,273 @@
 [
   {
-    "title": "Overview",
-    "description": "A high-level introduction to FastAPI, its key features, performance benefits, and what makes it a modern choice for building APIs.",
-    "path": "/overview",
-    "parentId": null,
+    "title": "Home",
+    "description": "An overview of FastAPI, its key features, performance benchmarks, and a simple getting-started example.",
+    "path": "/home",
     "sourceIds": [
       "README.md",
       "fastapi/__init__.py",
-      "fastapi/applications.py",
-      "fastapi/routing.py"
-    ]
+      "fastapi/applications.py"
+    ],
+    "parentId": ""
   },
   {
-    "title": "Getting Started",
-    "description": "A step-by-step tutorial to guide you from installation to creating and running your first FastAPI application.",
-    "path": "/getting-started",
-    "parentId": null,
+    "title": "Tutorials - User Guide",
+    "description": "Step-by-step guides to learn the core concepts of FastAPI from the ground up, from basics to advanced patterns.",
+    "path": "/tutorials",
+    "sourceIds": [
+      "docs_src/first_steps/tutorial001.py",
+      "docs_src/path_params/tutorial001.py",
+      "docs_src/query_params/tutorial001.py",
+      "docs_src/body/tutorial001.py",
+      "docs_src/dependencies/tutorial001.py",
+      "docs_src/security/tutorial001.py",
+      "docs_src/handling_errors/tutorial001.py"
+    ],
+    "parentId": ""
+  },
+  {
+    "title": "First Steps",
+    "description": "Learn how to install FastAPI and create your first simple 'Hello World' application.",
+    "path": "/tutorials/first-steps",
     "sourceIds": [
       "README.md",
       "docs_src/first_steps/tutorial001.py",
       "docs_src/first_steps/tutorial002.py",
       "docs_src/first_steps/tutorial003.py"
-    ]
+    ],
+    "parentId": "/tutorials"
   },
   {
-    "title": "User Guide",
-    "description": "Explore the core concepts of FastAPI with practical, step-by-step examples covering everything from parameters to dependency injection.",
-    "path": "/user-guide",
-    "parentId": null,
-    "sourceIds": [
-      "docs_src/path_params/tutorial001.py",
-      "docs_src/query_params/tutorial001.py",
-      "docs_src/body/tutorial001.py",
-      "docs_src/dependencies/tutorial001.py"
-    ]
-  },
-  {
-    "title": "Path Parameters",
-    "description": "Learn how to declare and validate path parameters in your API endpoints, including type hints and numeric validations.",
-    "path": "/user-guide/path-parameters",
-    "parentId": "/user-guide",
+    "title": "Path and Query Parameters",
+    "description": "Understand how to declare, validate, and document parameters from the URL path and query string.",
+    "path": "/tutorials/path-and-query-parameters",
     "sourceIds": [
       "docs_src/path_params/tutorial001.py",
       "docs_src/path_params/tutorial002.py",
       "docs_src/path_params/tutorial003.py",
-      "docs_src/path_params/tutorial003b.py",
       "docs_src/path_params/tutorial004.py",
       "docs_src/path_params/tutorial005.py",
       "docs_src/path_params_numeric_validations/tutorial001.py",
-      "docs_src/path_params_numeric_validations/tutorial002.py",
-      "docs_src/path_params_numeric_validations/tutorial003.py",
-      "docs_src/path_params_numeric_validations/tutorial004.py",
-      "docs_src/path_params_numeric_validations/tutorial005.py",
-      "docs_src/path_params_numeric_validations/tutorial006.py",
-      "fastapi/params.py",
-      "fastapi/param_functions.py"
-    ]
-  },
-  {
-    "title": "Query Parameters",
-    "description": "Understand how to define, validate, and document query parameters, including string validations, default values, and aliases.",
-    "path": "/user-guide/query-parameters",
-    "parentId": "/user-guide",
-    "sourceIds": [
       "docs_src/query_params/tutorial001.py",
       "docs_src/query_params/tutorial002.py",
-      "docs_src/query_params/tutorial003.py",
-      "docs_src/query_params/tutorial004.py",
-      "docs_src/query_params/tutorial005.py",
-      "docs_src/query_params/tutorial006.py",
       "docs_src/query_params_str_validations/tutorial001.py",
-      "docs_src/query_params_str_validations/tutorial002.py",
-      "docs_src/query_params_str_validations/tutorial003.py",
-      "docs_src/query_params_str_validations/tutorial004.py",
-      "docs_src/query_param_models/tutorial001.py",
-      "fastapi/params.py",
-      "fastapi/param_functions.py"
-    ]
+      "docs_src/query_params_str_validations/tutorial002.py"
+    ],
+    "parentId": "/tutorials"
   },
   {
     "title": "Request Body",
-    "description": "Learn how to receive and validate data from the request body using Pydantic models, including nested data structures and multiple body parameters.",
-    "path": "/user-guide/request-body",
-    "parentId": "/user-guide",
+    "description": "Explore how to receive, validate, and process JSON data and form data sent in the request body using Pydantic models.",
+    "path": "/tutorials/request-body",
     "sourceIds": [
       "docs_src/body/tutorial001.py",
       "docs_src/body/tutorial002.py",
-      "docs_src/body/tutorial003.py",
-      "docs_src/body/tutorial004.py",
       "docs_src/body_fields/tutorial001.py",
       "docs_src/body_multiple_params/tutorial001.py",
       "docs_src/body_nested_models/tutorial001.py",
-      "fastapi/params.py",
-      "fastapi/param_functions.py"
-    ]
+      "docs_src/request_forms/tutorial001.py",
+      "docs_src/request_files/tutorial001.py"
+    ],
+    "parentId": "/tutorials"
   },
   {
-    "title": "Handling Responses",
-    "description": "Control the API response by defining response models, changing status codes, and setting custom headers and cookies.",
-    "path": "/user-guide/handling-responses",
-    "parentId": "/user-guide",
-    "sourceIds": [
-      "docs_src/response_model/tutorial001.py",
-      "docs_src/response_status_code/tutorial001.py",
-      "docs_src/response_headers/tutorial001.py",
-      "docs_src/response_cookies/tutorial001.py",
-      "docs_src/response_directly/tutorial001.py",
-      "fastapi/responses.py"
-    ]
-  },
-  {
-    "title": "Dependency Injection",
-    "description": "Master FastAPI's powerful dependency injection system to manage dependencies, share logic, and handle authentication and database connections.",
-    "path": "/user-guide/dependency-injection",
-    "parentId": "/user-guide",
+    "title": "Dependencies and Security",
+    "description": "Master FastAPI's powerful Dependency Injection system and implement authentication and authorization, including HTTP Basic, OAuth2, and API Keys.",
+    "path": "/tutorials/dependencies-and-security",
     "sourceIds": [
       "docs_src/dependencies/tutorial001.py",
       "docs_src/dependencies/tutorial002.py",
-      "docs_src/dependencies/tutorial003.py",
       "docs_src/dependencies/tutorial004.py",
-      "fastapi/dependencies/utils.py",
-      "fastapi/dependencies/models.py",
-      "fastapi/params.py"
-    ]
-  },
-  {
-    "title": "Advanced Topics",
-    "description": "Dive deeper into advanced features like security, middleware, WebSockets, and structuring larger applications for production environments.",
-    "path": "/advanced",
-    "parentId": null,
-    "sourceIds": [
-      "SECURITY.md",
-      "docs_src/security/tutorial001.py",
-      "docs_src/middleware/tutorial001.py",
-      "docs_src/websockets/tutorial001.py",
-      "docs_src/bigger_applications/app/main.py",
-      "docs_src/sql_databases/tutorial001.py"
-    ]
-  },
-  {
-    "title": "Security",
-    "description": "Implement authentication and authorization in your API using various security schemes like OAuth2, HTTP Basic Auth, and API Keys.",
-    "path": "/advanced/security",
-    "parentId": "/advanced",
-    "sourceIds": [
-      "SECURITY.md",
       "docs_src/security/tutorial001.py",
       "docs_src/security/tutorial002.py",
       "docs_src/security/tutorial003.py",
       "docs_src/security/tutorial004.py",
       "docs_src/security/tutorial005.py",
-      "docs_src/security/tutorial006.py",
-      "docs_src/security/tutorial007.py",
-      "fastapi/security/api_key.py",
-      "fastapi/security/http.py",
-      "fastapi/security/oauth2.py",
-      "fastapi/security/open_id_connect_url.py"
-    ]
+      "docs_src/security/tutorial006.py"
+    ],
+    "parentId": "/tutorials"
   },
   {
-    "title": "Middleware",
-    "description": "Learn how to use and create middleware to process requests and responses, handle CORS, GZip, and implement custom logic.",
-    "path": "/advanced/middleware",
-    "parentId": "/advanced",
+    "title": "Advanced User Guide",
+    "description": "Dive deeper into advanced features like WebSockets, middleware, bigger application structures, and database integrations.",
+    "path": "/tutorials/advanced",
     "sourceIds": [
+      "docs_src/websockets/tutorial001.py",
       "docs_src/middleware/tutorial001.py",
-      "docs_src/advanced_middleware/tutorial001.py",
-      "docs_src/advanced_middleware/tutorial002.py",
-      "docs_src/advanced_middleware/tutorial003.py",
-      "fastapi/middleware/__init__.py",
-      "fastapi/middleware/cors.py",
-      "fastapi/middleware/gzip.py"
-    ]
+      "docs_src/sql_databases/tutorial001.py",
+      "docs_src/bigger_applications/app/main.py",
+      "docs_src/app_testing/tutorial001.py"
+    ],
+    "parentId": "/tutorials"
   },
   {
     "title": "WebSockets",
-    "description": "Enable real-time, bidirectional communication between clients and your server using WebSockets.",
-    "path": "/advanced/websockets",
-    "parentId": "/advanced",
+    "description": "Implement real-time, bidirectional communication with clients using WebSockets.",
+    "path": "/tutorials/advanced/websockets",
     "sourceIds": [
       "docs_src/websockets/tutorial001.py",
       "docs_src/websockets/tutorial002.py",
       "docs_src/websockets/tutorial003.py",
       "fastapi/websockets.py"
-    ]
+    ],
+    "parentId": "/tutorials/advanced"
   },
   {
     "title": "Bigger Applications",
-    "description": "Discover strategies for structuring large, production-ready applications by splitting your API into multiple files and routers.",
-    "path": "/advanced/bigger-applications",
-    "parentId": "/advanced",
+    "description": "Structure your growing application using APIRouters to split your API into multiple files and modules.",
+    "path": "/tutorials/advanced/bigger-applications",
     "sourceIds": [
       "docs_src/bigger_applications/app/main.py",
       "docs_src/bigger_applications/app/routers/items.py",
       "docs_src/bigger_applications/app/routers/users.py",
+      "docs_src/bigger_applications/app/internal/admin.py",
       "fastapi/routing.py"
-    ]
+    ],
+    "parentId": "/tutorials/advanced"
+  },
+  {
+    "title": "Middleware",
+    "description": "Learn how to add custom middleware for processing requests and responses, including CORS, GZip, and more.",
+    "path": "/tutorials/advanced/middleware",
+    "sourceIds": [
+      "docs_src/middleware/tutorial001.py",
+      "docs_src/advanced_middleware/tutorial001.py",
+      "docs_src/cors/tutorial001.py",
+      "fastapi/middleware/cors.py",
+      "fastapi/middleware/gzip.py"
+    ],
+    "parentId": "/tutorials/advanced"
+  },
+  {
+    "title": "SQL Databases",
+    "description": "Connect your FastAPI application to SQL databases using libraries like SQLModel, including examples for CRUD operations.",
+    "path": "/tutorials/advanced/sql-databases",
+    "sourceIds": [
+      "docs_src/sql_databases/tutorial001.py",
+      "docs_src/sql_databases/tutorial002.py"
+    ],
+    "parentId": "/tutorials/advanced"
   },
   {
     "title": "Testing",
-    "description": "Write effective tests for your FastAPI application, including unit and integration tests for dependencies, and event handlers.",
-    "path": "/advanced/testing",
-    "parentId": "/advanced",
+    "description": "Write tests for your FastAPI application, including testing dependencies with overrides, using the TestClient.",
+    "path": "/tutorials/advanced/testing",
     "sourceIds": [
       "docs_src/app_testing/tutorial001.py",
-      "docs_src/app_testing/tutorial002.py",
-      "docs_src/app_testing/tutorial003.py",
+      "docs_src/app_testing/main.py",
+      "docs_src/app_testing/test_main.py",
       "docs_src/dependency_testing/tutorial001.py",
       "fastapi/testclient.py"
-    ]
+    ],
+    "parentId": "/tutorials/advanced"
   },
   {
     "title": "API Reference",
-    "description": "Detailed technical documentation of FastAPI's public API, including classes, functions, and utilities for developers.",
+    "description": "A comprehensive, searchable reference for all of FastAPI's classes, functions, and utilities.",
     "path": "/api-reference",
-    "parentId": null,
     "sourceIds": [
-      "fastapi/__init__.py",
       "fastapi/applications.py",
       "fastapi/routing.py",
-      "fastapi/param_functions.py",
       "fastapi/params.py",
-      "fastapi/responses.py",
-      "fastapi/security/__init__.py",
-      "fastapi/encoders.py",
-      "fastapi/exceptions.py"
-    ]
+      "fastapi/param_functions.py",
+      "fastapi/dependencies/utils.py",
+      "fastapi/security/http.py",
+      "fastapi/responses.py"
+    ],
+    "parentId": ""
   },
   {
-    "title": "FastAPI Application",
-    "description": "Comprehensive reference for the main `FastAPI` application class, its configuration options, and methods.",
-    "path": "/api-reference/fastapi-app",
-    "parentId": "/api-reference",
+    "title": "FastAPI Class",
+    "description": "Detailed documentation for the main `FastAPI` application class, its parameters, and configuration options.",
+    "path": "/api-reference/fastapi-class",
     "sourceIds": [
       "fastapi/applications.py",
       "fastapi/__init__.py"
-    ]
+    ],
+    "parentId": "/api-reference"
   },
   {
-    "title": "Routing",
-    "description": "In-depth guide to `APIRouter` and `APIRoute` for structuring path operations and creating modular applications.",
-    "path": "/api-reference/routing",
-    "parentId": "/api-reference",
+    "title": "APIRouter",
+    "description": "Reference for the `APIRouter`, used to structure your application into multiple modules and files.",
+    "path": "/api-reference/apirouter",
     "sourceIds": [
       "fastapi/routing.py"
-    ]
+    ],
+    "parentId": "/api-reference"
   },
   {
     "title": "Parameters",
-    "description": "Detailed documentation for parameter-defining functions like `Path`, `Query`, `Header`, `Cookie`, `Body`, and `Form`.",
+    "description": "In-depth reference for `Path`, `Query`, `Header`, `Cookie`, `Body`, `Form`, and `File` parameter functions.",
     "path": "/api-reference/parameters",
-    "parentId": "/api-reference",
     "sourceIds": [
-      "fastapi/param_functions.py",
-      "fastapi/params.py"
-    ]
+      "fastapi/params.py",
+      "fastapi/param_functions.py"
+    ],
+    "parentId": "/api-reference"
   },
   {
     "title": "Dependencies",
-    "description": "Reference for the dependency injection system, including `Depends` and `Security`.",
+    "description": "Complete guide to the dependency injection system, including `Depends` and `Security`.",
     "path": "/api-reference/dependencies",
-    "parentId": "/api-reference",
     "sourceIds": [
+      "fastapi/params.py",
+      "fastapi/param_functions.py",
       "fastapi/dependencies/utils.py",
-      "fastapi/dependencies/models.py",
-      "fastapi/params.py"
-    ]
+      "fastapi/dependencies/models.py"
+    ],
+    "parentId": "/api-reference"
+  },
+  {
+    "title": "Security",
+    "description": "Reference for all security utilities, including `OAuth2PasswordBearer`, `HTTPBasic`, `APIKeyHeader`, and more.",
+    "path": "/api-reference/security",
+    "sourceIds": [
+      "fastapi/security/api_key.py",
+      "fastapi/security/http.py",
+      "fastapi/security/oauth2.py",
+      "fastapi/security/open_id_connect_url.py"
+    ],
+    "parentId": "/api-reference"
   },
   {
     "title": "Responses",
-    "description": "A complete reference for all available response classes, including `JSONResponse`, `HTMLResponse`, and `StreamingResponse`.",
+    "description": "Details on `Response` classes like `JSONResponse`, `HTMLResponse`, `StreamingResponse`, and how to customize them.",
     "path": "/api-reference/responses",
-    "parentId": "/api-reference",
     "sourceIds": [
-      "fastapi/responses.py"
-    ]
+      "fastapi/responses.py",
+      "fastapi/encoders.py"
+    ],
+    "parentId": "/api-reference"
   },
   {
-    "title": "Security Utilities",
-    "description": "Reference for all security-related utilities, including OAuth2, HTTP Basic/Bearer/Digest, and API Keys.",
-    "path": "/api-reference/security",
-    "parentId": "/api-reference",
+    "title": "Exceptions",
+    "description": "Documentation for `HTTPException`, `WebSocketException`, and related exception handlers.",
+    "path": "/api-reference/exceptions",
     "sourceIds": [
-      "fastapi/security/__init__.py",
-      "fastapi/security/api_key.py",
-      "fastapi/security/base.py",
-      "fastapi/security/http.py",
-      "fastapi/security/oauth2.py",
-      "fastapi/security/open_id_connect_url.py",
-      "fastapi/security/utils.py"
-    ]
+      "fastapi/exceptions.py",
+      "fastapi/exception_handlers.py"
+    ],
+    "parentId": "/api-reference"
   },
   {
     "title": "Contributing",
-    "description": "Learn how you can contribute to the FastAPI project, report security issues, and understand the project's internal scripts and maintenance.",
+    "description": "Learn how you can contribute to the FastAPI project, report issues, and understand the development process.",
     "path": "/contributing",
-    "parentId": null,
     "sourceIds": [
       "CONTRIBUTING.md",
       "SECURITY.md",
-      "scripts/docs.py",
       "scripts/translate.py",
-      "scripts/people.py",
-      "scripts/sponsors.py",
       "scripts/contributors.py"
-    ]
+    ],
+    "parentId": ""
+  },
+  {
+    "title": "Security Policy",
+    "description": "Information on how to report security vulnerabilities and details about supported versions.",
+    "path": "/contributing/security-policy",
+    "sourceIds": [
+      "SECURITY.md"
+    ],
+    "parentId": "/contributing"
   }
 ]

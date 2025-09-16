@@ -63,6 +63,8 @@ translateLanguages:
 docsDir: .aigne/doc-smith/docs # Directory to save generated documentation
 sourcesPath: # Source code paths to analyze
   - ./
-lastGitHead: 3e2dbf91699ef2e3a713372f099ef278b3bcc59e
+lastGitHead: 348d6e5333c91baf3b43672dd316972cd04747b3
 appUrl: https://docsmith.aigne.io
 boardId: fastapi
+# Checkout ID for document deployment service
+checkoutId: ""

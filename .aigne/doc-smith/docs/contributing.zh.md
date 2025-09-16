@@ -1,80 +1,54 @@
-# 贡献指南
+# 贡献
 
-感谢您有兴趣为 FastAPI 做出贡献！您的帮助对于保持其卓越至关重要。本文档将指导您如何做出贡献、报告安全问题以及了解项目的内部脚本和维护工作。
+感谢您有兴趣为 FastAPI 做出贡献！您的帮助对于保持项目的出色至关重要。无论是修复漏洞、改进文档还是添加新功能，我们都欢迎您的贡献。
 
-您可以通过以下几种方式为项目做出贡献：
+本文档概述了您的贡献方式。有关详细说明，请参阅官方指南。
 
-<x-cards data-columns="3">
-  <x-card data-title="开发指南" data-icon="lucide:code">
-    遵循我们的开发流程，为代码和文档做出贡献。
-  </x-card>
-  <x-card data-title="安全策略" data-icon="lucide:shield">
-    了解如何负责任地报告安全漏洞。
-  </x-card>
-  <x-card data-title="项目维护" data-icon="lucide:bot">
-    了解用于维护项目的内部脚本。
-  </x-card>
-</x-cards>
-
-## 开发指南
-
-有关设置开发环境、运行测试和提交拉取请求的一般指南，请阅读文档网站上的官方[开发 - 贡献](https://fastapi.tiangolo.com/contributing/)指南。其中提供了入门所需的所有必要信息。
+<x-card data-title="开发贡献指南" data-icon="lucide:book-open-check" data-href="https://fastapi.tiangolo.com/contributing/" data-cta="阅读完整指南">
+所有开发贡献（包括代码、文档和问题报告）的主要指南均位于官方文档网站上。请在开始前仔细阅读。
+</x-card>
 
 ## 安全策略
 
-对于 FastAPI 及其社区而言，安全至关重要。以下是我们的处理方式。
+安全是 FastAPI 的重中之重。如果您认为自己发现了安全漏洞，我们非常感谢您以负责任的方式向我们披露。
 
-### 支持的版本
+请不要公开讨论潜在的安全漏洞。请发送电子邮件至 `security@tiangolo.com` 进行私下报告。
 
-FastAPI 的最新版本始终是受支持的版本。我们鼓励您为应用程序编写测试，并在确保测试通过后频繁更新 FastAPI 版本。这样，您将受益于最新的功能、错误修复和**安全修复**。
+有关受支持版本和完整报告流程的更多详细信息，请参阅我们专门的[安全策略](./contributing-security-policy.md)。
 
-您可以在文档中了解更多关于 [FastAPI 版本及其管理方式](https://fastapi.tiangolo.com/deployment/versions/)的信息。
+## 翻译
 
-### 报告漏洞
+贡献翻译是帮助全球 FastAPI 社区的另一种绝佳方式。项目使用一套复杂的脚本来管理翻译工作流程，以确保不同语言的内容保持最新。
 
-如果您认为自己发现了漏洞，即使您不确定，也请立即发送电子邮件至 `security@tiangolo.com` 进行报告。请尽可能详细地描述所有步骤，并提供示例代码以复现该安全问题。作者将对其进行全面审查并与您联系。
+该流程包含用于添加新页面、更新过时内容以及自动创建拉取请求的工具，使翻译人员可以更轻松地专注于内容本身。
 
-### 公开讨论
+```python Translation Management Script icon=logos:python
+# 翻译管理脚本中的示例命令
 
-请避免公开讨论潜在的安全漏洞。最好先私下讨论以找到解决方案，这有助于尽可能地限制潜在影响。
+@app.command()
+def update_outdated(language: Annotated[str, typer.Option(envvar="LANGUAGE")]) -> None:
+    outdated_paths = list_outdated(language)
+    for path in outdated_paths:
+        print(f"Updating lang: {language} path: {path}")
+        translate_page(language=language, en_path=path)
+        print(f"Done updating: {path}")
+    print("Done updating all outdated paths")
 
-## 项目维护与脚本
 
-FastAPI 使用一系列内部脚本来自动化项目维护，包括文档管理、翻译和更新社区相关数据。如果您计划为项目的基础设施做出贡献，了解这些脚本会很有帮助。
+@app.command()
+def add_missing(language: Annotated[str, typer.Option(envvar="LANGUAGE")]) -> None:
+    missing_paths = list_missing(language)
+    for path in missing_paths:
+        print(f"Adding lang: {language} path: {path}")
+        translate_page(language=language, en_path=path)
+        print(f"Done adding: {path}")
+    print("Done adding all missing paths")
+```
 
-以下是主要脚本的摘要：
+## 贡献者致谢
 
-| 脚本文件 | 用途 |
-|---|---|
-| `docs.py` | 管理文档网站，包括为多种语言构建、创建新的语言设置以及在本地提供服务。 |
-| `translate.py` | 使用 AI 自动翻译文档内容，包括更新过时翻译和添加缺失翻译。 |
-| `people.py` | 从 GitHub Discussions 中收集和更新社区专家的数据。 |
-| `contributors.py` | 从 GitHub Pull Requests 中收集代码贡献者、翻译者和审阅者的数据。 |
-| `sponsors.py` | 获取并更新 GitHub Sponsors 列表，以表彰他们的支持。 |
+我们重视所有贡献，并通过自动化流程来表彰杰出的贡献者、翻译者和翻译审校者。该系统会分析拉取请求活动，以生成为项目做出重大贡献的社区成员列表。
 
-### 文档管理 (`docs.py`)
+您的努力使 FastAPI 变得更好，我们坚信应当给予应有的认可。
 
-该脚本是处理基于 MkDocs 的文档的主要工具。其主要功能包括：
-
-- **构建网站**：`build-lang` 和 `build-all` 命令将 Markdown 文件编译成一种或所有语言的静态网站。
-- **创建新翻译**：`new-lang` 命令为新的语言翻译设置必要的目录结构和配置文件。
-- **本地开发**：`serve` 和 `live` 命令提供一个带有实时重新加载功能的本地服务器，以便在处理文档时预览更改。
-- **验证**：`verify-readme` 和 `verify-config` 等命令可确保生成的文件（如主 `README.md`）与文档内容保持同步。
-
-### 翻译管理 (`translate.py`)
-
-为了方便将文档翻译成多种语言，该脚本利用 AI 来自动化该过程。它可以：
-
-- **翻译单个页面**：接收一个英文源文件，并为指定语言生成其翻译。
-- **更新过时翻译**：它可以检查英文源文件的更新时间是否晚于翻译文件，并触发重新翻译以保持内容同步。
-- **添加缺失翻译**：该脚本可以识别尚无特定语言翻译的英文文档并生成翻译。
-
-### 社区数据自动化
-
-多个脚本协同工作，通过从 GitHub 自动获取数据来保持网站 **FastAPI People** 部分的更新：
-
-- **`people.py`**：该脚本分析 GitHub Discussions 中“Questions”类别的内容，以识别活跃且乐于助人的社区成员，并将其认定为“专家”。它根据这些成员在不同时间段（上个月、三个月等）的活动情况对其进行分类。
-- **`contributors.py`**：该脚本查询 GitHub API 获取所有拉取请求，以构建贡献者列表。它根据 PR 标签和审阅活动来区分代码贡献者、翻译者和翻译审阅者。
-- **`sponsors.py`**：该脚本从官方 `tiangolo` GitHub Sponsors 账户获取最新的赞助者列表，并按赞助等级进行分组。这确保了每位支持该项目的人都得到适当的认可。
-
-这些自动化脚本有助于减少手动维护工作，并确保社区贡献得到及时认可。如果您希望帮助改进这些流程，可以在项目仓库的 `scripts/` 目录中找到这些脚本。
+我们期待您的贡献！

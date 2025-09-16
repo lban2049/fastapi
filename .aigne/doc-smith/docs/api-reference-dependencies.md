@@ -1,141 +1,77 @@
 # Dependencies
 
-FastAPI's dependency injection system is a powerful mechanism for managing shared logic, database connections, authentication, and more. This document provides a technical reference for the classes used to declare and manage dependencies.
+FastAPI includes a powerful and easy-to-use Dependency Injection system. It allows you to manage dependencies (like database sessions, security requirements, or shared logic) in a structured and reusable way. FastAPI handles calling your dependencies and injecting their results into your *path operation functions*.
 
-For a step-by-step guide and more conceptual examples, please see the [Dependency Injection User Guide](./user-guide-dependency-injection.md).
+This system helps you:
+-   Share logic and code.
+-   Share database connections.
+-   Implement security schemes (authentication and authorization).
+-   And much more...
 
-## Dependency Resolution Flow
+This page serves as a technical reference for the `Depends` and `Security` functions. For a step-by-step guide, please see the [Tutorial on Dependencies](./tutorials-dependencies-and-security.md).
 
-The following diagram illustrates the high-level process of how FastAPI resolves dependencies for an incoming request.
+## Depends
 
-```d2
-direction: down
-
-Incoming-Request: {
-  label: "Incoming Request"
-  shape: circle
-}
-
-FastAPI-Router: {
-  label: "FastAPI Router"
-  shape: rectangle
-}
-
-Dependency-Resolution-Engine: {
-  label: "Dependency Resolution Engine"
-  shape: rectangle
-  grid-columns: 1
-
-  Dependant-Graph: {
-    label: "Dependant Graph"
-    shape: rectangle
-
-    Sub-Dependency-A: {
-      label: "Sub-Dependency A"
-      shape: class
-    }
-    Sub-Dependency-B: {
-      label: "Sub-Dependency B"
-      shape: class
-    }
-    Path-Operation-Function: {
-      label: "Path Operation Function"
-      shape: class
-    }
-
-    Sub-Dependency-A -> Path-Operation-Function: "Result Injected"
-    Sub-Dependency-B -> Path-Operation-Function: "Result Injected"
-  }
-}
-
-Generated-Response: {
-  label: "Generated Response"
-  shape: circle
-}
-
-Incoming-Request -> FastAPI-Router: "Matches path operation"
-FastAPI-Router -> Dependency-Resolution-Engine: "Triggers dependency resolution"
-Dependency-Resolution-Engine -> Generated-Response: "Executes function & returns"
-```
-
----
-
-## `Depends`
-
-The `Depends` class is the primary tool for declaring a dependency in a *path operation function*. It signals to FastAPI that a parameter should be populated by the result of the specified dependency callable.
-
-```python class Depends icon=logos:python
-class Depends:
-    def __init__(
-        self,
-        dependency: Optional[Callable[..., Any]] = None,
-        *,
-        use_cache: bool = True,
-    ):
-        self.dependency = dependency
-        self.use_cache = use_cache
-```
+The `Depends` function is the primary tool for declaring a dependency in your application. You provide it with a callable (a function, a class, etc.), and FastAPI will execute it, resolve any sub-dependencies, and inject the returned value into your function's parameter.
 
 ### Parameters
 
-| Name         | Type                           | Description                                                                                                                                                                                  |
-|--------------|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `dependency` | `Optional[Callable[..., Any]]` | The dependency callable (e.g., a function or class). If `None`, the parameter's type annotation is used as the dependency.                                                                 |
-| `use_cache`  | `bool`                         | If `True` (default), the dependency's result is cached for the scope of a single request. Subsequent dependencies requiring the same callable (with the same scopes) will receive the cached value. |
+<x-field data-name="dependency" data-type="Optional[Callable[..., Any]]" data-default="None" data-required="false" data-desc="A 'dependable' callable, such as a function. You should pass the function object itself, not the result of calling it. FastAPI will execute it for you."></x-field>
+<x-field data-name="use_cache" data-type="bool" data-default="true" data-required="false" data-desc="If `True` (the default), the dependency's result is cached for the duration of a single request. If the same dependency is required multiple times in one request, it will only be executed once, and the cached value will be reused."></x-field>
 
-### Example Usage
+### Example
 
-```python Example icon=logos:python
-from typing import Annotated
+Here's how to create a dependency that provides common query parameters. This dependency can then be reused across multiple *path operations*.
+
+```python title="dependency_example.py" icon=logos:python
+from typing import Annotated, Union
 
 from fastapi import Depends, FastAPI
 
 app = FastAPI()
 
 
-async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):
+async def common_parameters(q: Union[str, None] = None, skip: int = 0, limit: int = 100):
     return {"q": q, "skip": skip, "limit": limit}
 
 
 @app.get("/items/")
 async def read_items(commons: Annotated[dict, Depends(common_parameters)]):
     return commons
+
+
+@app.get("/users/")
+async def read_users(commons: Annotated[dict, Depends(common_parameters)]):
+    return commons
 ```
 
-In this example, `read_items` depends on `common_parameters`. FastAPI will call `common_parameters` with the request's query parameters and inject the returned dictionary into the `commons` parameter.
+In this example, `common_parameters` is a dependency. When a request comes to `/items/` or `/users/`, FastAPI will:
+1.  Call the `common_parameters` function.
+2.  Extract `q`, `skip`, and `limit` from the request's query string.
+3.  Pass them as arguments to `common_parameters`.
+4.  Take the dictionary returned by `common_parameters`.
+5.  Inject that dictionary into the `commons` parameter of `read_items` or `read_users`.
 
----
+## Security
 
-## `Security`
+The `Security` function is a special sub-class of `Depends`. It works in the exact same way but adds the ability to define security scopes, which are then integrated into your OpenAPI schema and the interactive API documentation (e.g., at `/docs`).
 
-The `Security` class is a subclass of `Depends` used specifically for dependencies related to security schemes. It adds a `scopes` parameter to integrate with OpenAPI documentation, specifying required security scopes for an endpoint.
-
-```python class Security icon=logos:python
-class Security(Depends):
-    def __init__(
-        self,
-        dependency: Optional[Callable[..., Any]] = None,
-        *,
-        scopes: Optional[Sequence[str]] = None,
-        use_cache: bool = True,
-    ):
-        super().__init__(dependency=dependency, use_cache=use_cache)
-        self.scopes = scopes or []
-```
+This is particularly useful for documenting authentication and authorization requirements, especially with schemes like OAuth2.
 
 ### Parameters
 
-| Name         | Type                           | Description                                                                                                       |
-|--------------|--------------------------------|-------------------------------------------------------------------------------------------------------------------| 
-| `dependency` | `Optional[Callable[..., Any]]` | The security dependency callable, typically an instance of a security scheme like `OAuth2PasswordBearer`.         |
-| `scopes`     | `Optional[Sequence[str]]`      | A list of security scope strings required for this endpoint. These are used in the OpenAPI schema.              |
-| `use_cache`  | `bool`                         | If `True` (the default), the result is cached for the duration of the request.                                    |
+<x-field data-name="dependency" data-type="Optional[Callable[..., Any]]" data-default="None" data-required="false" data-desc="A 'dependable' callable that implements a security scheme, for example, by verifying a token or API key and returning the current user."></x-field>
+<x-field data-name="scopes" data-type="Optional[Sequence[str]]" data-default="None" data-required="false" data-desc="A sequence of strings (a list or tuple) representing the OAuth2 scopes required for this specific dependency. This information is used for the OpenAPI schema."></x-field>
+<x-field data-name="use_cache" data-type="bool" data-default="true" data-required="false" data-desc="Caches the result of the security dependency within a single request. Defaults to `True`."></x-field>
 
-### Example Usage
+### Example
 
-```python Example icon=logos:python
-from typing import Annotated
+In this example, `Security` is used to protect an endpoint. It relies on a dependency `get_current_active_user` and specifies that the `items` scope is required.
 
+```python title="security_dependency_example.py" icon=logos:python
+from typing import Annotated, Union
+
+from pydantic import BaseModel
 from fastapi import Depends, FastAPI, Security
 from fastapi.security import OAuth2PasswordBearer
 
@@ -143,68 +79,28 @@ app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+class User(BaseModel):
+    username: str
+    email: Union[str, None] = None
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    # In a real app, you would decode the token and get the user
-    return {"token": token, "scopes": ["me", "items"]}
+# This is a simplified example. In a real application,
+# you would decode and validate the token properly.
+def get_current_active_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    # In a real app, you would decode the token and get the user from the database
+    user = User(username=token + "_faked", email="user@example.com")
+    return user
 
-
-@app.get("/users/me")
-async def read_users_me(
-    current_user: Annotated[dict, Security(get_current_user, scopes=["me"])],
+@app.get("/users/me/items/")
+async def read_own_items(
+    current_user: Annotated[User, Security(get_current_active_user, scopes=["items"])],
 ):
-    return current_user
+    return [{"item_id": "Foo", "owner": current_user.username}]
+
 ```
 
----
+The use of `Security(get_current_active_user, scopes=["items"])` tells FastAPI to:
+1.  Treat `get_current_active_user` as a dependency.
+2.  Inject the result into the `current_user` parameter.
+3.  In the OpenAPI documentation, mark this endpoint as secured by the scheme defined in `get_current_active_user` (which itself depends on `oauth2_scheme`) and requiring the `items` scope.
 
-## Internal Models
-
-The following data classes are used internally by FastAPI to build and manage the dependency graph. While you typically don't interact with them directly, understanding them can be useful for building tools or advanced customizations on top of FastAPI.
-
-### `Dependant`
-
-The `Dependant` class models a single dependency and all of its sub-dependencies, parameters, and security requirements. FastAPI analyzes each *path operation function* and its parameters to build a `Dependant` object, which forms a node in the dependency graph.
-
-#### Key Attributes
-
-| Attribute                 | Type                                | Description                                                                                             |
-|---------------------------|-------------------------------------|---------------------------------------------------------------------------------------------------------|
-| `path_params`             | `List[ModelField]`                  | List of Pydantic model fields for path parameters.                                                      |
-| `query_params`            | `List[ModelField]`                  | List of Pydantic model fields for query parameters.                                                     |
-| `header_params`           | `List[ModelField]`                  | List of Pydantic model fields for header parameters.                                                    |
-| `cookie_params`           | `List[ModelField]`                  | List of Pydantic model fields for cookie parameters.                                                    |
-| `body_params`             | `List[ModelField]`                  | List of Pydantic model fields for body parameters.                                                      |
-| `dependencies`            | `List["Dependant"]`                | List of `Dependant` objects for sub-dependencies.                                                       |
-| `security_requirements`   | `List[SecurityRequirement]`         | List of security requirements for this dependency.                                                      |
-| `name`                    | `Optional[str]`                     | The name of the parameter this dependency is injected into.                                             |
-| `call`                    | `Optional[Callable[..., Any]]`      | The callable that is executed to resolve the dependency.                                                |
-| `use_cache`               | `bool`                              | Whether to cache the result of this dependency.                                                         |
-| `path`                    | `Optional[str]`                     | The path of the operation this dependency belongs to.                                                   |
-| `cache_key`               | `Tuple`                             | A unique key for caching, composed of the `call` and sorted `security_scopes`.                          |
-
-### `SecurityRequirement`
-
-This data class represents a specific security scheme and the scopes required for it.
-
-```python class SecurityRequirement icon=logos:python
-from dataclasses import dataclass
-from typing import Optional, Sequence
-from fastapi.security.base import SecurityBase
-
-@dataclass
-class SecurityRequirement:
-    security_scheme: SecurityBase
-    scopes: Optional[Sequence[str]] = None
-```
-
-#### Attributes
-
-| Attribute         | Type                         | Description                                                              |
-|-------------------|------------------------------|--------------------------------------------------------------------------|
-| `security_scheme` | `SecurityBase`               | The security scheme instance (e.g., an `OAuth2` instance).               |
-| `scopes`          | `Optional[Sequence[str]]`    | The list of required scopes for this scheme.                             |
-
----
-
-This reference covers the core components of FastAPI's dependency injection system. For details on the security schemes that are often used as dependencies, see the [Security Utilities API Reference](./api-reference-security.md).
+For a more in-depth look at security utilities, please see the [Security API Reference](./api-reference-security.md).

@@ -1,101 +1,20 @@
 # Parameters
 
-FastAPI uses parameter-defining functions to declare the inputs your API endpoints receive. These functions are not just for declaration; they also handle data validation, serialization, and automatic documentation generation for OpenAPI.
+FastAPI allows you to declare information about the parameters your *path operation* receives. This includes validation, metadata for documentation, and more.
 
-When you need to declare metadata or validation for a parameter, you use these functions inside of `typing.Annotated`.
+These parameter-declaring functions (`Path`, `Query`, `Header`, etc.) are used as arguments within `typing.Annotated`. They provide FastAPI with the necessary details to validate incoming data and generate accurate OpenAPI documentation.
 
-This page provides a detailed reference for each of the core parameter-defining functions.
+## Path
 
-## Overview of Parameter Sources
+Use `Path` to declare a parameter that is part of the URL path. Path parameters are always required.
 
-The following diagram illustrates where each type of parameter is extracted from in an incoming HTTP request.
-
-```d2
-direction: down
-
-"HTTP Request": {
-  shape: package
-  grid-columns: 1
-
-  "Request Line": {
-    shape: rectangle
-    "GET /items/{item_id}?q=search HTTP/1.1"
-
-    "Path": {
-      label: "/items/{item_id}"
-      shape: rectangle
-    }
-
-    "Query": {
-      label: "?q=search"
-      shape: rectangle
-    }
-
-    "Request Line" -> "Path"
-    "Request Line" -> "Query"
-  }
-
-  "Headers": {
-    shape: rectangle
-    "Host: example.com\nUser-Agent: curl/7.64.1\nCookie: session_id=abc123"
-
-    "Header": {
-      label: "User-Agent"
-      shape: rectangle
-    }
-
-    "Cookie": {
-      label: "Cookie"
-      shape: rectangle
-    }
-
-    "Headers" -> "Header"
-    "Headers" -> "Cookie"
-  }
-
-  "Body": {
-    shape: rectangle
-    "{\"name\": \"Foo\", \"price\": 42.0}"
-  }
-
-  "HTTP Request" -> "Request Line"
-  "HTTP Request" -> "Headers"
-  "HTTP Request" -> "Body"
-}
-
-"FastAPI Parameter Functions": {
-  shape: package
-  grid-columns: 2
-
-  "Path()": {shape: oval}
-  "Query()": {shape: oval}
-  "Header()": {shape: oval}
-  "Cookie()": {shape: oval}
-  "Body()": {shape: oval}
-  "Form()": {shape: oval}
-  "File()": {shape: oval}
-}
-
-"HTTP Request"."Request Line"."Path" -> "FastAPI Parameter Functions"."Path()": "Extracts {item_id}" { style.stroke-dash: 2 }
-"HTTP Request"."Request Line"."Query" -> "FastAPI Parameter Functions"."Query()": "Extracts q" { style.stroke-dash: 2 }
-"HTTP Request"."Headers"."Header" -> "FastAPI Parameter Functions"."Header()": "Extracts User-Agent" { style.stroke-dash: 2 }
-"HTTP Request"."Headers"."Cookie" -> "FastAPI Parameter Functions"."Cookie()": "Extracts session_id" { style.stroke-dash: 2 }
-"HTTP Request"."Body" -> "FastAPI Parameter Functions"."Body()": "Parses JSON" { style.stroke-dash: 2 }
-```
-
----
-
-## `Path()`
-
-Declares a path parameter. Path parameters are always required as they are part of the URL path.
-
-### Example
-
-```python icon=logos:python
+```python Path Parameter Example icon=logos:python
 from typing import Annotated
+
 from fastapi import FastAPI, Path
 
 app = FastAPI()
+
 
 @app.get("/items/{item_id}")
 async def read_items(
@@ -106,41 +25,36 @@ async def read_items(
 
 ### Parameters
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `default` | `Any` | Must be `...` as path parameters are always required. Available for compatibility. |
-| `alias` | `str` | An alternative name for the parameter, used in the OpenAPI schema. |
-| `title` | `str` | A human-readable title for the parameter. |
-| `description` | `str` | A human-readable description. |
-| `gt` | `float` | Value must be greater than this. |
-| `ge` | `float` | Value must be greater than or equal to this. |
-| `lt` | `float` | Value must be less than this. |
-| `le` | `float` | Value must be less than or equal to this. |
-| `min_length` | `int` | Minimum length for string values. |
-| `max_length` | `int` | Maximum length for string values. |
-| `pattern` | `str` | A regular expression pattern that the string value must match. |
-| `deprecated` | `bool` | Marks the parameter as deprecated in the OpenAPI documentation. |
-| `examples` | `List[Any]` | A list of example values. |
-| `openapi_examples` | `Dict[str, Example]` | OpenAPI-specific examples with more details. |
-| `include_in_schema`| `bool` | Whether to include this parameter in the OpenAPI schema. Defaults to `True`. |
-| `json_schema_extra`| `Dict[str, Any]` | Any additional JSON schema data to be included. |
+<x-field data-name="default" data-type="any" data-default="..." data-required="true" data-desc="Path parameters are always required. This is set to `...` to indicate that a value must be provided."></x-field>
+<x-field data-name="alias" data-type="str" data-required="false" data-desc="An alternative name for the parameter. Used for data extraction and OpenAPI documentation."></x-field>
+<x-field data-name="title" data-type="str" data-required="false" data-desc="A human-readable title for the parameter."></x-field>
+<x-field data-name="description" data-type="str" data-required="false" data-desc="A human-readable description for the parameter."></x-field>
+<x-field data-name="gt" data-type="float" data-required="false" data-desc="Greater than. The value must be greater than this number."></x-field>
+<x-field data-name="ge" data-type="float" data-required="false" data-desc="Greater than or equal. The value must be greater than or equal to this number."></x-field>
+<x-field data-name="lt" data-type="float" data-required="false" data-desc="Less than. The value must be less than this number."></x-field>
+<x-field data-name="le" data-type="float" data-required="false" data-desc="Less than or equal. The value must be less than or equal to this number."></x-field>
+<x-field data-name="min_length" data-type="int" data-required="false" data-desc="Minimum length for string values."></x-field>
+<x-field data-name="max_length" data-type="int" data-required="false" data-desc="Maximum length for string values."></x-field>
+<x-field data-name="pattern" data-type="str" data-required="false" data-desc="A regular expression pattern that the string value must match."></x-field>
+<x-field data-name="deprecated" data-type="bool" data-required="false" data-desc="Marks this parameter as deprecated in the OpenAPI documentation."></x-field>
+<x-field data-name="examples" data-type="List[Any]" data-required="false" data-desc="A list of example values for the parameter."></x-field>
+<x-field data-name="openapi_examples" data-type="Dict[str, Example]" data-required="false" data-desc="OpenAPI-specific examples for extended documentation in tools like Swagger UI."></x-field>
+<x-field data-name="include_in_schema" data-type="bool" data-default="true" data-required="false" data-desc="Whether to include this parameter in the generated OpenAPI schema."></x-field>
 
----
+## Query
 
-## `Query()`
+Use `Query` to declare a query parameter, which is the part of the URL after the `?`.
 
-Declares a query parameter. These are the key-value pairs in the URL that come after the `?`.
-
-### Example
-
-```python icon=logos:python
+```python Query Parameter Example icon=logos:python
 from typing import Annotated
+
 from fastapi import FastAPI, Query
 
 app = FastAPI()
 
+
 @app.get("/items/")
-async def read_items(q: Annotated[str | None, Query(max_length=50, description="Query string to search for items")] = None):
+async def read_items(q: Annotated[str | None, Query(max_length=50)] = None):
     results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
         results.update({"q": q})
@@ -149,38 +63,33 @@ async def read_items(q: Annotated[str | None, Query(max_length=50, description="
 
 ### Parameters
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `default` | `Any` | Default value if the parameter is not provided. If `...`, the parameter is required. |
-| `alias` | `str` | An alternative name for the parameter, used for extracting data and in OpenAPI. |
-| `title` | `str` | A human-readable title for the parameter. |
-| `description` | `str` | A human-readable description. |
-| `gt` | `float` | Value must be greater than this. |
-| `ge` | `float` | Value must be greater than or equal to this. |
-| `lt` | `float` | Value must be less than this. |
-| `le` | `float` | Value must be less than or equal to this. |
-| `min_length` | `int` | Minimum length for string values. |
-| `max_length` | `int` | Maximum length for string values. |
-| `pattern` | `str` | A regular expression pattern that the string value must match. |
-| `deprecated` | `bool` | Marks the parameter as deprecated in the OpenAPI documentation. |
-| `examples` | `List[Any]` | A list of example values. |
-| `openapi_examples` | `Dict[str, Example]` | OpenAPI-specific examples with more details. |
-| `include_in_schema`| `bool` | Whether to include this parameter in the OpenAPI schema. Defaults to `True`. |
-| `json_schema_extra`| `Dict[str, Any]` | Any additional JSON schema data to be included. |
+<x-field data-name="default" data-type="any" data-required="false" data-desc="The default value of the parameter if it is not provided by the client. If `None`, the parameter is optional."></x-field>
+<x-field data-name="alias" data-type="str" data-required="false" data-desc="An alternative name for the parameter. Used for data extraction and OpenAPI documentation."></x-field>
+<x-field data-name="title" data-type="str" data-required="false" data-desc="A human-readable title for the parameter."></x-field>
+<x-field data-name="description" data-type="str" data-required="false" data-desc="A human-readable description for the parameter."></x-field>
+<x-field data-name="gt" data-type="float" data-required="false" data-desc="Greater than. The value must be greater than this number."></x-field>
+<x-field data-name="ge" data-type="float" data-required="false" data-desc="Greater than or equal. The value must be greater than or equal to this number."></x-field>
+<x-field data-name="lt" data-type="float" data-required="false" data-desc="Less than. The value must be less than this number."></x-field>
+<x-field data-name="le" data-type="float" data-required="false" data-desc="Less than or equal. The value must be less than or equal to this number."></x-field>
+<x-field data-name="min_length" data-type="int" data-required="false" data-desc="Minimum length for string values."></x-field>
+<x-field data-name="max_length" data-type="int" data-required="false" data-desc="Maximum length for string values."></x-field>
+<x-field data-name="pattern" data-type="str" data-required="false" data-desc="A regular expression pattern that the string value must match."></x-field>
+<x-field data-name="deprecated" data-type="bool" data-required="false" data-desc="Marks this parameter as deprecated in the OpenAPI documentation."></x-field>
+<x-field data-name="examples" data-type="List[Any]" data-required="false" data-desc="A list of example values for the parameter."></x-field>
+<x-field data-name="openapi_examples" data-type="Dict[str, Example]" data-required="false" data-desc="OpenAPI-specific examples for extended documentation in tools like Swagger UI."></x-field>
+<x-field data-name="include_in_schema" data-type="bool" data-default="true" data-required="false" data-desc="Whether to include this parameter in the generated OpenAPI schema."></x-field>
 
----
+## Header
 
-## `Header()`
+Use `Header` to declare a request header parameter. 
 
-Declares a header parameter. It reads from the request headers.
-
-### Example
-
-```python icon=logos:python
+```python Header Parameter Example icon=logos:python
 from typing import Annotated
+
 from fastapi import FastAPI, Header
 
 app = FastAPI()
+
 
 @app.get("/items/")
 async def read_items(user_agent: Annotated[str | None, Header()] = None):
@@ -189,38 +98,21 @@ async def read_items(user_agent: Annotated[str | None, Header()] = None):
 
 ### Parameters
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `default` | `Any` | Default value if the header is not provided. |
-| `convert_underscores` | `bool` | If `True` (the default), converts underscores `_` in the parameter name to hyphens `-` to look for the header. |
-| `alias` | `str` | An alternative name for the parameter. |
-| `title` | `str` | A human-readable title for the parameter. |
-| `description` | `str` | A human-readable description. |
-| `gt` | `float` | Value must be greater than this. |
-| `ge` | `float` | Value must be greater than or equal to this. |
-| `lt` | `float` | Value must be less than this. |
-| `le` | `float` | Value must be less than or equal to this. |
-| `min_length` | `int` | Minimum length for string values. |
-| `max_length` | `int` | Maximum length for string values. |
-| `pattern` | `str` | A regular expression pattern that the string value must match. |
-| `deprecated` | `bool` | Marks the parameter as deprecated in the OpenAPI documentation. |
-| `examples` | `List[Any]` | A list of example values. |
-| `openapi_examples` | `Dict[str, Example]` | OpenAPI-specific examples with more details. |
-| `include_in_schema`| `bool` | Whether to include this parameter in the OpenAPI schema. Defaults to `True`. |
+`Header` accepts the same parameters as `Query`, with one addition:
 
----
+<x-field data-name="convert_underscores" data-type="bool" data-default="true" data-required="false" data-desc="If `True`, underscores (`_`) in the parameter name will be automatically converted to hyphens (`-`) to match standard HTTP header format."></x-field>
 
-## `Cookie()`
+## Cookie
 
-Declares a cookie parameter. It reads from the request cookies.
+Use `Cookie` to declare a parameter that comes from a request cookie.
 
-### Example
-
-```python icon=logos:python
+```python Cookie Parameter Example icon=logos:python
 from typing import Annotated
-from fastapi import Cookie, FastAPI
+
+from fastapi import FastAPI, Cookie
 
 app = FastAPI()
+
 
 @app.get("/items/")
 async def read_items(ads_id: Annotated[str | None, Cookie()] = None):
@@ -229,61 +121,53 @@ async def read_items(ads_id: Annotated[str | None, Cookie()] = None):
 
 ### Parameters
 
-`Cookie` shares most of the same validation and metadata parameters as `Query` and `Header`, such as `default`, `alias`, `title`, `description`, numeric validations (`gt`, `ge`, etc.), and string validations (`min_length`, `max_length`, etc.).
+`Cookie` accepts the same parameters as `Query`.
 
----
+## Body
 
-## `Body()`
+Use `Body` to declare a parameter that comes from the request body. It is often used with Pydantic models to define complex JSON objects.
 
-Declares a parameter that comes from the request body. It is often used with Pydantic models.
-
-### Example
-
-```python icon=logos:python
+```python Body Parameter Example icon=logos:python
 from typing import Annotated
 from fastapi import FastAPI, Body
 from pydantic import BaseModel
 
 class Item(BaseModel):
     name: str
+    description: str | None = None
     price: float
+    tax: float | None = None
 
 app = FastAPI()
 
-@app.post("/items/")
-async def create_item(item: Item, importance: Annotated[int, Body(gt=0)]):
-    return {"item": item, "importance": importance}
+@app.put("/items/{item_id}")
+async def update_item(
+    item_id: int, 
+    item: Item, 
+    importance: Annotated[int, Body(gt=0)]
+):
+    results = {"item_id": item_id, "item": item, "importance": importance}
+    return results
 ```
 
 ### Parameters
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `default` | `Any` | Default value if the field is not in the body. |
-| `embed` | `bool` | If `True`, the parameter will be expected inside a JSON body with its parameter name as the key. This happens automatically if you declare more than one `Body` parameter. |
-| `media_type` | `str` | The media type of the request body. Defaults to `application/json`. |
-| `alias` | `str` | An alternative name for the parameter field. |
-| `title` | `str` | A human-readable title. |
-| `description` | `str` | A human-readable description. |
-| `examples` | `List[Any]` | A list of example values. |
-| `openapi_examples` | `Dict[str, Example]` | OpenAPI-specific examples with more details. |
-| `json_schema_extra`| `Dict[str, Any]` | Any additional JSON schema data to be included. |
+`Body` accepts most of the same validation and metadata parameters as `Query`, plus the following:
 
-It also supports the same numeric and string validation parameters as `Path` and `Query` (`gt`, `ge`, `min_length`, etc.).
+<x-field data-name="embed" data-type="bool" data-default="false" data-required="false" data-desc="If `True`, the parameter will be expected inside a JSON body with the parameter name as the key. This is useful when you have a single primitive type in the body."></x-field>
+<x-field data-name="media_type" data-type="str" data-default="application/json" data-required="false" data-desc="The media type of the request body."></x-field>
 
----
+## Form
 
-## `Form()`
+Use `Form` to declare parameters from form fields (`application/x-www-form-urlencoded`).
 
-Declares a form field. This is used when the request has a media type of `application/x-www-form-urlencoded`.
-
-### Example
-
-```python icon=logos:python
+```python Form Parameter Example icon=logos:python
 from typing import Annotated
+
 from fastapi import FastAPI, Form
 
 app = FastAPI()
+
 
 @app.post("/login/")
 async def login(username: Annotated[str, Form()], password: Annotated[str, Form()]):
@@ -292,31 +176,30 @@ async def login(username: Annotated[str, Form()], password: Annotated[str, Form(
 
 ### Parameters
 
-`Form` inherits from `Body` and shares all the same parameters. The `media_type` defaults to `application/x-www-form-urlencoded`.
+`Form` inherits from `Body` and accepts the same parameters. It sets the `media_type` to `application/x-www-form-urlencoded` by default.
 
----
+## File
 
-## `File()`
+Use `File` to declare a parameter for file uploads (`multipart/form-data`). The parameter should be annotated with `bytes` or `UploadFile`.
 
-Declares a file upload. This is used when the request has a media type of `multipart/form-data`.
-
-### Example
-
-```python icon=logos:python
+```python File Upload Example icon=logos:python
 from typing import Annotated
+
 from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
+
 
 @app.post("/files/")
 async def create_file(file: Annotated[bytes, File()])-> dict:
     return {"file_size": len(file)}
 
+
 @app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile)-> dict:
+async def create_upload_file(file: UploadFile) -> dict:
     return {"filename": file.filename, "content_type": file.content_type}
 ```
 
 ### Parameters
 
-`File` inherits from `Form` and shares all the same parameters. The `media_type` defaults to `multipart/form-data`.
+`File` inherits from `Form` and accepts the same parameters. It sets the `media_type` to `multipart/form-data` by default.
