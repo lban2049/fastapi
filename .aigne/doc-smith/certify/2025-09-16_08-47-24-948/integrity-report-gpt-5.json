@@ -1,0 +1,975 @@
+{
+  "timestamp": "2025-09-16T08:47:24.948Z",
+  "metadata": {
+    "version": "1.0.0",
+    "generatedBy": "doc-smith",
+    "documentCount": 22
+  },
+  "structureEvaluation": {
+    "type": "document-structure",
+    "results": {
+      "purposeCoverage": {
+        "score": 5,
+        "reason": "三大目标均有对应模块且路径清晰：1) Get started quickly → Home(含入门示例)、Tutorials - User Guide/First Steps(安装、Hello World)，可在30分钟内跑通；2) Complete specific tasks → Tutorials 下的 Path and Query Parameters、Request Body、Dependencies and Security 以及 Advanced 子模块(WebSockets、Middleware、SQL Databases、Testing、Bigger Applications)覆盖常见任务与场景；3) Find answers fast → API Reference 及其子页(FastAPI Class、APIRouter、Parameters、Dependencies、Security、Responses、Exceptions)提供可检索参考。改进余地：增加任务导向的 How-to 索引页与少量常见任务专题(如 Background Tasks、Static Files、分页、错误处理/异常策略、部署)，但不影响总体目标达成。",
+        "covered": [
+          "Document Purpose - Get started quickly",
+          "Document Purpose - Complete specific tasks",
+          "Document Purpose - Find answers fast"
+        ],
+        "missing": []
+      },
+      "audienceCoverage": {
+        "score": 5,
+        "reason": "面向“集成型开发者”的代码优先诉求得到良好满足：Tutorials 与 Advanced 提供可复制示例与逐步操作(SQL CRUD、安全、路由拆分、测试等)，API Reference 提供精确参数与类/函数文档。可优化之处：补充更集中且可复制的命令/请求样例(curl/httpie)、端到端小型范例仓库链接，但不影响主要受众的有效使用。",
+        "covered": [
+          "Target Audience - Developers integrating your product/API"
+        ],
+        "missing": []
+      },
+      "coverageDepthAlignment": {
+        "score": 4,
+        "reason": "整体深度接近“平衡覆盖”：基础→进阶→参考的梯度合理，示例充分且避免过多内部细节。略有不足在于任务与运维常见主题的覆盖厚度偏薄(缺少专门的 Background Tasks、Static Files、生产部署与可观测性/日志、分页与错误处理 How-to)，导致“多数功能+部分边界场景”的目标略有欠缺；方向正确，个别模块稍不足。"
+      }
+    }
+  },
+  "documentEvaluations": {
+    "type": "document-content",
+    "individual": [
+      {
+        "documentInfo": {
+          "path": "/home",
+          "title": "Home"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "英文原文语言自然流畅，无明显语法与拼写错误；段落短小清晰，代码与命令行示例易读可复制，读者几乎无需回读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "先总览特性→上手示例→交互文档→性能→后续步骤，结构逐层深入，前后呼应，无矛盾与跳跃。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "充分实现内容规划：概述、关键特性、基准链接、可运行的基础示例与文档入口均具备，示例步骤完整（编写→运行→验证）。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实准确、术语统一；个别表述略显生硬：如“可用的最快的”建议改为“现有最快/最快之一”，“简短”可改“精简”。其余部分自然流畅。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语（OpenAPI/Swagger UI/ReDoc/FastAPI）与风格一致，组件与代码块格式统一；路径、端口与示例输出前后一致。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“快速开始”目标高度契合：给出可复制代码、运行命令与可视化文档入口；但缺少关键前置步骤（如安装命令、环境要求），可能导致新用户无法立即运行。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现，示例最小可用、可直接复制运行，链接与命令直达结果，满足集成场景的即时验证需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 3,
+            "reason": "对“用过类似工具”的读者而言，内容偏入门，缺少与 Flask/Starlette 等对比、迁移提示与差异化亮点的展开，深度略浅。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials",
+          "title": "Tutorials - User Guide"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言自然流畅，英/中文段落表达清晰，术语准确，代码注释简洁，无明显拼写或语法错误。"
+          },
+          "coherence": {
+            "score": 4,
+            "reason": "整体从入门到高级主题的结构递进清晰；但英文索引页与大量中文章节混排、部分链接风格不统一，衔接略显生硬。建议统一语言与链接风格。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖从快速入门、路径/查询参数、请求体、依赖与安全、WebSocket、中间件、SQL 数据库、测试等关键场景，示例充分且多数可用。但 OAuth2/JWT 一节包含占位注释（未提供 User/Token/工具函数实现）、个别 API 用法略旧（如使用 .dict 而非 Pydantic v2 的 .model_dump）。建议补齐完整可运行代码与统一到同一版本栈。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中文翻译忠实自然，术语（路径操作、依赖项、中间件、范围）统一，表达符合中文技术文档习惯。个别链接保留英文 slug 不影响理解。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语与风格整体一致，但存在：1) 链接形式混用（/tutorials/... 与 ./tutorials-*.md）；2) Pydantic v1/v2 方法混用（dict vs model_dump、model_validate）；3) 事件处理方式旧/新并存（on_event vs lifespan 未统一）。建议统一链接路由与技术栈版本。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "与“完成具体任务”的目标高度契合：各章节均以任务场景为中心提供步骤与代码示例，首页卡片清晰引导到对应主题。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向开发者的代码优先写作良好，示例多为可复制运行；但安全一节存在占位与缺失依赖说明，影响即用性。建议补充依赖安装命令、完整示例与运行步骤。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有经验的读者深度基本合适，涵盖进阶主题；但基础介绍略多、缺少“从其他框架迁移/差异点”提示。建议在关键处加入与 Flask/Django/Starlette 的差异说明，以及 Pydantic v1→v2 迁移要点。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/first-steps",
+          "title": "First Steps"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰自然，结构简洁，术语准确，命令与代码可直接复制，几乎无需回读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "按安装→编写→运行→验证→文档→后续步骤的流程展开，段落衔接顺畅，无逻辑跳跃或矛盾。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "完整实现“安装与创建 Hello World 应用”的规划目标，包含运行、验证与文档入口，示例可开箱即用；可选改进：补充 Python 版本要求与虚拟环境创建命令。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文忠实原文、术语统一（如“路径操作”“交互式文档”“自动重载”），语句自然流畅，无明显语义偏差。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "整体术语与风格一致；少量格式细节略不统一（如代码块标签中“json 响应”的中英混用），建议统一代码块标签与注释风格。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "严格聚焦“快速开始”，以最少步骤达成可运行示例，无与目标无关的扩展内容。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者提供可复制的命令与代码，说明运行与调试方式（auto-reload、/docs），满足工程化落地需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有相似工具经验的读者足够高效，但缺少“来自 Flask/Express 的差异与迁移提示”等对照内容；建议增设简短对比或注意事项以更贴合该水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/path-and-query-parameters",
+          "title": "Path and Query Parameters"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅、术语准确、示例紧凑，几乎无语法/拼写问题；代码可直接运行。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "从概念→声明→类型→顺序→枚举→特殊路径→查询参数→高级验证→总结，结构递进，前后呼应，无矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖了声明、类型提示、验证、枚举、路径捕获、默认值、可选参数、Query 校验等核心点；但未演示自动文档（/docs/OpenAPI）与更丰富的验证选项（如 min_length、regex、数值范围、多值列表等）。建议：补充 /docs 使用说明/截图，增加更多 Query/Path 约束与错误响应示例。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译忠实自然，术语（路径参数/查询参数/类型提示）统一；语序符合中文习惯，无明显误译或生硬表达。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "整体术语、格式、代码风格统一；轻微不一致：枚举比较示例同时使用 is 与 .value ==。建议统一采用 == 比较枚举成员，保持示例风格一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "紧扣“完成特定任务/速查”目标，聚焦路径与查询参数的常见用法，示例可复制，直接可用，无冗余背景。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "针对开发者，代码优先、解释简洁，符合集成场景需求；示例与注释便于直接应用到项目中。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对“使用过类似工具”的读者略偏基础，缺少与其他框架（如 Flask/Django）差异点或迁移建议。建议：新增“从 X 迁移”小节与进阶技巧（依赖注入、组合校验、复杂查询参数）。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/request-body",
+          "title": "Request Body"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，示例分节合理，无明显语法/拼写问题，基本无需回读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "从请求体基础→模型定义→使用→混合参数→验证→表单/文件上传循序渐进，前后呼应无矛盾。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖 JSON 体、验证、混合参数、表单和文件上传，示例可复制；但存在 Pydantic v2 语法未更新（推荐 model_dump/Optional）、列表类型与默认值用法不佳（tags: list = [] 建议使用 list[str] + default_factory）、“嵌套模型”未展示子模型嵌套示例，Body(embed=True) 处缺少对应请求 JSON 示例。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文忠实自然，术语统一（请求体/响应体/路径操作/查询参数等），表述符合中文习惯，无明显误译。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语、风格与代码格式统一；小问题多属最佳实践层面而非一致性缺陷。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "高度契合“完成具体任务/快速上手”目标，示例驱动、步骤清晰，紧扣请求体接收与验证场景。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向开发者的代码优先写作，示例可直接复用；但缺少 curl/httpie 或请求示例片段以便快速验证接口。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有相关经验的读者深度合适，但未强调与其他框架或 Pydantic v2 的差异点，进阶细节略少。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/dependencies-and-security",
+          "title": "Dependencies and Security"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅、术语清晰、段落结构合理，代码与文字分段明确，基本无语病或拼写错误，阅读无障碍。"
+          },
+          "coherence": {
+            "score": 4,
+            "reason": "整体从依赖到安全逐步推进，结构清晰。但存在少量不严谨：Step 2 称“validated”仍用 fake_decode_token；Step 3 自称“完整实现”却保留占位注释，衔接略跳跃。"
+          },
+          "contentQuality": {
+            "score": 3,
+            "reason": "覆盖依赖、Basic、OAuth2、JWT、Scopes 等核心内容，示例较丰富。但关键示例不完整/不可直接运行：Step 3 缺少 User/Token/TokenData、fake_users_db、create_access_token、authenticate_user 等实现；Scopes 未展示 token_data.scopes 的签发与校验；与 content_plan 所述 API Keys 未覆盖；Basic 示例回显密码且无 HTTPS 警示。建议：补全缺失代码与依赖安装指引，新增 API Key 示例，增加安全注意事项与测试方式。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实原文、自然流畅，术语大体统一（“路径操作”“依赖项”等）。少量术语可更统一（如“Bearer 令牌/持有者令牌”表述混用），但不影响理解。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "风格与术语基本一致，代码与叙述匹配。存在少量不一致：/users/me 与 /users/me/ 尾斜杠不统一；“完整实现”的表述与占位代码不一致。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“完成具体任务”较匹配：按步骤指导实现依赖与认证，包含可复用代码。扣分点：JWT 章节不完整影响落地闭环，未覆盖 content_plan 中的 API Keys。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向开发者的代码优先风格正确，示例可复制。扣分：代码块元信息（icon=logos:python）可能影响渲染/复制；缺少 PyJWT/Passlib 等依赖安装与最小可运行清单，降低集成效率。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "深度适中，适合有相关经验读者。安全细节略简化（Basic 回显密码、缺少仅 HTTPS 的警示、令牌失效/刷新策略未述），Scopes 示例未完整展示签发与校验流程。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced",
+          "title": "Advanced User Guide"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰自然，术语使用专业，段落结构与代码示例编排合理，无明显语病或拼写错误，阅读流畅。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "按主题分块组织，前后呼应并以“下一步”链接串联，示例由简入繁，逻辑顺畅无矛盾。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖计划的高级主题（WebSockets、中间件、SQL、测试、模块化）且示例细致。但存在：1) Bigger Applications 示例缺失 dependencies.py 的实现，main.py 使用相对导入需明确包结构与启动方式；2) SQL 部分仍用 @app.on_event('startup')，未提示 Lifespan 的现代用法。建议：补充目录树、依赖函数实现与 uvicorn 启动命令；在 SQL 章节加入 Lifespan 示例与版本注意事项。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文忠实自然，术语（路径操作、依赖项、会话、中间件、广播等）统一准确，表达符合中文技术写作习惯，仅极少直译痕迹不影响理解。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "总体一致但有少量不一致：1) 链接风格混用 /tutorials/advanced/* 与 ./tutorials-advanced-*.md；2) 标题“大型应用/更大型的应用”不统一；3) 代码块路径标注混用 main.py 与 app/routers/*.py。建议统一链接前缀、标题命名与文件路径，并给出固定工程骨架与运行指令。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "与“完成特定任务”高度匹配：提供面向实践的步骤化指导与可复制代码，覆盖常见工作流（路由拆分、CORS、会话/CRUD、测试与依赖覆盖、WebSocket 管理）。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向集成型开发者的代码优先风格到位；但部分示例缺少可立即运行所需的依赖与版本说明（fastapi/sqlmodel/sqlalchemy）、项目结构与启动命令，略影响“拷贝即用”。建议补充安装命令与版本约束、uvicorn 启动示例及标准项目骨架。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "深度与“有相似工具经验”的读者匹配：跳过入门细节，聚焦 FastAPI 的差异化能力（依赖注入、APIRouter、WebSockets、测试覆盖），内容实用且不过度抽象。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/websockets",
+          "title": "WebSockets"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅清晰，术语准确，代码与讲解配合得当，示例可直接复制运行。可微调：HTML 按钮建议加 type=\"button\" 以避免默认提交带来的歧义。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构由浅入深：基础示例→依赖注入→断开与广播→总结，逻辑顺畅，无明显跳跃或矛盾。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "示例覆盖回声、依赖注入、广播与断线处理，能完成实时双向通信目标。但缺少关键的运行指引（如 uvicorn 启动命令与依赖安装），未提示 ws/wss 区别与生产注意事项；广播未示例发送异常处理。建议补充运行步骤、wss/反向代理提示、基本错误处理与重连策略示例。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译忠实自然，术语统一（WebSocket、依赖注入、查询参数等）。细微建议：将“标头”统一为“请求头/Header”以更贴近常用表述。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语、代码风格与格式一致；章节标题与说明口径统一；示例命名与叙述对齐。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "与“完成特定任务/常见工作流”高度匹配：提供可复制的端到端示例（回声、鉴权依赖、广播），步骤清晰、直达目标。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现方式恰当，后端与前端示例兼备，涵盖依赖注入与连接管理，满足集成需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有经验读者基本适配，但略欠“从其他框架迁移/差异点”、生产实践（wss、CORS、反向代理、并发与错误处理）等深度内容。建议增补比较与最佳实践小节。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/bigger-applications",
+          "title": "Bigger Applications"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅、术语明确、无明显语法或拼写问题；代码与文字衔接自然。改进建议：可在开头增加一句话式摘要或要点列表，提升快速扫读体验。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构清晰（主文件→简单路由→带配置路由→包含带附加配置→总结），前后呼应无矛盾。改进建议：在“主应用文件”前补充项目结构预览，减少读者对文件位置的推断。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "核心目标（用 APIRouter 拆分多文件并配置 prefix/tags/dependencies/responses）讲解完整，示例可复用；但缺少项目目录树、运行指令（uvicorn）、依赖函数样例（get_query_token/get_token_header）与包初始化说明（__init__.py）。改进建议：补充最小可运行示例的完整代码与启动步骤。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译文忠实自然，技术术语统一（如“路径操作”“路由器”“依赖项”），语序地道。改进建议：可全篇统一“依赖/依赖项”其中一种表述以避免细微出入。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语与风格基本统一；少量格式/路径细节存在潜在不一致：代码块标题写法（main.py vs 包内相对导入）可能与实际目录结构不完全吻合。改进建议：提供规范的目录树并统一代码块标题路径标注。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“完成特定任务（模块化拆分）”高度相关；但对“快速上手”目标的关键步骤（安装、运行、最小可运行示例）略显不足。改进建议：加入编号式步骤与运行命令，确保30分钟内从零到可运行。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向开发者的代码示例充分，讲解聚焦API使用；但缺少可直接拷贝运行的完整片段与验证方式（如 curl/HTTPie 调用示例）。改进建议：补充依赖函数实现、__init__.py、启动命令与接口测试示例。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "深度适中，适合有相关经验的读者快速理解；但未突出与类似框架（如 Flask Blueprint/Starlette Router）的差异。改进建议：增加“从X迁移/差异点”小节，强调 APIRouter 的独特点与最佳实践。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/middleware",
+          "title": "Middleware"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅自然、无明显语法错误；术语使用清晰，代码示例简洁易读，绝大多数句子无需回读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构由概念→自定义→常用中间件→总结，层次清晰、前后呼应，无矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖自定义中间件、CORS、GZip、HTTPS 重定向，配有可复制的代码示例，基本满足“任务式”目标。扣分点：缺少关键注意事项与最佳实践，如 CORS 中 allow_origins=\"*\" 与 allow_credentials=True 不能同时使用的警示；未说明中间件执行顺序和异常传播；未示例如何在中间件中短路返回/统一错误处理；GZip minimum_size 默认值与对流式响应的影响未提及。改进：补充上述警示与示例，新增“常见陷阱与最佳实践”小节。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "总体忠实自然、术语基本统一。小问题：将 header 译为“标头”，大陆语境更常用“请求头/响应头/头部”；“用于 WebSocket”应为“用于 WebSockets”。建议统一为“HTTP 头部/请求头/响应头”，并微调个别句式以更贴合中文技术文风。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语（中间件/路径操作/响应）前后一致，中英版本结构对应。代码块围栏附加标注格式一致但非标准 Markdown，建议统一为常规 ```python。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "高度契合“完成特定任务”，围绕添加中间件、启用 CORS/GZip/HTTPS 展开，示例直接可用，无冗余背景。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先写法，API 参数说明与配置示例完整，可直接复制到项目中。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有相关经验的读者深度适中，但缺少与其它框架的对比/迁移指引。建议增加“从 Starlette/Flask/Express 迁移”要点与常见差异对照。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/sql-databases",
+          "title": "SQL Databases"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "行文清晰流畅，术语使用准确，代码块可直接复制，无明显语法与拼写问题。中英文版本均易读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构由浅入深（简单版→改进版），问题—解决（secret_name 暴露→分离模型）闭环完整，无矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "完整覆盖建模、会话、启动建表、CRUD（含 PATCH 更新）与安全模型分离，示例可运行。但缺少关键“安装依赖与运行命令”（pip/uvicorn）、版本兼容提示（Pydantic v2/SQLModel 版本），以及最小可运行环境说明。可补充：pip install 列表、uvicorn 启动命令、Python/库版本要求与兼容性说明。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "总体忠实自然，代码与术语保持一致。个别术语不统一：secret_name 在中文中既译为“秘密名称”又译为“秘密身份”。建议全篇统一为“秘密身份”。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "整体风格与格式基本统一。小问题：中文术语“秘密名称/秘密身份”不一致；改进版端点返回类型标注与首个示例略有差异；未统一给出所有端点的 response_model（删除接口无 response_model）。建议术语与类型标注统一、为所有端点明确响应模型。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“快速上手/完成常见任务”目标高度相关，代码导向强。但缺少安装与运行指南，影响30分钟内从零到跑通。建议新增“前置条件/安装/运行”三步清单与常见错误排查。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向开发者的代码优先呈现，依赖注入、会话管理等解释到位。仍缺环境搭建与启动命令，对集成开发者略有阻碍。建议补充依赖、命令、目录结构与可复制的 cURL/HTTPie 请求示例。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有类似工具经验的读者深度合适（重点在模型分层与PATCH局部更新）。可进一步点明与“原生 SQLAlchemy + Pydantic”的差异、Pydantic v2 的 model_validate/model_dump 迁移要点，提升对目标读者的针对性。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/testing",
+          "title": "Testing"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言自然流畅，步骤与示例清晰，几乎无拼写/语法问题，可直接复制运行。"
+          },
+          "coherence": {
+            "score": 4,
+            "reason": "从安装到运行测试、再到依赖覆盖的流程顺畅；但 test_main.py 使用相对导入（from .main import app）对项目结构有隐含前提，衔接略显突兀。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖了 TestClient 基本用法、项目结构与依赖覆盖，示例可用；但未说明如何重置 dependency_overrides 或使用 pytest fixture/上下文避免污染；相对导入可能导致导入错误的实操细节未交代。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译文忠实、自然，术语（依赖注入、覆盖、断言等）统一，无明显失真。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语与风格基本统一；少量不一致点：代码结构说明与相对导入写法存在偏差，可能与常见项目布局不一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "高度符合“快速开始/完成特定任务”的目标：提供必要安装命令与可运行示例，聚焦测试与依赖覆盖，无冗余背景。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现，包含命令、示例与断言，符合工程实践需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "深度适中，跳过基础理论，直接给出可操作示例，契合“使用过类似工具、但新用本方案”的读者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference",
+          "title": "API Reference"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 4,
+            "reason": "整体中文表达清晰流畅，技术术语使用恰当；但存在少量小瑕疵，如 “The `Depends` 函数”夹杂英文、个别句子偏长。建议：去除英文残留、拆分长句，统一标点与引号风格。"
+          },
+          "coherence": {
+            "score": 4,
+            "reason": "结构按主题分块，卡片导航与章节对应明确；参数以 x-field 统一呈现，逻辑顺序良好。轻微问题：顶层有英文“API Reference”与后续中文混用；FastAPI.include_router 与 APIRouter.include_router 参数展示不完全一致，可能造成理解跳跃。建议：统一语言版本显示，核对并同步相同 API 的参数说明。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖范围广（FastAPI 类、APIRouter、参数、依赖、响应、异常、安全），参数细节充分、示例可直接复用，满足“参考”需求。扣分点：FastAPI.include_router 未列出 default_response_class、include_in_schema 等参数；个别处（如 callbacks 类型）可补充版本差异说明。建议：对照最新 FastAPI 版本核验并补齐缺失参数/默认值/弃用说明，标注与 Starlette 的关联与差异。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体译文忠实自然，术语基本统一；但少量英文残留（如“The `Depends` 函数”），章节名偶有“安全/安全性”两种写法。建议：清理英文残留，统一术语与章节标题用词。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语、x-field 参数块格式基本一致；示例风格统一。小幅不一致：代码块信息行书写方式不一（如“```python icon=...” vs “```python 抛出 HTTPException icon=...”）、章节标题“安全/安全性”。建议：统一代码块元数据格式与章节标题命名；对相同 API 的参数表保持一致呈现。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "完全契合“快速查找答案/可检索参考”的目标：卡片导航、分节清晰、参数表结构化、示例简洁。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先写法，示例可复制运行，参数精确到类型与默认值，满足集成场景需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "深度适配“用过类似工具的开发者”：跳过入门冗余，聚焦差异化机制（依赖缓存、OpenAPI 元数据、响应类选择），难度与细节度恰当。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/fastapi-class",
+          "title": "FastAPI Class"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅、术语准确、示例简洁可复制，基本无语病或歧义。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构自上而下（简介→示例→参数→属性→方法）层级清楚，前后呼应，无矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖 FastAPI 类的核心参数、属性与常用方法，并配有可运行示例；但参考性尚不完全，缺失若干常用参数/选项（如 contact、license_info、terms_of_service、swagger_ui_*、root_path_in_servers 等）及部分路径装饰器参数（如 operation_id、responses/response_class 细化、openapi_extra、include_in_schema 等）。建议补齐完整参数表、给出默认值与版本注意，并为每项提供跳转与更详细示例。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译内容忠实自然，术语使用统一（如“路径操作”“依赖项”“OpenAPI 模式”），无明显误译；可微调用词如“快速上手”“Schema/规范”与 Webhooks 复数一致性以更地道。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语、风格与代码示例格式统一；参数块与示例排版一致，命名和引用前后一致。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“查找答案快（参考文档）”目标基本吻合，结构可检索、信息密集；但不够“全量”，影响一次性查全。建议增加参数总览索引、缺失字段、搜索关键词别名。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现，示例可直接粘贴，API 语义准确；满足集成类读者需要。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "深度适中，适合有相似工具经验的读者；但欠缺“来自 X 的对照/迁移”与差异点说明。建议补充与 Flask/Starlette 的对比、常见坑与最佳实践链接。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/apirouter",
+          "title": "APIRouter"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰、结构明了，代码示例简洁可复制，基本无语法/拼写问题。改进建议：参数区块可在小节末添加一句用途小结以强化记忆。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "从概念→基本用法→参数→装饰器→路由包含→WebSocket 的叙述顺序自然，前后呼应无矛盾。可选改进：在开头添加“你将学到什么”要点列表增强导览。"
+          },
+          "contentQuality": {
+            "score": 3,
+            "reason": "总体可用但存在关键准确性与覆盖度问题：1) APIRouter 构造参数误列 callbacks（应不存在）；2) 遗漏常见参数如 redirect_slashes、route_class、generate_unique_id_function、dependency_overrides_provider 等；3) 个别类型/默认值表述不够严谨（如 callbacks 类型）。改进：纠正 router 级 callbacks；补全/校对全部 APIRouter 与 include_router 可用参数并标注版本差异；补充 prefix 叠加与参数合并的示例与注意事项。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实自然，术语多处达成一致；少量表述略生硬（如“在 OpenAPI 结构中”）且存在“OpenAPI 文档/结构”混用。改进：统一术语为“OpenAPI 文档/规范”之一，润色“将…标记为已弃用”等句式。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "风格与格式基本统一，代码与描述对应良好；但“OpenAPI 文档/结构/Schema”用词不一。改进：制定术语表（路径操作/路由器/OpenAPI/依赖项等）并全篇统一。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“快速查找答案/参考文档”目标基本一致：参数清单+示例直达要点。但未完全覆盖全部 API 细节，且缺少速查索引/交叉引用。改进：补全参数面，添加锚点与小节索引，提供“常见任务速查”链接。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先写法，参数类型明确，示例可直接复制使用。可选改进：补充异步/同步处理与响应模型常见陷阱的简短提示。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "深度与熟悉相近工具的读者匹配，跳过基础概念直给可用信息与差异点。改进：可增一小节“与 FastAPI 应用对象的差异/迁移要点”。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/parameters",
+          "title": "Parameters"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 4,
+            "reason": "语言清晰流畅、术语准确，示例简洁可读；但个别代码围栏内含“icon=logos:python”等展示性标记、以及少量箭头类型注解前后空格不一致，略分散注意力。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构自上而下（概念→示例→参数表）有序展开，Path/Query/Header…依序介绍，前后呼应，无矛盾与跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖 Path/Query/Header/Cookie/Body/Form/File 的核心用途与常见参数，示例可直接运行；但存在细节偏差与缺漏：1) Query/Path 的 examples 更应为 OpenAPI 结构（dict）而非 List[Any]；2) “openapi_examples”非常见/非官方参数名；3) 未提及 Query 的 const、Body 的 example/examples 用法差异、Header 多值/大小写说明。建议修正参数类型与名称并补充常见参数项。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译忠实原文、表述自然，术语（路径参数、查询参数、媒体类型等）统一且专业，无明显误译。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语、节标题与参数表格式基本一致；少量版式不一（代码围栏标题混入、类型注解空格不统一）。建议统一代码块标注与排版细节。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "整体符合“快速查找答案”的参考目的，分节清晰、包含参数说明与示例；但未覆盖全部常用参数与差异点，完整性略有不足。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现，示例可复制、参数说明直接可用，符合集成型工程师需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "深度适中，假设读者具备基础经验并直接给出可用示例；但缺少与旧写法（非 Annotated）或他框架的对比说明与迁移提示。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/dependencies",
+          "title": "Dependencies"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "英文原文清晰流畅、结构简洁，术语使用自然，示例代码简明；整体无语法拼写问题，95%+ 句子无需回读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "按“概念—参数—示例—安全”递进展开，前后呼应，无矛盾或逻辑跳跃。"
+          },
+          "contentQuality": {
+            "score": 3,
+            "reason": "仅覆盖 Depends 与 Security 的基础用法与参数，缺少关键主题：yield 型依赖、生命周期/缓存细节与作用域、类/可调用对象依赖、依赖覆盖与测试、全局安全策略/多方案组合、Security vs Depends 适用场景等；与“完整指南”规划不符。建议补充上述进阶章节与常见实战场景（如数据库会话、事务、异常处理）。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实自然，但存在小问题：'The `Depends` 函数' 残留英文；'scopes' 译作“范围”建议统一为“作用域”；个别强调（斜体/引号）与中文习惯略不合。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语与格式总体统一（依赖项/路径操作/缓存等），参数表样式一致；但“范围/作用域”混用、斜体强调不完全一致。建议统一术语与强调样式。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "与“Find answers fast”较匹配：提供参数说明与可复制示例；但参考性不够全面，缺少进阶与边界行为说明，影响深入查阅。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先内容到位，示例可直接复制，API 名称准确，适合集成到现有项目。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 3,
+            "reason": "目标读者熟悉相似工具，但文档缺少与 Flask/Django 等的对照、迁移提示及 FastAPI 特有优势与差异点；进阶细节不足。建议补充“来自 X 的迁移/差异”与最佳实践。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/security",
+          "title": "Security"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 4,
+            "reason": "语言清晰流畅、结构明了；但存在一个代码片段语法错误（/login 示例函数缺少冒号），且个别代码注释仍为英文，轻微影响阅读体验。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构由总览到各方案（API Key→HTTP→OAuth2→OIDC）层级递进，前后呼应，无明显矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖主要安全工具与模型（APIKey、HTTPBasic/Bearer/Digest、OAuth2、OIDC、辅助模型），参数列举清晰；但缺少 OAuth2PasswordBearer 与 OAuth2AuthorizationCodeBearer 的使用示例；OAuth2PasswordRequestForm 示例存在语法错误；个别参数（如 OAuth2PasswordBearer 的 refreshUrl/description）是否受支持需核对源码/版本。建议：补齐关键类的可运行示例、修正语法、核验并标注版本差异。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实自然，术语（标头、作用域、依赖）统一；但代码注释有英文残留，个别小节标题中英混排略出戏。建议统一本地化代码注释与小标题风格。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "版式与术语基本一致（x-field、代码块、参数表）；但示例中 Header 名称示例 'X-API-Key' 与 'x-key' 混用（大小写不一），小节“用法/Usage”标注方式不完全统一。建议统一示例命名与小标题格式。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "定位为参考文档基本达成，参数与对象说明便于检索；但缺少所有关键类的最小可复制示例，影响“快速找到并直接使用”的目标。建议为每个依赖类提供可运行最小示例与返回类型说明。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "面向集成开发者的代码优先风格基本契合；但示例覆盖不全与一个语法错误降低了拷贝即用性。建议补全示例并增加一两处典型校验逻辑片段（如凭证缺失时返回）。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "针对熟悉领域的开发者，聚焦 API 与参数，省略入门背景，深度与难度匹配良好。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/responses",
+          "title": "Responses"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰自然，术语准确，代码示例可直接复制，无明显语法或拼写问题。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构从概述→标准响应类→高性能 JSON→jsonable_encoder，层次清晰，前后呼应无矛盾。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖了常用响应类与 jsonable_encoder，并提供安装与使用示例；但缺少关键实操细节：未展示直接使用 Response 设置 headers/cookies/status_code 的示例；StreamingResponse 与 FileResponse 无代码；未展示自定义 media_type、返回 bytes/流式分块等；ORJSONResponse 示例对 numpy 使用 .tolist() 削弱示范性，且未提示非字符串键将被转为字符串。建议补充上述示例与注意事项，并加“常见场景速查”。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "总体忠实流畅，术语大体统一；存在个别未译项（如“Pydantic networking types”保留英文），建议统一为“Pydantic 网络类型”。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "术语和风格基本一致；代码块标注含 icon 元数据风格统一；但参数区使用 <x-field> 标签与其他展示形式不一致，且出现少量中英夹杂。建议统一参数表展示与术语翻译。"
+          },
+          "purposeAlignment": {
+            "score": 4,
+            "reason": "更偏向“快速查找答案/完成具体任务”的参考文档，内容紧扣响应主题；但对常见任务覆盖不够全面（缺少设置头部/Cookie、文件与流下载实操片段）。建议增加“常见任务”小节以提升检索效率。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向开发者的代码优先呈现，示例与安装命令齐全，符合集成型读者需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "深度适中，适合有经验读者；但缺少与其他框架（如 Flask/Starlette）的差异点与迁移提示，建议增加“来自 X 的对比/迁移要点”。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/exceptions",
+          "title": "Exceptions"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅、术语准确，示例可直接复制使用；少量代码块标题含有“icon=...”等元数据，但不影响阅读。可优化：去除代码块多余元数据或以图标方式渲染。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构从概念→常用异常→验证错误→默认处理器→内部异常，层级清晰、前后呼应，无矛盾或跳跃。"
+          },
+          "contentQuality": {
+            "score": 4,
+            "reason": "覆盖了 HTTPException/WebSocketException 的参数与示例、验证错误与默认处理器，基本满足参考需求；但存在小缺口：1) 未展示携带 headers 的 HTTPException 实例用法；2) 未提供覆盖默认异常处理器的最小示例（app.exception_handler）；3) WebSocketException 的默认关闭流程缺少示例；4) 验证错误示例的错误结构可能与 Pydantic v2 的实际输出存在差异。改进：补充 headers 示例、添加覆盖处理器的代码片段、给出 WebSocket 关闭码与 reason 的返回示例、核对并更新 v2 错误结构。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译内容忠实自然，术语（异常、处理程序、验证等）统一，语序流畅。可微调：将“Union[str, None]”以“Optional[str]”表述以贴合常用写法。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语、风格和格式基本统一，英文与中文对应一致；代码与叙述相互印证。少量代码块标题样式差异不影响整体一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "高度符合“查找答案（参考）”目的：列出核心 API、参数定义与默认处理器，并附有示例与进一步链接。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "面向集成型开发者的代码优先呈现，示例可直接嵌入项目；链接到更深入教程，便于落地。可加值：示例中展示 status 枚举常量用法。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有类似工具经验的读者深度基本合适；但缺少与其他框架/旧版本（如 Starlette/Pydantic v1→v2）的差异提示与迁移要点。改进：增加“与X对比/迁移”小节与常见坑说明。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/contributing",
+          "title": "Contributing"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言简洁流畅，无明显语法或拼写问题；术语自然统一；代码片段可读性好。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构清晰：贡献概览→安全策略→翻译→致谢，层次分明，无明显跳跃或矛盾。"
+          },
+          "contentQuality": {
+            "score": 3,
+            "reason": "覆盖了贡献入口、安保报告渠道、翻译流程概览与致谢，但缺少可执行的贡献步骤（环境搭建、运行测试、代码规范、提交PR流程、一般问题报告方式）。多处仅链接到外部指南，导致落地性不足。建议补充“快速开始清单”、Issue/PR 示例与模板链接、分支与提交规范、运行命令示例。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "整体忠实自然，术语统一（如“拉取请求”“翻译脚本”）。但出现拓展内容（独立“安全策略”含“仅最新版本获安全支持”的陈述），超出原文贡献页信息；并使用表情与轻微文风改写。建议核对与上游一致性、减少与源文不对应的扩写，统一语气。"
+          },
+          "consistency": {
+            "score": 4,
+            "reason": "风格与术语基本一致；格式整体统一。轻微不一致：同一翻译集合中既有独立“安全策略”又在“贡献”中含“安全策略”章节，易致重复；代码块 info 标记含“python Translation Management Script icon=...”混用中英。建议统一代码块信息标记、避免重复章节。"
+          },
+          "purposeAlignment": {
+            "score": 3,
+            "reason": "与“Find answers fast”部分匹配（提供关键外链与概览），但缺少索引化导航、FAQ、更多指向常见任务的链接；作为“Quickstart/Tasks”不满足执行步骤与时效目标。建议增加可检索的目录/跳转、常见工作流链接与最少可行步骤。"
+          },
+          "audienceAlignment": {
+            "score": 2,
+            "reason": "所选受众为“集成产品/API 的开发者”，而文档面向“贡献者/译者”，缺少集成示例与API代码。建议明确受众为贡献者，或为集成开发者另设专门文档。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 2,
+            "reason": "目标读者“用过类似工具”期待差异点与项目特有流程；当前为通用概览，缺少与其他项目的对比、迁移提示及特有要求（测试、格式化、CI）的简要说明。建议新增“来自X的对比/迁移”与本项目独有约定的快速提示。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/contributing/security-policy",
+          "title": "Security Policy"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言简洁清晰、无语法错误，结构与段落划分合理，关键信息（版本支持、报告方式、注意事项）一目了然，易于扫读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "结构从“支持版本→报告流程→公开讨论约束”循序展开，前后呼应无矛盾，外链指向与内容逻辑一致。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "完整覆盖规划要点：说明仅最新版本获得安全支持；明确报告渠道与所需信息，并给出相关文档链接；内容可直接执行。可进一步增补响应时限/披露政策等但不影响当前目标达成。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "中译忠实自然，术语（安全、漏洞、支持版本）使用一致，格式与链接保持原文一致，无实质性误译。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "标题层级、术语与格式（邮箱代码样式、链接风格、表情符号使用）统一，无不一致用法。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "与“快速查找答案”目的高度匹配：直接给出支持策略与报告路径，描述精炼、定位明确。"
+          },
+          "audienceAlignment": {
+            "score": 4,
+            "reason": "对开发者足够清晰可执行，但对安全/合规团队常需信息（PGP 公钥、报告模板、范围与披露窗口）略显不足。建议提供报告模板（Markdown）、加密公钥、响应与修复时限说明。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "对有经验读者略显基础，缺少严重度分级、范围界定、CVE/披露流程等进阶细节。建议增补范围说明、SLA/响应流程与协调披露政策以满足进阶需求。"
+          }
+        }
+      }
+    ],
+    "aggregated": {
+      "readability": {
+        "score": 4.9,
+        "reason": "Average from 22 documents: 英文原文语言自然流畅，无明显语法与拼写错误；段落短小清晰，代码与命令行示例易读可复制，读者几乎无需回读。; 语言自然流畅，英/中文段落表达清晰，术语准确，代码注释简洁，无明显拼写或语法错误。; 语言清晰自然，结构简洁，术语准确，命令与代码可直接复制，几乎无需回读。"
+      },
+      "coherence": {
+        "score": 4.8,
+        "reason": "Average from 22 documents: 先总览特性→上手示例→交互文档→性能→后续步骤，结构逐层深入，前后呼应，无矛盾与跳跃。; 整体从入门到高级主题的结构递进清晰；但英文索引页与大量中文章节混排、部分链接风格不统一，衔接略显生硬。建议统一语言与链接风格。; 按安装→编写→运行→验证→文档→后续步骤的流程展开，段落衔接顺畅，无逻辑跳跃或矛盾。"
+      },
+      "contentQuality": {
+        "score": 4,
+        "reason": "Average from 22 documents: 充分实现内容规划：概述、关键特性、基准链接、可运行的基础示例与文档入口均具备，示例步骤完整（编写→运行→验证）。; 覆盖从快速入门、路径/查询参数、请求体、依赖与安全、WebSocket、中间件、SQL 数据库、测试等关键场景，示例充分且多数可用。但 OAuth2/JWT 一节包含占位注释（未提供 User/Token/工具函数实现）、个别 API 用法略旧（如使用 .dict 而非 Pydantic v2 的 .model_dump）。建议补齐完整可运行代码与统一到同一版本栈。; 完整实现“安装与创建 Hello World 应用”的规划目标，包含运行、验证与文档入口，示例可开箱即用；可选改进：补充 Python 版本要求与虚拟环境创建命令。"
+      },
+      "translationQuality": {
+        "score": 4.5,
+        "reason": "Average from 22 documents: 整体忠实准确、术语统一；个别表述略显生硬：如“可用的最快的”建议改为“现有最快/最快之一”，“简短”可改“精简”。其余部分自然流畅。; 中文翻译忠实自然，术语（路径操作、依赖项、中间件、范围）统一，表达符合中文技术文档习惯。个别链接保留英文 slug 不影响理解。; 译文忠实原文、术语统一（如“路径操作”“交互式文档”“自动重载”），语句自然流畅，无明显语义偏差。"
+      },
+      "consistency": {
+        "score": 4.3,
+        "reason": "Average from 22 documents: 术语（OpenAPI/Swagger UI/ReDoc/FastAPI）与风格一致，组件与代码块格式统一；路径、端口与示例输出前后一致。; 术语与风格整体一致，但存在：1) 链接形式混用（/tutorials/... 与 ./tutorials-*.md）；2) Pydantic v1/v2 方法混用（dict vs model_dump、model_validate）；3) 事件处理方式旧/新并存（on_event vs lifespan 未统一）。建议统一链接路由与技术栈版本。; 整体术语与风格一致；少量格式细节略不统一（如代码块标签中“json 响应”的中英混用），建议统一代码块标签与注释风格。"
+      },
+      "purposeAlignment": {
+        "score": 4.5,
+        "reason": "Average from 22 documents: 与“快速开始”目标高度契合：给出可复制代码、运行命令与可视化文档入口；但缺少关键前置步骤（如安装命令、环境要求），可能导致新用户无法立即运行。; 与“完成具体任务”的目标高度契合：各章节均以任务场景为中心提供步骤与代码示例，首页卡片清晰引导到对应主题。; 严格聚焦“快速开始”，以最少步骤达成可运行示例，无与目标无关的扩展内容。"
+      },
+      "audienceAlignment": {
+        "score": 4.5,
+        "reason": "Average from 22 documents: 面向开发者的代码优先呈现，示例最小可用、可直接复制运行，链接与命令直达结果，满足集成场景的即时验证需求。; 面向开发者的代码优先写作良好，示例多为可复制运行；但安全一节存在占位与缺失依赖说明，影响即用性。建议补充依赖安装命令、完整示例与运行步骤。; 面向开发者提供可复制的命令与代码，说明运行与调试方式（auto-reload、/docs），满足工程化落地需求。"
+      },
+      "knowledgeLevelAlignment": {
+        "score": 4,
+        "reason": "Average from 22 documents: 对“用过类似工具”的读者而言，内容偏入门，缺少与 Flask/Starlette 等对比、迁移提示与差异化亮点的展开，深度略浅。; 对有经验的读者深度基本合适，涵盖进阶主题；但基础介绍略多、缺少“从其他框架迁移/差异点”提示。建议在关键处加入与 Flask/Django/Starlette 的差异说明，以及 Pydantic v1→v2 迁移要点。; 对有相似工具经验的读者足够高效，但缺少“来自 Flask/Express 的差异与迁移提示”等对照内容；建议增设简短对比或注意事项以更贴合该水平。"
+      }
+    }
+  },
+  "summary": {
+    "structureScores": {
+      "purposeCoverage": 5,
+      "audienceCoverage": 5,
+      "coverageDepthAlignment": 4,
+      "average": 4.7
+    },
+    "documentScores": {
+      "readability": 4.9,
+      "coherence": 4.8,
+      "contentQuality": 4,
+      "translationQuality": 4.5,
+      "consistency": 4.3,
+      "purposeAlignment": 4.5,
+      "audienceAlignment": 4.5,
+      "knowledgeLevelAlignment": 4,
+      "average": 4.4
+    },
+    "overallScore": 4.6,
+    "issues": []
+  }
+}

@@ -1,0 +1,975 @@
+{
+  "timestamp": "2025-09-16T01:43:55.431Z",
+  "metadata": {
+    "version": "1.0.0",
+    "generatedBy": "doc-smith",
+    "documentCount": 22
+  },
+  "structureEvaluation": {
+    "type": "document-structure",
+    "results": {
+      "purposeCoverage": {
+        "score": 5,
+        "reason": "The structure provides dedicated, well-defined sections that perfectly map to all three user goals: quick start (/home, /tutorials/first-steps), task completion (/tutorials), and fast lookup (/api-reference).",
+        "covered": [
+          "Get started quickly",
+          "Complete specific tasks",
+          "Find answers fast"
+        ],
+        "missing": []
+      },
+      "audienceCoverage": {
+        "score": 5,
+        "reason": "The entire structure is expertly tailored for the 'Developers integrating your product/API' audience, offering a mix of practical, code-centric tutorials and in-depth technical references essential for integration.",
+        "covered": [
+          "Developers integrating your product/API"
+        ],
+        "missing": []
+      },
+      "coverageDepthAlignment": {
+        "score": 5,
+        "reason": "The plan achieves an ideal 'Balanced coverage' by progressing from simple guides to advanced topics and a comprehensive API reference, covering most features with practical examples without being overwhelming."
+      }
+    }
+  },
+  "documentEvaluations": {
+    "type": "document-content",
+    "individual": [
+      {
+        "documentInfo": {
+          "path": "/home",
+          "title": "Home"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "译文语言流畅自然，用词准确，没有语法或拼写错误，阅读体验良好。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从框架介绍、核心特性、快速示例到性能和后续步骤，内容层层递进，逻辑连贯性强。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完整准确地实现了规划目标，提供了清晰、可操作的代码示例和关键特性介绍，对用户非常有价值。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "翻译准确地传达了原文信息，术语使用恰当且统一，行文流畅，符合中文技术文档的表达习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如 FastAPI, API, Uvicorn）、格式（标题、代码块）和写作风格上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档内容完美契合“快速开始”的目标，通过简洁的介绍和立即可运行的示例，帮助用户在短时间内了解并上手使用 FastAPI。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档完全面向开发者受众，提供了他们最关心的代码示例、命令行操作和性能数据，语言和内容都符合其技术背景和需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度恰到好处，没有解释 Web 框架等基础概念，而是直接展示 FastAPI 的核心优势和独特功能（如类型提示、自动文档），非常适合已有相关经验的开发者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials",
+          "title": "Tutorials - User Guide"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文本清晰流畅，语法和拼写准确无误，专业术语翻译精准，整体阅读体验非常出色，符合专业技术文档的标准。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从入门到进阶的章节安排逻辑性强。每个文档内部的论述层次分明，代码、解释和总结衔接自然，且文档之间通过“后续步骤”链接，构成了连贯的学习路径。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全实现了内容规划的目标，提供了从基础到高级的详尽教程。每个主题都包含了丰富、准确且可直接运行的代码示例，对用户极具实用价值。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "翻译质量非常高，不仅忠实于原文的技术细节，而且语言表达自然流畅，完全符合中文技术文档的阅读习惯。关键术语（如“路径操作”、“依赖注入”）翻译统一且专业。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "所有文档在术语使用（如“路径操作”、“请求体”）、代码风格、格式（如标题、代码块）和整体行文风格上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档内容与用户选择的多个目标（快速入门、完成特定任务、快速查找答案）高度契合。《快速入门》满足了快速上手需求，而《SQL 数据库》、《中间件》等专题则完美地指导用户完成特定任务。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档完全为目标受众（开发者）量身定制，内容以代码为中心，提供了大量可直接复制使用的代码片段和清晰的技术解释，满足了开发者的核心需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档的深度和广度与目标读者的知识水平（用过类似工具）完美匹配。内容没有赘述Web开发的基础知识，而是聚焦于FastAPI的独特功能和实现方式，高效地帮助有经验的开发者掌握新工具。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/first-steps",
+          "title": "First Steps"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "翻译文本清晰流畅，无语法或拼写错误，术语翻译准确，符合中文技术文档的阅读习惯。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从安装、编码到运行和验证，步骤环环相扣，逻辑流程非常连贯。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全实现了规划目标，提供了准确、可直接运行的代码示例，并包含了代码解析和核心功能介绍等有价值的细节。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文所有信息，术语统一且符合中文技术社区习惯，行文流畅自然。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用、代码格式、标题层级和写作风格上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "内容完全符合“快速入门”的目标，聚焦于最核心的安装和运行步骤，提供了立即可用的示例，帮助用户迅速上手。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档以代码为中心，提供了可直接复制粘贴的命令和代码片段，并包含技术性解释，完全满足开发者的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 4,
+            "reason": "内容解释过于基础（例如解释 import 和函数定义），更适合零基础初学者，对于“用过类似工具”的读者来说，可以适当精简基础概念，聚焦 FastAPI 的特有优势。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/path-and-query-parameters",
+          "title": "Path and Query Parameters"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅自然，术语翻译准确，没有语法或拼写错误，阅读体验佳。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构清晰，从路径参数到查询参数的讲解层层递进，各小节之间衔接自然，逻辑无懈可击。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "完全实现了内容规划目标，提供了丰富、准确且可直接运行的代码示例，对关键概念（如自动验证和类型转换）的解释清晰透彻。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "翻译准确传达了原文的技术细节和语气，术语使用精准且统一，行文符合中文技术文档的习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语（如“路径参数”、“查询参数”、“类型提示”）和格式（代码块、标题）在全文中保持了高度统一。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美地契合了“完成特定任务”和“快速入门”的目标，内容聚焦于路径和查询参数的核心用法，提供了清晰的步骤和示例，无冗余信息。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了大量可直接复制使用的示例，完全满足了目标受众（开发者）的需求，语言和风格都非常专业。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度恰当，没有赘述通用的 Web 框架概念，而是聚焦于 FastAPI 利用类型提示进行自动验证和转换的独特优势，非常适合有相关经验的开发者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/request-body",
+          "title": "Request Body"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文档语言清晰、专业，语法和拼写准确无误。中文译文流畅自然，术语翻译精准，整体阅读体验优秀。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构逻辑性强，从基本的Pydantic模型定义逐步深入到嵌套模型、表单和文件上传等复杂场景，章节之间衔接自然，符合学习认知规律。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全覆盖了内容规划（处理JSON和表单数据），并超预期地包含了文件上传、嵌套模型等高级主题。代码示例丰富、可直接运行，质量很高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术含义，术语（如请求体、Pydantic模型）统一且符合中文技术社区习惯，行文流畅，达到了信、达、雅的标准。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如“路径操作函数”）、代码风格和格式（如代码块标题）上保持了高度一致性，提升了专业性和可读性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美符合“完成特定任务”的目标，为处理各类请求体提供了清晰的、按部就班的指导和代码范例，实用性极强。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档以代码为中心，提供了大量可直接复制使用的代码片段，内容技术性强且准确，完全满足了目标受众（开发者）的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档内容深度恰当，没有赘述API基础，而是聚焦于FastAPI通过Pydantic处理请求体的特有方式，非常适合“用过类似工具”的读者快速上手。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/dependencies-and-security",
+          "title": "Dependencies and Security"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰、专业，技术概念表述准确，无论是原文还是译文都非常流畅，没有发现语法或拼写错误。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "逻辑结构清晰，从依赖注入的基础概念逐步深入到复杂的安全认证实现，各部分衔接自然，层层递进，没有出现逻辑跳跃或矛盾。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容详实准确，提供了从基础到高级的完整代码示例，覆盖了依赖注入和多种认证方式的核心用法，对开发者极具实用价值。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确地传达了原文的技术细节，术语翻译统一且符合行业标准，行文流畅自然，符合中文技术文档的阅读习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语（如“依赖注入”、“路径操作”）、代码风格和格式（标题、代码块）上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美符合“完成特定任务”的目标，为“使用依赖注入实现API安全认证”这一具体任务提供了详尽的、可操作的步骤和代码示例。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容完全面向开发者，以代码为中心，提供了可直接复制和使用的代码片段，准确满足了技术集成者的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档深度恰当，没有赘述HTTP或OAuth2等基础概念，而是聚焦于FastAPI独特的依赖注入实现方式，精准匹配了“用过类似工具”的读者水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced",
+          "title": "Advanced User Guide"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰、专业、流畅，无语法或拼写错误，技术术语翻译准确，完全符合中文开发者的阅读习惯。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从高级指南的概览页到各个具体主题的深入讲解，逻辑衔接紧密。每个主题内部的章节安排（如从简单示例到高级用法）也层层递进，逻辑性强。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全覆盖了高级用户所需的核心主题（数据库、中间件、大型应用结构等），提供了完整、可直接运行的代码示例，并对关键概念进行详尽解释，质量非常高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "翻译准确无误，忠实于原文的技术细节，同时语言表达自然流畅，术语统一且符合行业标准，达到了信、达、雅的水平。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "所有文档在术语使用（如“路径操作”、“依赖项”）、代码风格、格式（标题、代码块）等方面保持了高度一致性，提供了统一的阅读体验。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美地实现了“完成特定任务”的目标。每个页面都是一个独立的、可操作的指南，引导用户完成一项高级功能（如集成数据库、使用WebSockets），步骤清晰，重点突出。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容完全为目标受众（开发者）量身定制，以代码为中心，提供了大量可复制粘贴的代码片段和精确的技术解释，满足了开发者的核心需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档的深度与“用过类似工具”的读者知识水平完全匹配。文档明确为“高级用户指南”，跳过了基础知识，直接深入探讨高级特性和最佳实践，深度适宜。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/websockets",
+          "title": "WebSockets"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文档语言清晰流畅，专业术语使用准确，无论是原文还是译文都易于理解，没有发现语法或拼写错误。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构由浅入深，从最基础的“回声”示例，到依赖注入，再到连接管理和广播，逻辑层次分明，衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容准确完整地实现了教学目标，提供了三个可直接运行的、贴近实际场景的完整代码示例，质量非常高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确地传达了原文的技术细节，术语翻译统一规范（如“依赖注入”），行文流畅，符合中文技术文档的阅读习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语（如 WebSocket, Depends）、代码风格和格式（如代码块标题）上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完全符合“快速入门”和“完成特定任务”的目标。开篇即提供可运行的简单示例，后续逐步引导完成聊天室等常见任务。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容完全面向开发者，以代码为中心，提供了可直接复制粘贴的示例，并对关键代码进行了解释，完全满足目标受众的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档深度恰当，没有赘述 WebSocket 的基础概念，而是直接聚焦于 FastAPI 的实现方式和独特优势（如依赖注入），非常适合已有相关经验的开发者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/bigger-applications",
+          "title": "Bigger Applications"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，专业术语使用准确，无语法或拼写错误，阅读体验极佳。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文章结构清晰，从引入问题到分步解决，再到总结，层层递进，逻辑严谨。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "完全覆盖了内容规划目标，提供了多个实用且可直接运行的代码示例，内容准确详尽。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术细节和语气，术语翻译统一且专业，符合中文技术文档习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文的术语（如`APIRouter`、`路径操作`）、代码格式和写作风格保持了高度一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "完美契合‘完成特定任务’的文档目标，提供了清晰的步骤指导用户如何使用 APIRouter 组织应用。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供可直接复制的示例和技术性解释，完全满足开发者受众的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度恰当，没有赘述基础概念，而是专注于 FastAPI 的具体实现，适合已有相关经验的读者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/middleware",
+          "title": "Middleware"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文档语言流畅自然，术语翻译专业准确，整体清晰易读，无语法或拼写错误。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构逻辑清晰，从中间件的定义到自定义实现，再到内置中间件的介绍，层层递进，衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完整准确地实现了规划目标，提供了多个实用且可直接运行的代码示例，信息详实，对开发者非常有价值。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文忠实于原文，术语翻译精准统一（如“横切关注点”、“路径操作”），并且符合中文技术文档的表达习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文在术语使用（如“中间件”、“请求”、“响应”）、代码风格和文档格式上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美地满足了“完成特定任务”和“快速查找答案”的目标，结构化的内容和清晰的示例使得开发者可以快速定位并解决问题。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容完全面向开发者，以代码为中心，提供了可直接复制粘贴的示例和清晰的参数说明，完全符合目标受众的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档的深度和广度恰到好处，它假定读者了解CORS等基本Web概念，而专注于FastAPI中的具体实现方式，精准匹配了“用过类似工具”的读者水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/sql-databases",
+          "title": "SQL Databases"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅自然，专业术语翻译准确，没有发现语法或拼写错误，阅读体验很好。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从一个简单的初始示例逐步演进到一个更健壮、安全的最终方案，逻辑递进关系明确，前后内容衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全实现了规划目标，提供了从基础到进阶的完整、可运行的代码示例，并清晰解释了API设计中的重要实践（如分离模型以增强安全性），内容准确且极具实用价值。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的所有信息，专业术语翻译精准统一，语言风格符合中文技术文档的习惯，自然流畅。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如 SQLModel, Session, Engine）、代码风格、标题层级和格式上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美契合“快速入门”和“完成特定任务”的目标。它提供了一个立即可运行的简单示例帮助用户快速上手，并在此基础上引导用户完成构建一个安全、健壮的CRUD API的完整任务。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为核心，提供了大量可直接复制粘贴的示例，并围绕API开发者的需求（如依赖注入、数据模型、安全性）进行讲解，完全符合目标受众的偏好。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档恰当地假设了读者已具备Web框架和ORM的基础知识，没有赘述基本概念，而是直接聚焦于FastAPI和SQLModel的特定用法和最佳实践，深度和广度都非常适合目标读者的知识水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/tutorials/advanced/testing",
+          "title": "Testing"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，语法正确，专业术语翻译准确，符合中文技术文档的阅读习惯。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构由浅入深，从简单示例到项目结构，再到高级特性（依赖覆盖），逻辑递进清晰，衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "完整实现了内容规划，提供了清晰、可运行的代码示例，准确讲解了 FastAPI 测试的核心概念，特别是 `TestClient` 和依赖覆盖。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "翻译准确无误，忠实于原文的技术细节，术语使用专业且统一，行文流畅自然，符合目标语言习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语（如 `TestClient`、`依赖项覆盖`）、代码格式和整体写作风格在全文中保持了高度一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档完美契合“快速入门”和“完成特定任务”的目标，提供了从零开始的清晰步骤和可直接上手的代码示例，帮助用户快速掌握 FastAPI 的测试方法。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了可直接复制和运行的示例，完全满足了目标受众（开发者）对技术准确性和实践性的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度恰当，没有赘述通用的测试理论，而是直接聚焦于 FastAPI 特有的 `TestClient` 和依赖注入覆盖机制，精准匹配了了解同类工具的读者的知识水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference",
+          "title": "API Reference"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 4,
+            "reason": "整体语言流畅专业，但存在少量英文单词（如 'The'）和非代码化的布尔值（如 'true'）未完全融入中文语境，存在微小的阅读瑕疵。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "各文档内部结构清晰，从概念介绍到参数详解再到代码示例，逻辑递进合理，不同文档之间遵循统一的组织模式。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容详实、准确，全面覆盖了FastAPI核心组件的参数和用法，代码示例丰富且可直接使用，完全实现了作为综合性参考手册的目标。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "翻译整体准确流畅，专业术语（如“路径操作”、“依赖注入”）统一且恰当。但个别句子保留了英文语序痕迹，有微小优化空间。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "所有文档在术语使用（如“路径操作”）、代码格式、文档结构（如参数列表）和写作风格上保持了高度一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档以API参考为核心，结构清晰，便于开发者快速查找特定类或函数的用法与参数，完全符合“快速查找答案”的目标。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了大量可直接复制的代码片段和详细的技术参数说明，精准地满足了目标开发者群体的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档省略了通用的Web框架基础知识，直接聚焦于FastAPI的具体实现和特性，非常适合已有相关经验、需要快速了解此特定工具的开发者。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/fastapi-class",
+          "title": "FastAPI Class"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰、专业，结构层次分明，无论是原文还是译文都非常易于目标读者阅读和理解。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构从整体介绍到参数、属性、方法，层层递进，逻辑清晰，内容组织有序，易于查阅。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容详尽且准确地覆盖了FastAPI类的核心功能，提供了丰富的参数说明和可直接使用的代码示例，完全实现了作为一篇参考文档的内容规划。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术细节，术语翻译精准且符合中文开发者的习惯，行文流畅自然。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文在术语使用（如“路径操作”）、代码风格、格式排版（如参数说明的格式）上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档作为一篇详尽的API参考，完美契合了“快速查找答案”的目标，用户可以高效地查询到特定参数或方法的用法。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了大量技术细节和配置选项，完全满足了目标受众（集成API的开发者）的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档跳过了Web开发的基础概念，直接深入FastAPI的具体实现，精准匹配了“用过类似工具”的读者知识水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/apirouter",
+          "title": "APIRouter"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，专业术语准确，中英文版本均无语法或拼写错误，排版结构（标题、代码块）有助于快速阅读。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构逻辑严谨，从基本概念和用法入手，逐步深入到参数详解、具体方法示例和高级用法（嵌套路由），层次分明，易于理解。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "详尽地介绍了 `APIRouter` 的各项功能，包括初始化参数、装饰器参数、HTTP 方法、嵌套和 WebSocket，内容准确且示例丰富，完全实现了参考文档的目标。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术细节，术语翻译统一且符合中文开发者的习惯，行文流畅自然，质量很高。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文在术语（如“路径操作”、“装饰器”）、代码风格和文档格式（如参数列表的 `<x-field>` 标签）上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档结构清晰，参数罗列详尽，非常适合作为参考手册，完全符合“快速查找答案”的目标，开发者可以快速定位到所需信息。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了大量可直接使用的代码片段和详尽的 API 参数说明，精准地满足了目标受众（集成API的开发者）的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档没有解释路由、HTTP 等基础概念，而是直接聚焦于 FastAPI 的 `APIRouter` 实现细节，这完全符合“用过类似工具”的读者水平，避免了冗余信息。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/parameters",
+          "title": "Parameters"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文档语言清晰、专业，结构层次分明，无论是原文还是译文都易于阅读和理解。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容逻辑结构清晰，从总体介绍到各部分分述，层次井然，前后衔接自然，无任何逻辑矛盾。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容准确、详尽地实现了内容规划目标，为每种参数类型都提供了清晰的说明、实用的代码示例和完整的参数列表，质量非常高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术信息，术语翻译精准统一，语言流畅自然，符合中文技术文档的表达习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如“参数”、“路径操作”）、内容结构（说明-示例-参数列表）和格式上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档内容完全符合“快速查找答案”的目标，作为一篇参考手册，其结构清晰、内容全面，非常便于开发者快速定位和查询所需信息。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档完全为“开发者”受众量身定制，提供了他们最需要的代码示例、API参数详解和技术说明，内容精准且实用。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档的深度和广度与“用过类似工具”的读者知识水平完美匹配，没有赘述基础的Web概念，而是直接聚焦于FastAPI的特定实现和高级功能，高效地传递了核心信息。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/dependencies",
+          "title": "Dependencies"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅自然，专业术语使用准确，无语法或拼写错误，阅读体验佳。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "内容结构清晰，从概念介绍到具体函数（Depends, Security）的讲解，再到参数和示例，逻辑层次分明，衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容准确详尽，成功实现了对`Depends`和`Security`函数作为技术参考的规划目标，提供了清晰的参数说明和可直接运行的代码示例。"
+          },
+          "translationQuality": {
+            "score": 4,
+            "reason": "翻译整体准确流畅，专业术语翻译精准。唯一的扣分点在于代码示例中的英文注释未被翻译，影响了内容的完全本地化。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "术语（如“依赖项”、“路径操作函数”）、格式（标题、代码块、参数列表）和写作风格在整个文档中保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档结构非常适合作为技术参考，通过清晰的标题、参数列表和示例，用户可以快速定位和查找关于 `Depends` 和 `Security` 的具体信息，完全符合“快速查找答案”的目标。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了清晰的参数定义和可直接使用的代码片段，完全满足了集成API的开发者的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档没有赘述依赖注入的基本概念，而是直接聚焦于FastAPI的具体实现（`Depends` 和 `Security`），精准地匹配了了解相关概念但对该框架具体实现不熟悉的用户知识水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/security",
+          "title": "Security"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "文档语言清晰、专业，结构层次分明，无论是原文还是译文都易于阅读和理解，没有发现语法或拼写错误。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构逻辑性强，按照认证类型（API Key, HTTP, OAuth2等）进行组织，各部分内容前后衔接自然，没有出现矛盾或逻辑跳跃。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容全面覆盖了FastAPI的安全工具，对每个类都提供了清晰的参数说明和可直接使用的代码示例，信息准确且详实，质量非常高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确地传达了原文的技术含义，术语翻译统一且符合中文技术文档习惯（如“依赖项”、“路径操作”），行文流畅自然。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如'dependency', 'scheme'）、内容结构（描述-参数-示例）和格式方面保持了高度一致性，提升了参考文档的专业性和易用性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "完全符合“快速查找答案”的参考手册目标。文档结构清晰，覆盖全面，便于快速定位和查阅特定API的用法，是理想的参考资料。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "文档内容完全面向开发者。以代码为中心，提供了精确的技术参数和可直接复制粘贴的示例，满足了开发者集成的核心需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度与“用过类似工具”的读者知识水平完美匹配。文档聚焦于FastAPI的具体实现，而没有赘述通用的安全概念，高效地传递了核心信息。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/responses",
+          "title": "Responses"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，专业术语使用准确，无语法或拼写错误，译文质量高。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从标准响应类到高性能响应，再到编码工具，逻辑递进，衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容全面且准确，覆盖了多种响应类型及相关工具，提供了可直接使用的代码示例和详细的参数说明，质量很高。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术细节，术语统一且符合中文技术社区习惯，行文流畅自然。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文的术语（如 '路径操作'）、代码格式、标题样式等保持了高度一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档结构清晰，表格和代码示例便于快速查找，完美符合“快速查找答案”的参考型文档目标。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了丰富的代码片段和技术细节，完全满足目标受众（开发者）的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "内容深度适中，未解释基础概念，直接聚焦于 FastAPI 的特定实现和高级功能，精准匹配“用过类似工具”的读者水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/api-reference/exceptions",
+          "title": "Exceptions"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，语法正确，专业术语使用得当，无阅读障碍。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从具体异常到处理程序，逻辑层次分明，内容前后连贯。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容准确详尽，完整覆盖了 FastAPI 的主要异常类型，并提供了可直接使用的代码示例和参数说明。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的技术细节，术语统一，语言流畅自然，符合中文技术文档的表达习惯。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "全文的术语（如‘异常’、‘处理程序’）、代码格式和文档结构保持了高度一致。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档作为参考资料，内容组织清晰，便于快速查找特定异常的用法和参数，完全符合‘快速查找答案’的目标。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容以代码为中心，提供了清晰的参数说明和可复制的示例，完全满足集成 API 的开发者的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档没有解释 HTTP 异常等基础概念，而是直接聚焦于 FastAPI 的具体实现，精准匹配了熟悉同类工具的读者知识水平。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/contributing",
+          "title": "Contributing"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言流畅自然，语法正确，格式清晰，没有发现阅读障碍或错误。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从总体介绍到具体贡献领域（安全、翻译、致谢）的划分逻辑性强，内容前后衔接自然。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容准确完整地实现了内容规划目标，为潜在贡献者提供了清晰的指引、关键链接和联系方式，信息价值高。"
+          },
+          "translationQuality": {
+            "score": 2,
+            "reason": "翻译交付内容存在严重错误。评估数据中提供了两份独立的译文，其中第一份（安全策略）与提供的原文（贡献指南）完全不符。虽然第二份译文质量尚可，但交付了错误的内容导致此项严重扣分。"
+          },
+          "consistency": {
+            "score": 2,
+            "reason": "交付的译文内容不一致。它混合了“安全策略”和“贡献指南”两份独立文档，它们在内容上存在重叠和潜在矛盾（例如对安全策略的描述），严重破坏了文档的整体一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档内容与“完成特定任务”和“快速查找答案”的目标高度一致，清晰地指导了用户如何报告安全问题、参与翻译，并快速定位到完整的贡献指南。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容完全符合目标受众（开发者）的需求，提供了代码示例、指向详细技术文档的链接以及明确的技术流程说明，语言风格和信息密度都非常合适。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档的深度与目标读者的知识水平（有相关经验）完全匹配，没有解释诸如“拉取请求”等基础概念，而是直接聚焦于FastAPI项目特定的贡献流程和规则。"
+          }
+        }
+      },
+      {
+        "documentInfo": {
+          "path": "/contributing/security-policy",
+          "title": "Security Policy"
+        },
+        "evaluation": {
+          "readability": {
+            "score": 5,
+            "reason": "语言清晰流畅，结构分明，中英文版本均无语法或拼写错误，易于理解。"
+          },
+          "coherence": {
+            "score": 5,
+            "reason": "文档结构清晰，从总体声明到具体策略（支持版本、报告流程、公开讨论规则）的安排逻辑性强，内容前后一致。"
+          },
+          "contentQuality": {
+            "score": 5,
+            "reason": "内容完全覆盖了规划中的核心要点（支持版本和漏洞报告方式），并提供了具体、可操作的指引（如联系邮箱、报告要求），信息准确且实用。"
+          },
+          "translationQuality": {
+            "score": 5,
+            "reason": "译文准确传达了原文的所有信息，语言流畅自然，术语翻译统一且符合中文技术社区习惯，保持了原文的专业语气。"
+          },
+          "consistency": {
+            "score": 5,
+            "reason": "文档在术语使用（如 “FastAPI”、“安全漏洞”）、格式（标题、粗体）和专业语气上保持了高度一致性。"
+          },
+          "purposeAlignment": {
+            "score": 5,
+            "reason": "文档内容高度聚焦于特定任务（报告漏洞）和快速查找信息（安全策略），与用户选择的“完成特定任务”和“快速查找答案”的目标完全匹配。"
+          },
+          "audienceAlignment": {
+            "score": 5,
+            "reason": "内容直接面向开发者，使用了“编写测试”、“项目依赖”、“版本锁定”等技术术语，并提供了明确的报告渠道和代码复现要求，完全符合开发者受众的需求。"
+          },
+          "knowledgeLevelAlignment": {
+            "score": 5,
+            "reason": "文档假设读者具备安全漏洞、版本管理等基本软件开发知识，没有赘述基础概念，而是直接提供了 FastAPI 特定的策略和流程，与“用过类似工具”的读者知识水平完全匹配。"
+          }
+        }
+      }
+    ],
+    "aggregated": {
+      "readability": {
+        "score": 5,
+        "reason": "Average from 22 documents: 译文语言流畅自然，用词准确，没有语法或拼写错误，阅读体验良好。; 文本清晰流畅，语法和拼写准确无误，专业术语翻译精准，整体阅读体验非常出色，符合专业技术文档的标准。; 翻译文本清晰流畅，无语法或拼写错误，术语翻译准确，符合中文技术文档的阅读习惯。"
+      },
+      "coherence": {
+        "score": 5,
+        "reason": "Average from 22 documents: 文档结构清晰，从框架介绍、核心特性、快速示例到性能和后续步骤，内容层层递进，逻辑连贯性强。; 文档结构清晰，从入门到进阶的章节安排逻辑性强。每个文档内部的论述层次分明，代码、解释和总结衔接自然，且文档之间通过“后续步骤”链接，构成了连贯的学习路径。; 文档结构清晰，从安装、编码到运行和验证，步骤环环相扣，逻辑流程非常连贯。"
+      },
+      "contentQuality": {
+        "score": 5,
+        "reason": "Average from 22 documents: 内容完整准确地实现了规划目标，提供了清晰、可操作的代码示例和关键特性介绍，对用户非常有价值。; 内容完全实现了内容规划的目标，提供了从基础到高级的详尽教程。每个主题都包含了丰富、准确且可直接运行的代码示例，对用户极具实用价值。; 内容完全实现了规划目标，提供了准确、可直接运行的代码示例，并包含了代码解析和核心功能介绍等有价值的细节。"
+      },
+      "translationQuality": {
+        "score": 4.8,
+        "reason": "Average from 22 documents: 翻译准确地传达了原文信息，术语使用恰当且统一，行文流畅，符合中文技术文档的表达习惯。; 翻译质量非常高，不仅忠实于原文的技术细节，而且语言表达自然流畅，完全符合中文技术文档的阅读习惯。关键术语（如“路径操作”、“依赖注入”）翻译统一且专业。; 译文准确传达了原文所有信息，术语统一且符合中文技术社区习惯，行文流畅自然。"
+      },
+      "consistency": {
+        "score": 4.9,
+        "reason": "Average from 22 documents: 文档在术语使用（如 FastAPI, API, Uvicorn）、格式（标题、代码块）和写作风格上保持了高度一致性。; 所有文档在术语使用（如“路径操作”、“请求体”）、代码风格、格式（如标题、代码块）和整体行文风格上保持了高度一致性。; 文档在术语使用、代码格式、标题层级和写作风格上保持了高度一致性。"
+      },
+      "purposeAlignment": {
+        "score": 5,
+        "reason": "Average from 22 documents: 文档内容完美契合“快速开始”的目标，通过简洁的介绍和立即可运行的示例，帮助用户在短时间内了解并上手使用 FastAPI。; 文档内容与用户选择的多个目标（快速入门、完成特定任务、快速查找答案）高度契合。《快速入门》满足了快速上手需求，而《SQL 数据库》、《中间件》等专题则完美地指导用户完成特定任务。; 内容完全符合“快速入门”的目标，聚焦于最核心的安装和运行步骤，提供了立即可用的示例，帮助用户迅速上手。"
+      },
+      "audienceAlignment": {
+        "score": 5,
+        "reason": "Average from 22 documents: 文档完全面向开发者受众，提供了他们最关心的代码示例、命令行操作和性能数据，语言和内容都符合其技术背景和需求。; 文档完全为目标受众（开发者）量身定制，内容以代码为中心，提供了大量可直接复制使用的代码片段和清晰的技术解释，满足了开发者的核心需求。; 文档以代码为中心，提供了可直接复制粘贴的命令和代码片段，并包含技术性解释，完全满足开发者的需求。"
+      },
+      "knowledgeLevelAlignment": {
+        "score": 5,
+        "reason": "Average from 22 documents: 内容深度恰到好处，没有解释 Web 框架等基础概念，而是直接展示 FastAPI 的核心优势和独特功能（如类型提示、自动文档），非常适合已有相关经验的开发者。; 文档的深度和广度与目标读者的知识水平（用过类似工具）完美匹配。内容没有赘述Web开发的基础知识，而是聚焦于FastAPI的独特功能和实现方式，高效地帮助有经验的开发者掌握新工具。; 内容解释过于基础（例如解释 import 和函数定义），更适合零基础初学者，对于“用过类似工具”的读者来说，可以适当精简基础概念，聚焦 FastAPI 的特有优势。"
+      }
+    }
+  },
+  "summary": {
+    "structureScores": {
+      "purposeCoverage": 5,
+      "audienceCoverage": 5,
+      "coverageDepthAlignment": 5,
+      "average": 5
+    },
+    "documentScores": {
+      "readability": 5,
+      "coherence": 5,
+      "contentQuality": 5,
+      "translationQuality": 4.8,
+      "consistency": 4.9,
+      "purposeAlignment": 5,
+      "audienceAlignment": 5,
+      "knowledgeLevelAlignment": 5,
+      "average": 5
+    },
+    "overallScore": 5,
+    "issues": []
+  }
+}
